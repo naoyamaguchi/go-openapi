@@ -1,3 +1,9 @@
 module github.com/nasa9084/go-openapi
 
-require gopkg.in/yaml.v2 v2.0.0-20171116090243-287cf08546ab
+go 1.13
+
+require (
+	github.com/goccy/go-yaml v1.0.0
+	golang.org/x/sys v0.0.0-20191105231009-c1f44814a5cd // indirect
+	gopkg.in/yaml.v2 v2.2.5
+)
