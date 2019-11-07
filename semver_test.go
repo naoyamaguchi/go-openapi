@@ -123,7 +123,7 @@ func TestSplitSemVer(t *testing.T) {
 	}
 }
 
-func TestIsSemVer(t *testing.T) {
+func TestIsValidSemVer(t *testing.T) {
 	tests := []struct {
 		input string
 		want  bool
@@ -135,6 +135,10 @@ func TestIsSemVer(t *testing.T) {
 		{
 			input: "1",
 			want:  false,
+		},
+		{
+			input: "3.0.0",
+			want:  true,
 		},
 		{
 			input: "a.0.1",

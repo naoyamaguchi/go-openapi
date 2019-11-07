@@ -132,7 +132,7 @@ func main() {
 				case *ast.Ident: // built-in type
 					switch t.Name {
 					case "string":
-						outf("\nv.%s = string(%[1]sBytes)", fn)
+						outf("\nv.%s = strings.Trim(string(%[1]sBytes), `\"`)", fn)
 					case "bool":
 						outf("\nt, err := strconv.ParseBool(string(%sBytes))", fn)
 						outf("\nif err != nil {")

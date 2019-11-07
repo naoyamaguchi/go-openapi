@@ -22,7 +22,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"openapi" field is required`)
 	}
-	v.openapi = string(openapiBytes)
+	v.openapi = strings.Trim(string(openapiBytes), `"`)
 
 	if !isValidSemVer(v.openapi) {
 		return errors.New(`"openapi" field must be a valid semantic version but not`)
@@ -114,14 +114,14 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"title" field is required`)
 	}
-	v.title = string(titleBytes)
+	v.title = strings.Trim(string(titleBytes), `"`)
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 
 	if termsOfServiceBytes, ok := proxy["termsOfService"]; ok {
-		v.termsOfService = string(termsOfServiceBytes)
+		v.termsOfService = strings.Trim(string(termsOfServiceBytes), `"`)
 	}
 
 	if v.termsOfService != "" {
@@ -150,7 +150,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"version" field is required`)
 	}
-	v.version = string(versionBytes)
+	v.version = strings.Trim(string(versionBytes), `"`)
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
 		if !strings.HasPrefix(key, "x-") {
@@ -175,11 +175,11 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
-		v.name = string(nameBytes)
+		v.name = strings.Trim(string(nameBytes), `"`)
 	}
 
 	if urlBytes, ok := proxy["url"]; ok {
-		v.url = string(urlBytes)
+		v.url = strings.Trim(string(urlBytes), `"`)
 	}
 
 	if v.url != "" {
@@ -189,7 +189,7 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 	}
 
 	if emailBytes, ok := proxy["email"]; ok {
-		v.email = string(emailBytes)
+		v.email = strings.Trim(string(emailBytes), `"`)
 	}
 
 	if v.email != "" {
@@ -225,10 +225,10 @@ func (v *License) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"name" field is required`)
 	}
-	v.name = string(nameBytes)
+	v.name = strings.Trim(string(nameBytes), `"`)
 
 	if urlBytes, ok := proxy["url"]; ok {
-		v.url = string(urlBytes)
+		v.url = strings.Trim(string(urlBytes), `"`)
 	}
 
 	if v.url != "" {
@@ -263,14 +263,14 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"url" field is required`)
 	}
-	v.url = string(urlBytes)
+	v.url = strings.Trim(string(urlBytes), `"`)
 
 	if _, err := url.Parse(urlTemplateVarRegexp.ReplaceAllLiteralString(v.url, `placeholder`)); err != nil {
 		return err
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 
 	if variablesBytes, ok := proxy["variables"]; ok {
@@ -315,10 +315,10 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"default" field is required`)
 	}
-	v.default_ = string(default_Bytes)
+	v.default_ = strings.Trim(string(default_Bytes), `"`)
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -474,11 +474,11 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	}
 
 	if summaryBytes, ok := proxy["summary"]; ok {
-		v.summary = string(summaryBytes)
+		v.summary = strings.Trim(string(summaryBytes), `"`)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 
 	if getBytes, ok := proxy["get"]; ok {
@@ -592,11 +592,11 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	}
 
 	if summaryBytes, ok := proxy["summary"]; ok {
-		v.summary = string(summaryBytes)
+		v.summary = strings.Trim(string(summaryBytes), `"`)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
@@ -608,7 +608,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	}
 
 	if operationIDBytes, ok := proxy["operationID"]; ok {
-		v.operationID = string(operationIDBytes)
+		v.operationID = strings.Trim(string(operationIDBytes), `"`)
 	}
 
 	if parametersBytes, ok := proxy["parameters"]; ok {
@@ -692,14 +692,14 @@ func (v *ExternalDocumentation) UnmarshalYAML(b []byte) error {
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 
 	urlBytes, ok := proxy["url"]
 	if !ok {
 		return errors.New(`"url" field is required`)
 	}
-	v.url = string(urlBytes)
+	v.url = strings.Trim(string(urlBytes), `"`)
 
 	if _, err := url.ParseRequestURI(v.url); err != nil {
 		return err
@@ -731,20 +731,20 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"name" field is required`)
 	}
-	v.name = string(nameBytes)
+	v.name = strings.Trim(string(nameBytes), `"`)
 
 	inBytes, ok := proxy["in"]
 	if !ok {
 		return errors.New(`"in" field is required`)
 	}
-	v.in = string(inBytes)
+	v.in = strings.Trim(string(inBytes), `"`)
 
 	if isOneOf(v.in, []string{"query", "header", "path", "cookie"}) {
 		return errors.New(`"in" field must be one of ["query", "header", "path", "cookie"]`)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 
 	if requiredBytes, ok := proxy["required"]; ok {
@@ -772,7 +772,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	}
 
 	if styleBytes, ok := proxy["style"]; ok {
-		v.style = string(styleBytes)
+		v.style = strings.Trim(string(styleBytes), `"`)
 	}
 
 	if explodeBytes, ok := proxy["explode"]; ok {
@@ -838,7 +838,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
+		v.reference = strings.Trim(string(referenceBytes), `"`)
 	}
 	return nil
 }
@@ -850,7 +850,7 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 
 	contentBytes, ok := proxy["content"]
@@ -886,7 +886,7 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
+		v.reference = strings.Trim(string(referenceBytes), `"`)
 	}
 	return nil
 }
@@ -952,7 +952,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 	}
 
 	if contentTypeBytes, ok := proxy["contentType"]; ok {
-		v.contentType = string(contentTypeBytes)
+		v.contentType = strings.Trim(string(contentTypeBytes), `"`)
 	}
 
 	if headersBytes, ok := proxy["headers"]; ok {
@@ -964,11 +964,11 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 	}
 
 	if styleBytes, ok := proxy["style"]; ok {
-		v.style = string(styleBytes)
+		v.style = strings.Trim(string(styleBytes), `"`)
 	}
 
 	if explodeBytes, ok := proxy["explode"]; ok {
-		v.explode = string(explodeBytes)
+		v.explode = strings.Trim(string(explodeBytes), `"`)
 	}
 
 	if allowReservedBytes, ok := proxy["allowReserved"]; ok {
@@ -1042,7 +1042,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"description" field is required`)
 	}
-	v.description = string(descriptionBytes)
+	v.description = strings.Trim(string(descriptionBytes), `"`)
 
 	if headersBytes, ok := proxy["headers"]; ok {
 		var headers map[string]*Header
@@ -1083,7 +1083,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
+		v.reference = strings.Trim(string(referenceBytes), `"`)
 	}
 	return nil
 }
@@ -1123,7 +1123,7 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
+		v.reference = strings.Trim(string(referenceBytes), `"`)
 	}
 	return nil
 }
@@ -1135,11 +1135,11 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	}
 
 	if summaryBytes, ok := proxy["summary"]; ok {
-		v.summary = string(summaryBytes)
+		v.summary = strings.Trim(string(summaryBytes), `"`)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 
 	if valueBytes, ok := proxy["value"]; ok {
@@ -1151,7 +1151,7 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	}
 
 	if externalValeBytes, ok := proxy["externalVale"]; ok {
-		v.externalVale = string(externalValeBytes)
+		v.externalVale = strings.Trim(string(externalValeBytes), `"`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1169,7 +1169,7 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
+		v.reference = strings.Trim(string(referenceBytes), `"`)
 	}
 	return nil
 }
@@ -1181,11 +1181,11 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	}
 
 	if operationreferenceBytes, ok := proxy["operationreference"]; ok {
-		v.operationreference = string(operationreferenceBytes)
+		v.operationreference = strings.Trim(string(operationreferenceBytes), `"`)
 	}
 
 	if operationIDBytes, ok := proxy["operationId"]; ok {
-		v.operationID = string(operationIDBytes)
+		v.operationID = strings.Trim(string(operationIDBytes), `"`)
 	}
 
 	if parametersBytes, ok := proxy["parameters"]; ok {
@@ -1205,7 +1205,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 
 	if serverBytes, ok := proxy["server"]; ok {
@@ -1231,7 +1231,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
+		v.reference = strings.Trim(string(referenceBytes), `"`)
 	}
 	return nil
 }
@@ -1243,15 +1243,15 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
-		v.name = string(nameBytes)
+		v.name = strings.Trim(string(nameBytes), `"`)
 	}
 
 	if inBytes, ok := proxy["in"]; ok {
-		v.in = string(inBytes)
+		v.in = strings.Trim(string(inBytes), `"`)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 
 	if requiredBytes, ok := proxy["required"]; ok {
@@ -1279,7 +1279,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	}
 
 	if styleBytes, ok := proxy["style"]; ok {
-		v.style = string(styleBytes)
+		v.style = strings.Trim(string(styleBytes), `"`)
 	}
 
 	if explodeBytes, ok := proxy["explode"]; ok {
@@ -1345,7 +1345,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
+		v.reference = strings.Trim(string(referenceBytes), `"`)
 	}
 	return nil
 }
@@ -1360,10 +1360,10 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"name" field is required`)
 	}
-	v.name = string(nameBytes)
+	v.name = strings.Trim(string(nameBytes), `"`)
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
@@ -1397,7 +1397,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	}
 
 	if titleBytes, ok := proxy["title"]; ok {
-		v.title = string(titleBytes)
+		v.title = strings.Trim(string(titleBytes), `"`)
 	}
 
 	if multipleOfBytes, ok := proxy["multipleOf"]; ok {
@@ -1457,7 +1457,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	}
 
 	if patternBytes, ok := proxy["pattern"]; ok {
-		v.pattern = string(patternBytes)
+		v.pattern = strings.Trim(string(patternBytes), `"`)
 	}
 
 	if maxItemsBytes, ok := proxy["maxItems"]; ok {
@@ -1509,7 +1509,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	}
 
 	if type_Bytes, ok := proxy["type"]; ok {
-		v.type_ = string(type_Bytes)
+		v.type_ = strings.Trim(string(type_Bytes), `"`)
 	}
 
 	if allOfBytes, ok := proxy["allOf"]; ok {
@@ -1569,15 +1569,15 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 
 	if formatBytes, ok := proxy["format"]; ok {
-		v.format = string(formatBytes)
+		v.format = strings.Trim(string(formatBytes), `"`)
 	}
 
 	if default_Bytes, ok := proxy["default"]; ok {
-		v.default_ = string(default_Bytes)
+		v.default_ = strings.Trim(string(default_Bytes), `"`)
 	}
 
 	if nullableBytes, ok := proxy["nullable"]; ok {
@@ -1659,7 +1659,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
+		v.reference = strings.Trim(string(referenceBytes), `"`)
 	}
 	return nil
 }
@@ -1671,7 +1671,7 @@ func (v *Discriminator) UnmarshalYAML(b []byte) error {
 	}
 
 	if propertyNameBytes, ok := proxy["propertyName"]; ok {
-		v.propertyName = string(propertyNameBytes)
+		v.propertyName = strings.Trim(string(propertyNameBytes), `"`)
 	}
 
 	if mappingBytes, ok := proxy["mapping"]; ok {
@@ -1691,15 +1691,15 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
-		v.name = string(nameBytes)
+		v.name = strings.Trim(string(nameBytes), `"`)
 	}
 
 	if namespaceBytes, ok := proxy["namespace"]; ok {
-		v.namespace = string(namespaceBytes)
+		v.namespace = strings.Trim(string(namespaceBytes), `"`)
 	}
 
 	if prefixBytes, ok := proxy["prefix"]; ok {
-		v.prefix = string(prefixBytes)
+		v.prefix = strings.Trim(string(prefixBytes), `"`)
 	}
 
 	if attributeBytes, ok := proxy["attribute"]; ok {
@@ -1741,7 +1741,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if type_Bytes, ok := proxy["type"]; ok {
-		v.type_ = string(type_Bytes)
+		v.type_ = strings.Trim(string(type_Bytes), `"`)
 	}
 
 	if v.type_ != "" {
@@ -1751,15 +1751,15 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
+		v.description = strings.Trim(string(descriptionBytes), `"`)
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
-		v.name = string(nameBytes)
+		v.name = strings.Trim(string(nameBytes), `"`)
 	}
 
 	if inBytes, ok := proxy["in"]; ok {
-		v.in = string(inBytes)
+		v.in = strings.Trim(string(inBytes), `"`)
 	}
 
 	if v.in != "" {
@@ -1769,11 +1769,11 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if schemeBytes, ok := proxy["scheme"]; ok {
-		v.scheme = string(schemeBytes)
+		v.scheme = strings.Trim(string(schemeBytes), `"`)
 	}
 
 	if bearerFormatBytes, ok := proxy["bearerFormat"]; ok {
-		v.bearerFormat = string(bearerFormatBytes)
+		v.bearerFormat = strings.Trim(string(bearerFormatBytes), `"`)
 	}
 
 	if flowsBytes, ok := proxy["flows"]; ok {
@@ -1785,7 +1785,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if openIDConnectURLBytes, ok := proxy["openIdConnectUrl"]; ok {
-		v.openIDConnectURL = string(openIDConnectURLBytes)
+		v.openIDConnectURL = strings.Trim(string(openIDConnectURLBytes), `"`)
 	}
 
 	if v.openIDConnectURL != "" {
@@ -1809,7 +1809,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
+		v.reference = strings.Trim(string(referenceBytes), `"`)
 	}
 	return nil
 }
@@ -1875,7 +1875,7 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	}
 
 	if authorizationURLBytes, ok := proxy["authorizationUrl"]; ok {
-		v.authorizationURL = string(authorizationURLBytes)
+		v.authorizationURL = strings.Trim(string(authorizationURLBytes), `"`)
 	}
 
 	if v.authorizationURL != "" {
@@ -1885,7 +1885,7 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	}
 
 	if tokenURLBytes, ok := proxy["tokenUrl"]; ok {
-		v.tokenURL = string(tokenURLBytes)
+		v.tokenURL = strings.Trim(string(tokenURLBytes), `"`)
 	}
 
 	if v.tokenURL != "" {
@@ -1895,7 +1895,7 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	}
 
 	if refreshURLBytes, ok := proxy["refreshUrl"]; ok {
-		v.refreshURL = string(refreshURLBytes)
+		v.refreshURL = strings.Trim(string(refreshURLBytes), `"`)
 	}
 
 	if v.refreshURL != "" {
