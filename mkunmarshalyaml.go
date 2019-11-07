@@ -132,7 +132,14 @@ func main() {
 				case *ast.Ident: // built-in type
 					switch t.Name {
 					case "string":
-						outf("\nv.%s = strings.Trim(string(%[1]sBytes), `\"`)", fn)
+						outf("\nv.%s = string(%[1]sBytes)", fn)
+						outf("\nif submatch := singleQuotedRegexp.FindStringSubmatch(v.%s); submatch != nil {", fn)
+						outf("\nv.%s = submatch[1]", fn)
+						outf("\n} else {")
+						outf("\nif submatch := doubleQuotedRegexp.FindStringSubmatch(v.%s); submatch != nil {", fn)
+						outf("\nv.%s = submatch[1]", fn)
+						outf("\n}")
+						outf("\n}")
 					case "bool":
 						outf("\nt, err := strconv.ParseBool(string(%sBytes))", fn)
 						outf("\nif err != nil {")
@@ -189,7 +196,7 @@ func formatValidation(outf func(string, ...interface{}), fieldname, yamlname str
 		}
 		outf("\nif _, err := ")
 		if len(tag["format"]) > 1 && tag["format"][1] == "template" {
-			outf("url.Parse(urlTemplateVarRegexp.ReplaceAllLiteralString(v.%s, `placeholder`))", fieldname)
+			outf("url.Parse(urlTemplateVarRegexp.ReplaceAllLiteralString(v.%s, `1111`))", fieldname)
 		} else {
 			outf("url.ParseRequestURI(v.%s)", fieldname)
 		}

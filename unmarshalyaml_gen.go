@@ -22,7 +22,14 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"openapi" field is required`)
 	}
-	v.openapi = strings.Trim(string(openapiBytes), `"`)
+	v.openapi = string(openapiBytes)
+	if submatch := singleQuotedRegexp.FindStringSubmatch(v.openapi); submatch != nil {
+		v.openapi = submatch[1]
+	} else {
+		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.openapi); submatch != nil {
+			v.openapi = submatch[1]
+		}
+	}
 
 	if !isValidSemVer(v.openapi) {
 		return errors.New(`"openapi" field must be a valid semantic version but not`)
@@ -114,14 +121,35 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"title" field is required`)
 	}
-	v.title = strings.Trim(string(titleBytes), `"`)
+	v.title = string(titleBytes)
+	if submatch := singleQuotedRegexp.FindStringSubmatch(v.title); submatch != nil {
+		v.title = submatch[1]
+	} else {
+		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.title); submatch != nil {
+			v.title = submatch[1]
+		}
+	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 
 	if termsOfServiceBytes, ok := proxy["termsOfService"]; ok {
-		v.termsOfService = strings.Trim(string(termsOfServiceBytes), `"`)
+		v.termsOfService = string(termsOfServiceBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.termsOfService); submatch != nil {
+			v.termsOfService = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.termsOfService); submatch != nil {
+				v.termsOfService = submatch[1]
+			}
+		}
 	}
 
 	if v.termsOfService != "" {
@@ -150,7 +178,14 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"version" field is required`)
 	}
-	v.version = strings.Trim(string(versionBytes), `"`)
+	v.version = string(versionBytes)
+	if submatch := singleQuotedRegexp.FindStringSubmatch(v.version); submatch != nil {
+		v.version = submatch[1]
+	} else {
+		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.version); submatch != nil {
+			v.version = submatch[1]
+		}
+	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
 		if !strings.HasPrefix(key, "x-") {
@@ -175,11 +210,25 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
-		v.name = strings.Trim(string(nameBytes), `"`)
+		v.name = string(nameBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+			v.name = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+				v.name = submatch[1]
+			}
+		}
 	}
 
 	if urlBytes, ok := proxy["url"]; ok {
-		v.url = strings.Trim(string(urlBytes), `"`)
+		v.url = string(urlBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
+			v.url = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
+				v.url = submatch[1]
+			}
+		}
 	}
 
 	if v.url != "" {
@@ -189,7 +238,14 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 	}
 
 	if emailBytes, ok := proxy["email"]; ok {
-		v.email = strings.Trim(string(emailBytes), `"`)
+		v.email = string(emailBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.email); submatch != nil {
+			v.email = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.email); submatch != nil {
+				v.email = submatch[1]
+			}
+		}
 	}
 
 	if v.email != "" {
@@ -225,10 +281,24 @@ func (v *License) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"name" field is required`)
 	}
-	v.name = strings.Trim(string(nameBytes), `"`)
+	v.name = string(nameBytes)
+	if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+		v.name = submatch[1]
+	} else {
+		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+			v.name = submatch[1]
+		}
+	}
 
 	if urlBytes, ok := proxy["url"]; ok {
-		v.url = strings.Trim(string(urlBytes), `"`)
+		v.url = string(urlBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
+			v.url = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
+				v.url = submatch[1]
+			}
+		}
 	}
 
 	if v.url != "" {
@@ -263,14 +333,28 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"url" field is required`)
 	}
-	v.url = strings.Trim(string(urlBytes), `"`)
+	v.url = string(urlBytes)
+	if submatch := singleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
+		v.url = submatch[1]
+	} else {
+		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
+			v.url = submatch[1]
+		}
+	}
 
-	if _, err := url.Parse(urlTemplateVarRegexp.ReplaceAllLiteralString(v.url, `placeholder`)); err != nil {
+	if _, err := url.Parse(urlTemplateVarRegexp.ReplaceAllLiteralString(v.url, `1111`)); err != nil {
 		return err
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 
 	if variablesBytes, ok := proxy["variables"]; ok {
@@ -315,10 +399,24 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"default" field is required`)
 	}
-	v.default_ = strings.Trim(string(default_Bytes), `"`)
+	v.default_ = string(default_Bytes)
+	if submatch := singleQuotedRegexp.FindStringSubmatch(v.default_); submatch != nil {
+		v.default_ = submatch[1]
+	} else {
+		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.default_); submatch != nil {
+			v.default_ = submatch[1]
+		}
+	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -474,11 +572,25 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	}
 
 	if summaryBytes, ok := proxy["summary"]; ok {
-		v.summary = strings.Trim(string(summaryBytes), `"`)
+		v.summary = string(summaryBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.summary); submatch != nil {
+			v.summary = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.summary); submatch != nil {
+				v.summary = submatch[1]
+			}
+		}
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 
 	if getBytes, ok := proxy["get"]; ok {
@@ -592,11 +704,25 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	}
 
 	if summaryBytes, ok := proxy["summary"]; ok {
-		v.summary = strings.Trim(string(summaryBytes), `"`)
+		v.summary = string(summaryBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.summary); submatch != nil {
+			v.summary = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.summary); submatch != nil {
+				v.summary = submatch[1]
+			}
+		}
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
@@ -608,7 +734,14 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	}
 
 	if operationIDBytes, ok := proxy["operationID"]; ok {
-		v.operationID = strings.Trim(string(operationIDBytes), `"`)
+		v.operationID = string(operationIDBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.operationID); submatch != nil {
+			v.operationID = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.operationID); submatch != nil {
+				v.operationID = submatch[1]
+			}
+		}
 	}
 
 	if parametersBytes, ok := proxy["parameters"]; ok {
@@ -692,14 +825,28 @@ func (v *ExternalDocumentation) UnmarshalYAML(b []byte) error {
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 
 	urlBytes, ok := proxy["url"]
 	if !ok {
 		return errors.New(`"url" field is required`)
 	}
-	v.url = strings.Trim(string(urlBytes), `"`)
+	v.url = string(urlBytes)
+	if submatch := singleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
+		v.url = submatch[1]
+	} else {
+		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
+			v.url = submatch[1]
+		}
+	}
 
 	if _, err := url.ParseRequestURI(v.url); err != nil {
 		return err
@@ -731,20 +878,41 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"name" field is required`)
 	}
-	v.name = strings.Trim(string(nameBytes), `"`)
+	v.name = string(nameBytes)
+	if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+		v.name = submatch[1]
+	} else {
+		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+			v.name = submatch[1]
+		}
+	}
 
 	inBytes, ok := proxy["in"]
 	if !ok {
 		return errors.New(`"in" field is required`)
 	}
-	v.in = strings.Trim(string(inBytes), `"`)
+	v.in = string(inBytes)
+	if submatch := singleQuotedRegexp.FindStringSubmatch(v.in); submatch != nil {
+		v.in = submatch[1]
+	} else {
+		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.in); submatch != nil {
+			v.in = submatch[1]
+		}
+	}
 
 	if isOneOf(v.in, []string{"query", "header", "path", "cookie"}) {
 		return errors.New(`"in" field must be one of ["query", "header", "path", "cookie"]`)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 
 	if requiredBytes, ok := proxy["required"]; ok {
@@ -772,7 +940,14 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	}
 
 	if styleBytes, ok := proxy["style"]; ok {
-		v.style = strings.Trim(string(styleBytes), `"`)
+		v.style = string(styleBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.style); submatch != nil {
+			v.style = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.style); submatch != nil {
+				v.style = submatch[1]
+			}
+		}
 	}
 
 	if explodeBytes, ok := proxy["explode"]; ok {
@@ -838,7 +1013,14 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = strings.Trim(string(referenceBytes), `"`)
+		v.reference = string(referenceBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+			v.reference = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+				v.reference = submatch[1]
+			}
+		}
 	}
 	return nil
 }
@@ -850,7 +1032,14 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 
 	contentBytes, ok := proxy["content"]
@@ -886,7 +1075,14 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = strings.Trim(string(referenceBytes), `"`)
+		v.reference = string(referenceBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+			v.reference = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+				v.reference = submatch[1]
+			}
+		}
 	}
 	return nil
 }
@@ -952,7 +1148,14 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 	}
 
 	if contentTypeBytes, ok := proxy["contentType"]; ok {
-		v.contentType = strings.Trim(string(contentTypeBytes), `"`)
+		v.contentType = string(contentTypeBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.contentType); submatch != nil {
+			v.contentType = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.contentType); submatch != nil {
+				v.contentType = submatch[1]
+			}
+		}
 	}
 
 	if headersBytes, ok := proxy["headers"]; ok {
@@ -964,11 +1167,25 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 	}
 
 	if styleBytes, ok := proxy["style"]; ok {
-		v.style = strings.Trim(string(styleBytes), `"`)
+		v.style = string(styleBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.style); submatch != nil {
+			v.style = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.style); submatch != nil {
+				v.style = submatch[1]
+			}
+		}
 	}
 
 	if explodeBytes, ok := proxy["explode"]; ok {
-		v.explode = strings.Trim(string(explodeBytes), `"`)
+		v.explode = string(explodeBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.explode); submatch != nil {
+			v.explode = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.explode); submatch != nil {
+				v.explode = submatch[1]
+			}
+		}
 	}
 
 	if allowReservedBytes, ok := proxy["allowReserved"]; ok {
@@ -1042,7 +1259,14 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"description" field is required`)
 	}
-	v.description = strings.Trim(string(descriptionBytes), `"`)
+	v.description = string(descriptionBytes)
+	if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+		v.description = submatch[1]
+	} else {
+		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		}
+	}
 
 	if headersBytes, ok := proxy["headers"]; ok {
 		var headers map[string]*Header
@@ -1083,7 +1307,14 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = strings.Trim(string(referenceBytes), `"`)
+		v.reference = string(referenceBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+			v.reference = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+				v.reference = submatch[1]
+			}
+		}
 	}
 	return nil
 }
@@ -1123,7 +1354,14 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = strings.Trim(string(referenceBytes), `"`)
+		v.reference = string(referenceBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+			v.reference = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+				v.reference = submatch[1]
+			}
+		}
 	}
 	return nil
 }
@@ -1135,11 +1373,25 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	}
 
 	if summaryBytes, ok := proxy["summary"]; ok {
-		v.summary = strings.Trim(string(summaryBytes), `"`)
+		v.summary = string(summaryBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.summary); submatch != nil {
+			v.summary = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.summary); submatch != nil {
+				v.summary = submatch[1]
+			}
+		}
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 
 	if valueBytes, ok := proxy["value"]; ok {
@@ -1151,7 +1403,14 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	}
 
 	if externalValeBytes, ok := proxy["externalVale"]; ok {
-		v.externalVale = strings.Trim(string(externalValeBytes), `"`)
+		v.externalVale = string(externalValeBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.externalVale); submatch != nil {
+			v.externalVale = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.externalVale); submatch != nil {
+				v.externalVale = submatch[1]
+			}
+		}
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1169,7 +1428,14 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = strings.Trim(string(referenceBytes), `"`)
+		v.reference = string(referenceBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+			v.reference = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+				v.reference = submatch[1]
+			}
+		}
 	}
 	return nil
 }
@@ -1181,11 +1447,25 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	}
 
 	if operationreferenceBytes, ok := proxy["operationreference"]; ok {
-		v.operationreference = strings.Trim(string(operationreferenceBytes), `"`)
+		v.operationreference = string(operationreferenceBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.operationreference); submatch != nil {
+			v.operationreference = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.operationreference); submatch != nil {
+				v.operationreference = submatch[1]
+			}
+		}
 	}
 
 	if operationIDBytes, ok := proxy["operationId"]; ok {
-		v.operationID = strings.Trim(string(operationIDBytes), `"`)
+		v.operationID = string(operationIDBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.operationID); submatch != nil {
+			v.operationID = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.operationID); submatch != nil {
+				v.operationID = submatch[1]
+			}
+		}
 	}
 
 	if parametersBytes, ok := proxy["parameters"]; ok {
@@ -1205,7 +1485,14 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 
 	if serverBytes, ok := proxy["server"]; ok {
@@ -1231,7 +1518,14 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = strings.Trim(string(referenceBytes), `"`)
+		v.reference = string(referenceBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+			v.reference = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+				v.reference = submatch[1]
+			}
+		}
 	}
 	return nil
 }
@@ -1243,15 +1537,36 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
-		v.name = strings.Trim(string(nameBytes), `"`)
+		v.name = string(nameBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+			v.name = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+				v.name = submatch[1]
+			}
+		}
 	}
 
 	if inBytes, ok := proxy["in"]; ok {
-		v.in = strings.Trim(string(inBytes), `"`)
+		v.in = string(inBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.in); submatch != nil {
+			v.in = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.in); submatch != nil {
+				v.in = submatch[1]
+			}
+		}
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 
 	if requiredBytes, ok := proxy["required"]; ok {
@@ -1279,7 +1594,14 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	}
 
 	if styleBytes, ok := proxy["style"]; ok {
-		v.style = strings.Trim(string(styleBytes), `"`)
+		v.style = string(styleBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.style); submatch != nil {
+			v.style = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.style); submatch != nil {
+				v.style = submatch[1]
+			}
+		}
 	}
 
 	if explodeBytes, ok := proxy["explode"]; ok {
@@ -1345,7 +1667,14 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = strings.Trim(string(referenceBytes), `"`)
+		v.reference = string(referenceBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+			v.reference = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+				v.reference = submatch[1]
+			}
+		}
 	}
 	return nil
 }
@@ -1360,10 +1689,24 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"name" field is required`)
 	}
-	v.name = strings.Trim(string(nameBytes), `"`)
+	v.name = string(nameBytes)
+	if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+		v.name = submatch[1]
+	} else {
+		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+			v.name = submatch[1]
+		}
+	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
@@ -1397,7 +1740,14 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	}
 
 	if titleBytes, ok := proxy["title"]; ok {
-		v.title = strings.Trim(string(titleBytes), `"`)
+		v.title = string(titleBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.title); submatch != nil {
+			v.title = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.title); submatch != nil {
+				v.title = submatch[1]
+			}
+		}
 	}
 
 	if multipleOfBytes, ok := proxy["multipleOf"]; ok {
@@ -1457,7 +1807,14 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	}
 
 	if patternBytes, ok := proxy["pattern"]; ok {
-		v.pattern = strings.Trim(string(patternBytes), `"`)
+		v.pattern = string(patternBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.pattern); submatch != nil {
+			v.pattern = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.pattern); submatch != nil {
+				v.pattern = submatch[1]
+			}
+		}
 	}
 
 	if maxItemsBytes, ok := proxy["maxItems"]; ok {
@@ -1509,7 +1866,14 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	}
 
 	if type_Bytes, ok := proxy["type"]; ok {
-		v.type_ = strings.Trim(string(type_Bytes), `"`)
+		v.type_ = string(type_Bytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.type_); submatch != nil {
+			v.type_ = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.type_); submatch != nil {
+				v.type_ = submatch[1]
+			}
+		}
 	}
 
 	if allOfBytes, ok := proxy["allOf"]; ok {
@@ -1569,15 +1933,36 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 
 	if formatBytes, ok := proxy["format"]; ok {
-		v.format = strings.Trim(string(formatBytes), `"`)
+		v.format = string(formatBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.format); submatch != nil {
+			v.format = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.format); submatch != nil {
+				v.format = submatch[1]
+			}
+		}
 	}
 
 	if default_Bytes, ok := proxy["default"]; ok {
-		v.default_ = strings.Trim(string(default_Bytes), `"`)
+		v.default_ = string(default_Bytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.default_); submatch != nil {
+			v.default_ = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.default_); submatch != nil {
+				v.default_ = submatch[1]
+			}
+		}
 	}
 
 	if nullableBytes, ok := proxy["nullable"]; ok {
@@ -1659,7 +2044,14 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = strings.Trim(string(referenceBytes), `"`)
+		v.reference = string(referenceBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+			v.reference = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+				v.reference = submatch[1]
+			}
+		}
 	}
 	return nil
 }
@@ -1671,7 +2063,14 @@ func (v *Discriminator) UnmarshalYAML(b []byte) error {
 	}
 
 	if propertyNameBytes, ok := proxy["propertyName"]; ok {
-		v.propertyName = strings.Trim(string(propertyNameBytes), `"`)
+		v.propertyName = string(propertyNameBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.propertyName); submatch != nil {
+			v.propertyName = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.propertyName); submatch != nil {
+				v.propertyName = submatch[1]
+			}
+		}
 	}
 
 	if mappingBytes, ok := proxy["mapping"]; ok {
@@ -1691,15 +2090,36 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
-		v.name = strings.Trim(string(nameBytes), `"`)
+		v.name = string(nameBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+			v.name = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+				v.name = submatch[1]
+			}
+		}
 	}
 
 	if namespaceBytes, ok := proxy["namespace"]; ok {
-		v.namespace = strings.Trim(string(namespaceBytes), `"`)
+		v.namespace = string(namespaceBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.namespace); submatch != nil {
+			v.namespace = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.namespace); submatch != nil {
+				v.namespace = submatch[1]
+			}
+		}
 	}
 
 	if prefixBytes, ok := proxy["prefix"]; ok {
-		v.prefix = strings.Trim(string(prefixBytes), `"`)
+		v.prefix = string(prefixBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.prefix); submatch != nil {
+			v.prefix = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.prefix); submatch != nil {
+				v.prefix = submatch[1]
+			}
+		}
 	}
 
 	if attributeBytes, ok := proxy["attribute"]; ok {
@@ -1741,7 +2161,14 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if type_Bytes, ok := proxy["type"]; ok {
-		v.type_ = strings.Trim(string(type_Bytes), `"`)
+		v.type_ = string(type_Bytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.type_); submatch != nil {
+			v.type_ = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.type_); submatch != nil {
+				v.type_ = submatch[1]
+			}
+		}
 	}
 
 	if v.type_ != "" {
@@ -1751,15 +2178,36 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = strings.Trim(string(descriptionBytes), `"`)
+		v.description = string(descriptionBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+			v.description = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
+				v.description = submatch[1]
+			}
+		}
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
-		v.name = strings.Trim(string(nameBytes), `"`)
+		v.name = string(nameBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+			v.name = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
+				v.name = submatch[1]
+			}
+		}
 	}
 
 	if inBytes, ok := proxy["in"]; ok {
-		v.in = strings.Trim(string(inBytes), `"`)
+		v.in = string(inBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.in); submatch != nil {
+			v.in = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.in); submatch != nil {
+				v.in = submatch[1]
+			}
+		}
 	}
 
 	if v.in != "" {
@@ -1769,11 +2217,25 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if schemeBytes, ok := proxy["scheme"]; ok {
-		v.scheme = strings.Trim(string(schemeBytes), `"`)
+		v.scheme = string(schemeBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.scheme); submatch != nil {
+			v.scheme = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.scheme); submatch != nil {
+				v.scheme = submatch[1]
+			}
+		}
 	}
 
 	if bearerFormatBytes, ok := proxy["bearerFormat"]; ok {
-		v.bearerFormat = strings.Trim(string(bearerFormatBytes), `"`)
+		v.bearerFormat = string(bearerFormatBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.bearerFormat); submatch != nil {
+			v.bearerFormat = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.bearerFormat); submatch != nil {
+				v.bearerFormat = submatch[1]
+			}
+		}
 	}
 
 	if flowsBytes, ok := proxy["flows"]; ok {
@@ -1785,7 +2247,14 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if openIDConnectURLBytes, ok := proxy["openIdConnectUrl"]; ok {
-		v.openIDConnectURL = strings.Trim(string(openIDConnectURLBytes), `"`)
+		v.openIDConnectURL = string(openIDConnectURLBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.openIDConnectURL); submatch != nil {
+			v.openIDConnectURL = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.openIDConnectURL); submatch != nil {
+				v.openIDConnectURL = submatch[1]
+			}
+		}
 	}
 
 	if v.openIDConnectURL != "" {
@@ -1809,7 +2278,14 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = strings.Trim(string(referenceBytes), `"`)
+		v.reference = string(referenceBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+			v.reference = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
+				v.reference = submatch[1]
+			}
+		}
 	}
 	return nil
 }
@@ -1875,7 +2351,14 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	}
 
 	if authorizationURLBytes, ok := proxy["authorizationUrl"]; ok {
-		v.authorizationURL = strings.Trim(string(authorizationURLBytes), `"`)
+		v.authorizationURL = string(authorizationURLBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.authorizationURL); submatch != nil {
+			v.authorizationURL = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.authorizationURL); submatch != nil {
+				v.authorizationURL = submatch[1]
+			}
+		}
 	}
 
 	if v.authorizationURL != "" {
@@ -1885,7 +2368,14 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	}
 
 	if tokenURLBytes, ok := proxy["tokenUrl"]; ok {
-		v.tokenURL = strings.Trim(string(tokenURLBytes), `"`)
+		v.tokenURL = string(tokenURLBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.tokenURL); submatch != nil {
+			v.tokenURL = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.tokenURL); submatch != nil {
+				v.tokenURL = submatch[1]
+			}
+		}
 	}
 
 	if v.tokenURL != "" {
@@ -1895,7 +2385,14 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	}
 
 	if refreshURLBytes, ok := proxy["refreshUrl"]; ok {
-		v.refreshURL = strings.Trim(string(refreshURLBytes), `"`)
+		v.refreshURL = string(refreshURLBytes)
+		if submatch := singleQuotedRegexp.FindStringSubmatch(v.refreshURL); submatch != nil {
+			v.refreshURL = submatch[1]
+		} else {
+			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.refreshURL); submatch != nil {
+				v.refreshURL = submatch[1]
+			}
+		}
 	}
 
 	if v.refreshURL != "" {
