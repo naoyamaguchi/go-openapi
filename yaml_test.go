@@ -48,6 +48,8 @@ paths:
 	}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("\n  got:  %#v\n  want: %#v", got, want)
+		t.Log(got.paths.paths["/"].get.responses.responses, want.paths.paths["/"].get.responses.responses)
+		t.Log(reflect.DeepEqual(got.paths.paths["/"].get.responses.responses, want.paths.paths["/"].get.responses.responses))
 		return
 	}
 }

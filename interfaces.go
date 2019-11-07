@@ -6,201 +6,234 @@ package openapi
 //+object
 // OpenAPI is the root document object of the OpenAPI document.
 type OpenAPI struct {
-	openapi      string `required:"yes"`
-	info         *Info  `required:"yes"`
-	servers      []*Server
-	paths        *Paths `required:"yes"`
-	components   *Components
-	security     []*SecurityRequirement
-	tags         []*Tag
-	externalDocs *ExternalDocumentation
+	openapi      string                 `required:"yes" format:"semver"`
+	info         *Info                  `required:"yes"`
+	servers      []*Server              `yaml:",omitempty"`
+	paths        *Paths                 `required:"yes"`
+	components   *Components            `yaml:",omitempty"`
+	security     []*SecurityRequirement `yaml:",omitepmty"`
+	tags         []*Tag                 `yaml:",omitempty"`
+	externalDocs *ExternalDocumentation `yaml:",omitempty"`
 
-	extension Extension
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // Info provides metadata about the API.
 type Info struct {
-	title          string `required:"yes"`
-	description    string
-	termsOfService string
-	contact        *Contact
-	license        *License
-	version        string `required:"yes"`
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	title          string   `required:"yes"`
+	description    string   `yaml:",omitempty"`
+	termsOfService string   `yaml:",omitempty" format:"url"`
+	contact        *Contact `yaml:",omitempty"`
+	license        *License `yaml:",omitempty"`
+	version        string   `required:"yes"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // Contact information for the exposed API.
 type Contact struct {
-	name  string
-	url   string
-	email string
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	name  string `yaml:",omitempty"`
+	url   string `yaml:",omitempty" format:"url"`
+	email string `yaml:",omitempty" format:"email"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // License information for the exposed API.
 type License struct {
-	name string `required:"yes"`
-	url  string
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	name string `required:"yes"`
+	url  string `yaml:",omitempty" format:"url"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // Server is an object representing a Server.
 type Server struct {
-	url         string `required:"yes"`
-	description string
-	variables   map[string]*ServerVariable
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	url         string                     `required:"yes" format:"url,template"`
+	description string                     `yaml:",omitempty"`
+	variables   map[string]*ServerVariable `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // ServerVariable is an object representing a Server Variable for serverURL template substitution.
 type ServerVariable struct {
-	enum []string
-	//nolint[golint]
-	default_    string `required:"yes" yaml:"default"`
-	description string
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	enum        []string `yaml:",omitempty"`
+	default_    string   `required:"yes" yaml:"default"` //nolint[golint]
+	description string   `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // Components holds a set of reusable objects for different aspects of the OAS.
 type Components struct {
-	schemas         map[string]*Schema
-	responses       map[string]*Response
-	parameters      map[string]*Parameter
-	examples        map[string]*Example
-	requestBodies   map[string]*RequestBody
-	headers         map[string]*Header
-	securitySchemes map[string]*SecurityScheme
-	links           map[string]*Link
-	callbacks       map[string]*Callback
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	schemas         map[string]*Schema         `yaml:",omitempty"`
+	responses       map[string]*Response       `yaml:",omitempty"`
+	parameters      map[string]*Parameter      `yaml:",omitempty"`
+	examples        map[string]*Example        `yaml:",omitempty"`
+	requestBodies   map[string]*RequestBody    `yaml:",omitempty"`
+	headers         map[string]*Header         `yaml:",omitempty"`
+	securitySchemes map[string]*SecurityScheme `yaml:",omitempty"`
+	links           map[string]*Link           `yaml:",omitempty"`
+	callbacks       map[string]*Callback       `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // Paths holds the relative paths to the individual endpoints and their operations.
 type Paths struct {
-	paths map[string]*PathItem `yaml:",inline"`
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	paths map[string]*PathItem `yaml:",inline" format:"prefix,/"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // PathItem describes the operations available on a single path.
 type PathItem struct {
-	summary     string
-	description string
-	get         *Operation
-	put         *Operation
-	post        *Operation
-	delete      *Operation
-	options     *Operation
-	head        *Operation
-	patch       *Operation
-	trace       *Operation
-	servers     []*Server
-	parameters  []*Parameter
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	summary     string       `yaml:",omitempty"`
+	description string       `yaml:",omitempty"`
+	get         *Operation   `yaml:",omitempty"`
+	put         *Operation   `yaml:",omitempty"`
+	post        *Operation   `yaml:",omitempty"`
+	delete      *Operation   `yaml:",omitempty"`
+	options     *Operation   `yaml:",omitempty"`
+	head        *Operation   `yaml:",omitempty"`
+	patch       *Operation   `yaml:",omitempty"`
+	trace       *Operation   `yaml:",omitempty"`
+	servers     []*Server    `yaml:",omitempty"`
+	parameters  []*Parameter `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // Operation describes a single API operation on a path.
 type Operation struct {
-	tags         []string
-	summary      string
-	description  string
-	externalDocs *ExternalDocumentation
-	operationID  string
-	parameters   *Parameter
-	requestBody  *RequestBody
-	responses    *Responses `required:"yes"`
-	callbacks    map[string]*Callback
-	deprecated   bool
-	security     []*SecurityRequirement
-	servers      []*Server
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	tags         []string               `yaml:",omitempty"`
+	summary      string                 `yaml:",omitempty"`
+	description  string                 `yaml:",omitempty"`
+	externalDocs *ExternalDocumentation `yaml:",omitempty"`
+	operationID  string                 `yaml:",omitempty"`
+	parameters   *Parameter             `yaml:",omitempty"`
+	requestBody  *RequestBody           `yaml:",omitempty"`
+	responses    *Responses             `required:"yes"`
+	callbacks    map[string]*Callback   `yaml:",omitempty"`
+	deprecated   bool                   `yaml:",omitempty"`
+	security     []*SecurityRequirement `yaml:",omitempty"`
+	servers      []*Server              `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // ExternalDocumentation allows referencing an external resource for extended documentation.
 type ExternalDocumentation struct {
-	description string
-	url         string `required:"yes"`
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	description string `yaml:",omitempty"`
+	url         string `required:"yes" format:"url"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // Parameter describes a single operation parameter.
 type Parameter struct {
-	name            string `required:"yes"`
-	in              string `required:"yes"`
-	description     string
-	required        bool
-	deprecated      bool
-	allowEmptyValue bool
-	style           string
-	explode         bool
-	allowReserved   bool
-	schema          *Schema
-	example         interface{}
-	examples        map[string]*Example
-	content         map[string]*MediaType
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	name            string                `required:"yes"`
+	in              string                `required:"yes" oneof:"query,header,path,cookie"`
+	description     string                `yaml:",omitempty"`
+	required        bool                  `yaml:",omitempty"`
+	deprecated      bool                  `yaml:",omitempty"`
+	allowEmptyValue bool                  `yaml:",omitempty"`
+	style           string                `yaml:",omitempty"`
+	explode         bool                  `yaml:",omitempty"`
+	allowReserved   bool                  `yaml:",omitempty"`
+	schema          *Schema               `yaml:",omitempty"`
+	example         interface{}           `yaml:",omitempty"`
+	examples        map[string]*Example   `yaml:",omitempty"`
+	content         map[string]*MediaType `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
+
+	reference string `yaml:"$ref,omitempty"`
 }
 
 //+object
 // RequestBody describes a single request body.
 type RequestBody struct {
-	description string
-	content     map[string]*MediaType `required:"yes"`
-	required    bool
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	description string                `yaml:",omitempty"`
+	content     map[string]*MediaType `required:"yes"`
+	required    bool                  `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
+
+	reference string `yaml:"$ref,omitempty"`
 }
 
 //+object
 // MediaType provides schema and examples for the media type identified by its key.
 type MediaType struct {
-	schema   *Schema
-	example  interface{}
-	examples map[string]*Example
-	encoding map[string]*Encoding
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	schema   *Schema              `yaml:",omitempty"`
+	example  interface{}          `yaml:",omitempty"`
+	examples map[string]*Example  `yaml:",omitempty"`
+	encoding map[string]*Encoding `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // Encoding is a single encoding definition applied to a single schema property.
 type Encoding struct {
-	contentType   string
-	headers       map[string]*Header
-	style         string
-	explode       string
-	allowReserved bool
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	contentType   string             `yaml:",omitempty"`
+	headers       map[string]*Header `yaml:",omitempty"`
+	style         string             `yaml:",omitempty"`
+	explode       string             `yaml:",omitempty"`
+	allowReserved bool               `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // Responses is a container for the expected responses of an operation.
 type Responses struct {
-	responses map[string]*Response
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	responses map[string]*Response `yaml:",omitempty,inline" format:"regexp,^[1-5]([0-9][0-9]|XX)|default$"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
@@ -208,177 +241,217 @@ type Responses struct {
 //+object
 // static links to operations based on the response.
 type Response struct {
-	description string `required:"yes"`
-	headers     map[string]*Header
-	content     map[string]*MediaType
-	links       map[string]*Link
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	description string                `required:"yes"`
+	headers     map[string]*Header    `yaml:",omitempty"`
+	content     map[string]*MediaType `yaml:",omitempty"`
+	links       map[string]*Link      `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
+
+	reference string `yaml:"$ref,omitempty"`
 }
 
 //+object
 // Callback is a map of possible out-of band callbacks relatedd to the parent operation.
 type Callback struct {
-	callback map[string]*PathItem
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	callback map[string]*PathItem `yaml:",omitempty" format:"runtime"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
+
+	reference string `yaml:"$ref,omitempty"`
 }
 
 //+object
 // Example object represents an example.
 type Example struct {
-	summary      string
-	description  string
-	value        interface{}
-	externalVale string
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	summary      string      `yaml:",omitempty"`
+	description  string      `yaml:",omitempty"`
+	value        interface{} `yaml:",omitempty"`
+	externalVale string      `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
+
+	reference string `yaml:"$ref,omitempty"`
 }
 
 //+object
 // Link represents a possible design-time link for a response.
 type Link struct {
-	operationRef string
-	operationId  string
-	parameters   map[string]interface{}
-	requestBody  interface{}
-	description  string
-	server       *Server
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	operationreference string                 `yaml:",omitempty"`
+	operationID        string                 `yaml:"operationId,omitempty"`
+	parameters         map[string]interface{} `yaml:",omitempty"`
+	requestBody        interface{}            `yaml:",omitempty"`
+	description        string                 `yaml:",omitempty"`
+	server             *Server                `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
+
+	reference string `yaml:"$ref,omitempty"`
 }
 
 //+object
 // Header object
 type Header struct {
-	name            string
-	in              string
-	description     string
-	required        bool
-	deprecated      bool
-	allowEmptyValue bool
-	style           string
-	explode         bool
-	allowReserved   bool
-	schema          *Schema
-	example         interface{}
-	examples        map[string]*Example
-	content         map[string]*MediaType
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	name            string                `yaml:",omitempty"`
+	in              string                `yaml:",omitempty"`
+	description     string                `yaml:",omitempty"`
+	required        bool                  `yaml:",omitempty"`
+	deprecated      bool                  `yaml:",omitempty"`
+	allowEmptyValue bool                  `yaml:",omitempty"`
+	style           string                `yaml:",omitempty"`
+	explode         bool                  `yaml:",omitempty"`
+	allowReserved   bool                  `yaml:",omitempty"`
+	schema          *Schema               `yaml:",omitempty"`
+	example         interface{}           `yaml:",omitempty"`
+	examples        map[string]*Example   `yaml:",omitempty"`
+	content         map[string]*MediaType `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
+
+	reference string `yaml:"$ref,omitempty"`
 }
 
 //+object
 // Tag adds metadata to a single tag that is used by the Operation Object.
 type Tag struct {
-	name         string `required:"yes"`
-	description  string
-	externalDocs *ExternalDocumentation
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	name         string                 `required:"yes"`
+	description  string                 `yaml:",omitempty"`
+	externalDocs *ExternalDocumentation `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // Schema allows the definition of input and output data types.
 type Schema struct {
-	title            string
-	multipleOf       int
-	maximum          int
-	exclusiveMaximum bool
-	minimum          int
-	exclusiveMinimum bool
-	maxLength        int
-	minLength        int
-	pattern          string
-	maxItems         int
-	minItems         int
-	maxProperties    int
-	minProperties    int
-	required         []string
-	enum             []string
+	root *OpenAPI `yaml:"-"`
 
-	type_                string `yaml:"type"`
-	allOf                []*Schema
-	oneOf                []*Schema
-	anyOf                []*Schema
-	not                  *Schema
-	items                *Schema
-	properties           map[string]*Schema
-	additionalProperties *Schema
-	description          string
-	format               string
-	default_             string `yaml:"default"`
+	title            string   `yaml:",omitempty"`
+	multipleOf       int      `yaml:",omitempty"`
+	maximum          int      `yaml:",omitempty"`
+	exclusiveMaximum bool     `yaml:",omitempty"`
+	minimum          int      `yaml:",omitempty"`
+	exclusiveMinimum bool     `yaml:",omitempty"`
+	maxLength        int      `yaml:",omitempty"`
+	minLength        int      `yaml:",omitempty"`
+	pattern          string   `yaml:",omitempty"`
+	maxItems         int      `yaml:",omitempty"`
+	minItems         int      `yaml:",omitempty"`
+	maxProperties    int      `yaml:",omitempty"`
+	minProperties    int      `yaml:",omitempty"`
+	required         []string `yaml:",omitempty"`
+	enum             []string `yaml:",omitempty"`
 
-	nullable      bool
-	discriminator *Discriminator
-	readOnly      bool
-	writeOnly     bool
-	xml           *XML
-	externalDocs  *ExternalDocumentation
-	example       interface{}
-	deprecated    bool
+	type_                string             `yaml:"type,omitempty"` //nolint[golint]
+	allOf                []*Schema          `yaml:",omitempty"`
+	oneOf                []*Schema          `yaml:",omitempty"`
+	anyOf                []*Schema          `yaml:",omitempty"`
+	not                  *Schema            `yaml:",omitempty"`
+	items                *Schema            `yaml:",omitempty"`
+	properties           map[string]*Schema `yaml:",omitempty"`
+	additionalProperties *Schema            `yaml:",omitempty"`
+	description          string             `yaml:",omitempty"`
+	format               string             `yaml:",omitempty"`
+	default_             string             `yaml:"default,omitempty"` //nolint[golint]
 
-	extension Extension
+	nullable      bool                   `yaml:",omitempty"`
+	discriminator *Discriminator         `yaml:",omitempty"`
+	readOnly      bool                   `yaml:",omitempty"`
+	writeOnly     bool                   `yaml:",omitempty"`
+	xml           *XML                   `yaml:",omitempty"`
+	externalDocs  *ExternalDocumentation `yaml:",omitempty"`
+	example       interface{}            `yaml:",omitempty"`
+	deprecated    bool                   `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
+
+	reference string `yaml:"$ref,omitempty"`
 }
 
 //+object
 // Discriminator object.
 type Discriminator struct {
-	propertyName string
-	mapping      map[string]string
+	root *OpenAPI `yaml:"-"`
+
+	propertyName string            `yaml:",omitempty"`
+	mapping      map[string]string `yaml:",omitempty"`
 }
 
 //+object
 // XML is a metadata object that allows for more fine-tuned XML model definitions.
 type XML struct {
-	name      string
-	namespace string
-	prefix    string
-	attribute bool
-	wrapped   bool
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	name      string `yaml:",omitempty"`
+	namespace string `yaml:",omitempty"`
+	prefix    string `yaml:",omitempty"`
+	attribute bool   `yaml:",omitempty"`
+	wrapped   bool   `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // SecuritySchema defines a security scheme that can be used by the operations.
 type SecurityScheme struct {
-	type_            string `yaml:"type"`
-	description      string
-	name             string
-	in               string
-	scheme           string
-	bearerFormat     string
-	flows            *OAuthFlows
-	openIDConnectURL string `yaml:"openIdConnectUrl"`
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	type_            string      `yaml:"type,omitempty" oneof:"apiKey,http,oauth2,openIdConnect"` //nolint[golint]
+	description      string      `yaml:",omitempty"`
+	name             string      `yaml:",omitempty"`
+	in               string      `yaml:",omitempty" oneof:"query,header,cookie"`
+	scheme           string      `yaml:",omitempty"`
+	bearerFormat     string      `yaml:",omitempty"`
+	flows            *OAuthFlows `yaml:",omitempty"`
+	openIDConnectURL string      `yaml:"openIdConnectUrl,omitempty" format:"url"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
+
+	reference string `yaml:"$ref,omitempty"`
 }
 
 //+object
 // OAuthFlows allows configuration of the supported OAuthFlows.
 type OAuthFlows struct {
-	implicit          *OAuthFlow
-	password          *OAuthFlow
-	clientCredentials *OAuthFlow
-	authorizationCode *OAuthFlow
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	implicit          *OAuthFlow `yaml:",omitempty"`
+	password          *OAuthFlow `yaml:",omitempty"`
+	clientCredentials *OAuthFlow `yaml:",omitempty"`
+	authorizationCode *OAuthFlow `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // OAuthFlow is configuration details for a supported OAuth Flow.
 type OAuthFlow struct {
-	authorizationURL string `yaml:"authorizationUrl"`
-	tokenURL         string `yaml:"tokenUrl"`
-	refreshURL       string `yaml:"refreshUrl"`
-	scopes           map[string]string
+	root *OpenAPI `yaml:"-"`
 
-	extension Extension
+	authorizationURL string            `yaml:"authorizationUrl,omitempty" format:"url"`
+	tokenURL         string            `yaml:"tokenUrl,omitempty" format:"url"`
+	refreshURL       string            `yaml:"refreshUrl,omitempty" format:"url"`
+	scopes           map[string]string `yaml:",omitempty"`
+
+	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 }
 
 //+object
 // SecurityRequirements is lists the required security schemes to execute this operation.
-type SecurityRequirement map[string][]string
+type SecurityRequirement struct {
+	root *OpenAPI `yaml:"-"`
 
-type Extension map[string]interface{}
+	securityRequirement map[string][]string `yaml:",inline"`
+}

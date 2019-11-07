@@ -46,8 +46,15 @@ func (v *OpenAPI) ExternalDocs() *ExternalDocumentation {
 	return v.externalDocs
 }
 
-func (v *OpenAPI) Extension() Extension {
+func (v *OpenAPI) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Info) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Info) Title() string {
@@ -80,8 +87,15 @@ func (v *Info) Version() string {
 	return v.version
 }
 
-func (v *Info) Extension() Extension {
+func (v *Info) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Contact) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Contact) Name() string {
@@ -96,8 +110,15 @@ func (v *Contact) Email() string {
 	return v.email
 }
 
-func (v *Contact) Extension() Extension {
+func (v *Contact) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *License) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *License) Name() string {
@@ -108,8 +129,15 @@ func (v *License) Url() string {
 	return v.url
 }
 
-func (v *License) Extension() Extension {
+func (v *License) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Server) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Server) Url() string {
@@ -124,8 +152,15 @@ func (v *Server) Variables() map[string]*ServerVariable {
 	return v.variables
 }
 
-func (v *Server) Extension() Extension {
+func (v *Server) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *ServerVariable) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *ServerVariable) Enum() []string {
@@ -140,8 +175,15 @@ func (v *ServerVariable) Description() string {
 	return v.description
 }
 
-func (v *ServerVariable) Extension() Extension {
+func (v *ServerVariable) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Components) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Components) Schemas() map[string]*Schema {
@@ -180,16 +222,30 @@ func (v *Components) Callbacks() map[string]*Callback {
 	return v.callbacks
 }
 
-func (v *Components) Extension() Extension {
+func (v *Components) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Paths) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Paths) Paths() map[string]*PathItem {
 	return v.paths
 }
 
-func (v *Paths) Extension() Extension {
+func (v *Paths) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *PathItem) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *PathItem) Summary() string {
@@ -264,8 +320,15 @@ func (v *PathItem) Parameters() []*Parameter {
 	return v.parameters
 }
 
-func (v *PathItem) Extension() Extension {
+func (v *PathItem) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Operation) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Operation) Tags() []string {
@@ -328,8 +391,15 @@ func (v *Operation) Servers() []*Server {
 	return v.servers
 }
 
-func (v *Operation) Extension() Extension {
+func (v *Operation) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *ExternalDocumentation) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *ExternalDocumentation) Description() string {
@@ -340,8 +410,15 @@ func (v *ExternalDocumentation) Url() string {
 	return v.url
 }
 
-func (v *ExternalDocumentation) Extension() Extension {
+func (v *ExternalDocumentation) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Parameter) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Parameter) Name() string {
@@ -399,8 +476,19 @@ func (v *Parameter) Content() map[string]*MediaType {
 	return v.content
 }
 
-func (v *Parameter) Extension() Extension {
+func (v *Parameter) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Parameter) Reference() string {
+	return v.reference
+}
+
+func (v *RequestBody) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *RequestBody) Description() string {
@@ -415,8 +503,19 @@ func (v *RequestBody) Required() bool {
 	return v.required
 }
 
-func (v *RequestBody) Extension() Extension {
+func (v *RequestBody) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *RequestBody) Reference() string {
+	return v.reference
+}
+
+func (v *MediaType) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *MediaType) Schema() *Schema {
@@ -438,8 +537,15 @@ func (v *MediaType) Encoding() map[string]*Encoding {
 	return v.encoding
 }
 
-func (v *MediaType) Extension() Extension {
+func (v *MediaType) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Encoding) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Encoding) ContentType() string {
@@ -462,16 +568,30 @@ func (v *Encoding) AllowReserved() bool {
 	return v.allowReserved
 }
 
-func (v *Encoding) Extension() Extension {
+func (v *Encoding) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Responses) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Responses) Responses() map[string]*Response {
 	return v.responses
 }
 
-func (v *Responses) Extension() Extension {
+func (v *Responses) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Response) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Response) Description() string {
@@ -490,16 +610,38 @@ func (v *Response) Links() map[string]*Link {
 	return v.links
 }
 
-func (v *Response) Extension() Extension {
+func (v *Response) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Response) Reference() string {
+	return v.reference
+}
+
+func (v *Callback) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Callback) Callback() map[string]*PathItem {
 	return v.callback
 }
 
-func (v *Callback) Extension() Extension {
+func (v *Callback) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Callback) Reference() string {
+	return v.reference
+}
+
+func (v *Example) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Example) Summary() string {
@@ -518,16 +660,27 @@ func (v *Example) ExternalVale() string {
 	return v.externalVale
 }
 
-func (v *Example) Extension() Extension {
+func (v *Example) Extension() map[string]interface{} {
 	return v.extension
 }
 
-func (v *Link) OperationRef() string {
-	return v.operationRef
+func (v *Example) Reference() string {
+	return v.reference
 }
 
-func (v *Link) OperationId() string {
-	return v.operationId
+func (v *Link) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
+}
+
+func (v *Link) Operationreference() string {
+	return v.operationreference
+}
+
+func (v *Link) OperationID() string {
+	return v.operationID
 }
 
 func (v *Link) Parameters() map[string]interface{} {
@@ -549,8 +702,19 @@ func (v *Link) Server() *Server {
 	return v.server
 }
 
-func (v *Link) Extension() Extension {
+func (v *Link) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Link) Reference() string {
+	return v.reference
+}
+
+func (v *Header) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Header) Name() string {
@@ -608,8 +772,19 @@ func (v *Header) Content() map[string]*MediaType {
 	return v.content
 }
 
-func (v *Header) Extension() Extension {
+func (v *Header) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Header) Reference() string {
+	return v.reference
+}
+
+func (v *Tag) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Tag) Name() string {
@@ -627,8 +802,15 @@ func (v *Tag) ExternalDocs() *ExternalDocumentation {
 	return v.externalDocs
 }
 
-func (v *Tag) Extension() Extension {
+func (v *Tag) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Schema) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Schema) Title() string {
@@ -785,8 +967,19 @@ func (v *Schema) Deprecated() bool {
 	return v.deprecated
 }
 
-func (v *Schema) Extension() Extension {
+func (v *Schema) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *Schema) Reference() string {
+	return v.reference
+}
+
+func (v *Discriminator) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *Discriminator) PropertyName() string {
@@ -795,6 +988,13 @@ func (v *Discriminator) PropertyName() string {
 
 func (v *Discriminator) Mapping() map[string]string {
 	return v.mapping
+}
+
+func (v *XML) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *XML) Name() string {
@@ -817,8 +1017,15 @@ func (v *XML) Wrapped() bool {
 	return v.wrapped
 }
 
-func (v *XML) Extension() Extension {
+func (v *XML) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *SecurityScheme) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *SecurityScheme) Type_() string {
@@ -856,8 +1063,19 @@ func (v *SecurityScheme) OpenIDConnectURL() string {
 	return v.openIDConnectURL
 }
 
-func (v *SecurityScheme) Extension() Extension {
+func (v *SecurityScheme) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *SecurityScheme) Reference() string {
+	return v.reference
+}
+
+func (v *OAuthFlows) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *OAuthFlows) Implicit() *OAuthFlow {
@@ -888,8 +1106,15 @@ func (v *OAuthFlows) AuthorizationCode() *OAuthFlow {
 	return v.authorizationCode
 }
 
-func (v *OAuthFlows) Extension() Extension {
+func (v *OAuthFlows) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *OAuthFlow) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
 }
 
 func (v *OAuthFlow) AuthorizationURL() string {
@@ -908,6 +1133,17 @@ func (v *OAuthFlow) Scopes() map[string]string {
 	return v.scopes
 }
 
-func (v *OAuthFlow) Extension() Extension {
+func (v *OAuthFlow) Extension() map[string]interface{} {
 	return v.extension
+}
+
+func (v *SecurityRequirement) Root() *OpenAPI {
+	if v.root == nil {
+		return &OpenAPI{}
+	}
+	return v.root
+}
+
+func (v *SecurityRequirement) SecurityRequirement() map[string][]string {
+	return v.securityRequirement
 }

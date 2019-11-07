@@ -4,6 +4,8 @@ package openapi
 
 import (
 	"errors"
+	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -21,6 +23,10 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 		return errors.New(`"openapi" field is required`)
 	}
 	v.openapi = string(openapiBytes)
+
+	if !isValidSemVer(v.openapi) {
+		return errors.New(`"openapi" field must be a valid semantic version but not`)
+	}
 
 	infoBytes, ok := proxy["info"]
 	if !ok {
@@ -81,8 +87,20 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 		}
 		v.externalDocs = &externalDocs
 	}
-
-	v.extension = extension(proxy)
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -106,6 +124,12 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 		v.termsOfService = string(termsOfServiceBytes)
 	}
 
+	if v.termsOfService != "" {
+		if _, err := url.ParseRequestURI(v.termsOfService); err != nil {
+			return err
+		}
+	}
+
 	if contactBytes, ok := proxy["contact"]; ok {
 		var contact Contact
 		if err := yaml.Unmarshal(contactBytes, &contact); err != nil {
@@ -127,8 +151,20 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 		return errors.New(`"version" field is required`)
 	}
 	v.version = string(versionBytes)
-
-	v.extension = extension(proxy)
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -146,11 +182,36 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 		v.url = string(urlBytes)
 	}
 
+	if v.url != "" {
+		if _, err := url.ParseRequestURI(v.url); err != nil {
+			return err
+		}
+	}
+
 	if emailBytes, ok := proxy["email"]; ok {
 		v.email = string(emailBytes)
 	}
 
-	v.extension = extension(proxy)
+	if v.email != "" {
+
+		if v.email != "" && !emailRegexp.MatchString(v.email) {
+			return errors.New(`"email" field must be an email address`)
+		}
+	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -170,7 +231,25 @@ func (v *License) UnmarshalYAML(b []byte) error {
 		v.url = string(urlBytes)
 	}
 
-	v.extension = extension(proxy)
+	if v.url != "" {
+		if _, err := url.ParseRequestURI(v.url); err != nil {
+			return err
+		}
+	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -186,6 +265,10 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 	}
 	v.url = string(urlBytes)
 
+	if _, err := url.Parse(urlTemplateVarRegexp.ReplaceAllLiteralString(v.url, `placeholder`)); err != nil {
+		return err
+	}
+
 	if descriptionBytes, ok := proxy["description"]; ok {
 		v.description = string(descriptionBytes)
 	}
@@ -197,8 +280,20 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 		}
 		v.variables = variables
 	}
-
-	v.extension = extension(proxy)
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -216,17 +311,29 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 		v.enum = enum
 	}
 
-	defaultBytes, ok := proxy["default"]
+	default_Bytes, ok := proxy["default"]
 	if !ok {
 		return errors.New(`"default" field is required`)
 	}
-	v.default_ = string(defaultBytes)
+	v.default_ = string(default_Bytes)
 
 	if descriptionBytes, ok := proxy["description"]; ok {
 		v.description = string(descriptionBytes)
 	}
-
-	v.extension = extension(proxy)
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -307,8 +414,20 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 		}
 		v.callbacks = callbacks
 	}
-
-	v.extension = extension(proxy)
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -319,18 +438,32 @@ func (v *Paths) UnmarshalYAML(b []byte) error {
 	}
 	paths := map[string]*PathItem{}
 	for key, val := range proxy {
-		if strings.HasPrefix(key, "x-") {
+		if !strings.HasPrefix(key, "/") {
 			continue
 		}
-		var pathItem PathItem
-		if err := yaml.Unmarshal(val, &pathItem); err != nil {
+		var pathsv PathItem
+		if err := yaml.Unmarshal(val, &pathsv); err != nil {
 			return err
 		}
-		paths[key] = &pathItem
+		paths[key] = &pathsv
 	}
-	v.paths = paths
-
-	v.extension = extension(proxy)
+	if len(paths) != 0 {
+		v.paths = paths
+	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -427,8 +560,20 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 		}
 		v.parameters = parameters
 	}
-
-	v.extension = extension(proxy)
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -523,8 +668,20 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 		}
 		v.servers = servers
 	}
-
-	v.extension = extension(proxy)
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -544,7 +701,23 @@ func (v *ExternalDocumentation) UnmarshalYAML(b []byte) error {
 	}
 	v.url = string(urlBytes)
 
-	v.extension = extension(proxy)
+	if _, err := url.ParseRequestURI(v.url); err != nil {
+		return err
+	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -565,6 +738,10 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 		return errors.New(`"in" field is required`)
 	}
 	v.in = string(inBytes)
+
+	if isOneOf(v.in, []string{"query", "header", "path", "cookie"}) {
+		return errors.New(`"in" field must be one of ["query", "header", "path", "cookie"]`)
+	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
 		v.description = string(descriptionBytes)
@@ -645,8 +822,24 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 		}
 		v.content = content
 	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 
-	v.extension = extension(proxy)
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		v.reference = string(referenceBytes)
+	}
 	return nil
 }
 
@@ -677,8 +870,24 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 		}
 		v.required = t
 	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 
-	v.extension = extension(proxy)
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		v.reference = string(referenceBytes)
+	}
 	return nil
 }
 
@@ -719,8 +928,20 @@ func (v *MediaType) UnmarshalYAML(b []byte) error {
 		}
 		v.encoding = encoding
 	}
-
-	v.extension = extension(proxy)
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -757,8 +978,20 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 		}
 		v.allowReserved = t
 	}
-
-	v.extension = extension(proxy)
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -769,26 +1002,33 @@ func (v *Responses) UnmarshalYAML(b []byte) error {
 	}
 	responses := map[string]*Response{}
 	for key, val := range proxy {
-		if strings.HasPrefix(key, "x-") {
+		responsesRegexp := regexp.MustCompile(`^[1-5]([0-9][0-9]|XX)|default$`)
+		if !responsesRegexp.MatchString(key) {
 			continue
 		}
-		var response Response
-		if err := yaml.Unmarshal(val, &response); err != nil {
+		var responsesv Response
+		if err := yaml.Unmarshal(val, &responsesv); err != nil {
 			return err
 		}
-		responses[key] = &response
+		responses[key] = &responsesv
 	}
-	v.responses = responses
-
-	if responsesBytes, ok := proxy["responses"]; ok {
-		var responses map[string]*Response
-		if err := yaml.Unmarshal(responsesBytes, &responses); err != nil {
-			return err
-		}
+	if len(responses) != 0 {
 		v.responses = responses
 	}
-
-	v.extension = extension(proxy)
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -827,8 +1067,24 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 		}
 		v.links = links
 	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 
-	v.extension = extension(proxy)
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		v.reference = string(referenceBytes)
+	}
 	return nil
 }
 
@@ -846,7 +1102,29 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 		v.callback = callback
 	}
 
-	v.extension = extension(proxy)
+	for key := range v.callback {
+		if !matchRuntimeExpr(key) {
+			return errors.New(`the keys of "callback" must be a runtime expression`)
+		}
+	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
+
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		v.reference = string(referenceBytes)
+	}
 	return nil
 }
 
@@ -875,8 +1153,24 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	if externalValeBytes, ok := proxy["externalVale"]; ok {
 		v.externalVale = string(externalValeBytes)
 	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 
-	v.extension = extension(proxy)
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		v.reference = string(referenceBytes)
+	}
 	return nil
 }
 
@@ -886,12 +1180,12 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 		return err
 	}
 
-	if operationRefBytes, ok := proxy["operationRef"]; ok {
-		v.operationRef = string(operationRefBytes)
+	if operationreferenceBytes, ok := proxy["operationreference"]; ok {
+		v.operationreference = string(operationreferenceBytes)
 	}
 
-	if operationIdBytes, ok := proxy["operationId"]; ok {
-		v.operationId = string(operationIdBytes)
+	if operationIDBytes, ok := proxy["operationId"]; ok {
+		v.operationID = string(operationIDBytes)
 	}
 
 	if parametersBytes, ok := proxy["parameters"]; ok {
@@ -921,8 +1215,24 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 		}
 		v.server = &server
 	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 
-	v.extension = extension(proxy)
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		v.reference = string(referenceBytes)
+	}
 	return nil
 }
 
@@ -1019,8 +1329,24 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 		}
 		v.content = content
 	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 
-	v.extension = extension(proxy)
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		v.reference = string(referenceBytes)
+	}
 	return nil
 }
 
@@ -1047,8 +1373,20 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 		}
 		v.externalDocs = &externalDocs
 	}
-
-	v.extension = extension(proxy)
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -1170,8 +1508,8 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 		v.enum = enum
 	}
 
-	if typeBytes, ok := proxy["type"]; ok {
-		v.type_ = string(typeBytes)
+	if type_Bytes, ok := proxy["type"]; ok {
+		v.type_ = string(type_Bytes)
 	}
 
 	if allOfBytes, ok := proxy["allOf"]; ok {
@@ -1238,8 +1576,8 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 		v.format = string(formatBytes)
 	}
 
-	if defaultBytes, ok := proxy["default"]; ok {
-		v.default_ = string(defaultBytes)
+	if default_Bytes, ok := proxy["default"]; ok {
+		v.default_ = string(default_Bytes)
 	}
 
 	if nullableBytes, ok := proxy["nullable"]; ok {
@@ -1305,8 +1643,24 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 		}
 		v.deprecated = t
 	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 
-	v.extension = extension(proxy)
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		v.reference = string(referenceBytes)
+	}
 	return nil
 }
 
@@ -1363,8 +1717,20 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 		}
 		v.wrapped = t
 	}
-
-	v.extension = extension(proxy)
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -1374,8 +1740,14 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 		return err
 	}
 
-	if typeBytes, ok := proxy["type"]; ok {
-		v.type_ = string(typeBytes)
+	if type_Bytes, ok := proxy["type"]; ok {
+		v.type_ = string(type_Bytes)
+	}
+
+	if v.type_ != "" {
+		if isOneOf(v.type_, []string{"apiKey", "http", "oauth2", "openIdConnect"}) {
+			return errors.New(`"type" field must be one of ["apiKey", "http", "oauth2", "openIdConnect"]`)
+		}
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
@@ -1388,6 +1760,12 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 
 	if inBytes, ok := proxy["in"]; ok {
 		v.in = string(inBytes)
+	}
+
+	if v.in != "" {
+		if isOneOf(v.in, []string{"query", "header", "cookie"}) {
+			return errors.New(`"in" field must be one of ["query", "header", "cookie"]`)
+		}
 	}
 
 	if schemeBytes, ok := proxy["scheme"]; ok {
@@ -1406,11 +1784,33 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 		v.flows = &flows
 	}
 
-	if openIdConnectUrlBytes, ok := proxy["openIdConnectUrl"]; ok {
-		v.openIDConnectURL = string(openIdConnectUrlBytes)
+	if openIDConnectURLBytes, ok := proxy["openIdConnectUrl"]; ok {
+		v.openIDConnectURL = string(openIDConnectURLBytes)
 	}
 
-	v.extension = extension(proxy)
+	if v.openIDConnectURL != "" {
+		if _, err := url.ParseRequestURI(v.openIDConnectURL); err != nil {
+			return err
+		}
+	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
+
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		v.reference = string(referenceBytes)
+	}
 	return nil
 }
 
@@ -1451,8 +1851,20 @@ func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 		}
 		v.authorizationCode = &authorizationCode
 	}
-
-	v.extension = extension(proxy)
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
 	return nil
 }
 
@@ -1462,16 +1874,34 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 		return err
 	}
 
-	if authorizationUrlBytes, ok := proxy["authorizationUrl"]; ok {
-		v.authorizationURL = string(authorizationUrlBytes)
+	if authorizationURLBytes, ok := proxy["authorizationUrl"]; ok {
+		v.authorizationURL = string(authorizationURLBytes)
 	}
 
-	if tokenUrlBytes, ok := proxy["tokenUrl"]; ok {
-		v.tokenURL = string(tokenUrlBytes)
+	if v.authorizationURL != "" {
+		if _, err := url.ParseRequestURI(v.authorizationURL); err != nil {
+			return err
+		}
 	}
 
-	if refreshUrlBytes, ok := proxy["refreshUrl"]; ok {
-		v.refreshURL = string(refreshUrlBytes)
+	if tokenURLBytes, ok := proxy["tokenUrl"]; ok {
+		v.tokenURL = string(tokenURLBytes)
+	}
+
+	if v.tokenURL != "" {
+		if _, err := url.ParseRequestURI(v.tokenURL); err != nil {
+			return err
+		}
+	}
+
+	if refreshURLBytes, ok := proxy["refreshUrl"]; ok {
+		v.refreshURL = string(refreshURLBytes)
+	}
+
+	if v.refreshURL != "" {
+		if _, err := url.ParseRequestURI(v.refreshURL); err != nil {
+			return err
+		}
 	}
 
 	if scopesBytes, ok := proxy["scopes"]; ok {
@@ -1481,7 +1911,38 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 		}
 		v.scopes = scopes
 	}
+	extension := map[string]interface{}{}
+	for key, val := range proxy {
+		if !strings.HasPrefix(key, "x-") {
+			continue
+		}
+		var extensionv interface{}
+		if err := yaml.Unmarshal(val, &extensionv); err != nil {
+			return err
+		}
+		extension[key] = extensionv
+	}
+	if len(extension) != 0 {
+		v.extension = extension
+	}
+	return nil
+}
 
-	v.extension = extension(proxy)
+func (v *SecurityRequirement) UnmarshalYAML(b []byte) error {
+	var proxy map[string]raw
+	if err := yaml.Unmarshal(b, &proxy); err != nil {
+		return err
+	}
+	securityRequirement := map[string][]string{}
+	for key, val := range proxy {
+		var securityRequirementv []string
+		if err := yaml.Unmarshal(val, &securityRequirementv); err != nil {
+			return err
+		}
+		securityRequirement[key] = securityRequirementv
+	}
+	if len(securityRequirement) != 0 {
+		v.securityRequirement = securityRequirement
+	}
 	return nil
 }
