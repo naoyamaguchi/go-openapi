@@ -1393,6 +1393,134 @@ func TestMediaTypeUnmarshalYAML(t *testing.T) {
 	})
 }
 
+func TestEncodingUnmarshalYAML(t *testing.T) {
+	yml := `requestBody:
+  content:
+    multipart/mixed:
+      schema:
+        type: object
+        properties:
+          id:
+            # default is text/plain
+            type: string
+            format: uuid
+          address:
+            # default is application/json
+            type: object
+            properties: {}
+          historyMetadata:
+            # need to declare XML format!
+            description: metadata in XML format
+            type: object
+            properties: {}
+          profileImage:
+            # default is application/octet-stream, need to declare an image type only!
+            type: string
+            format: binary
+      encoding:
+        historyMetadata:
+          # require XML Content-Type in utf-8 encoding
+          contentType: application/xml; charset=utf-8
+        profileImage:
+          # only accept png/jpeg
+          contentType: image/png, image/jpeg
+          headers:
+            X-Rate-Limit-Limit:
+              description: The number of allowed requests in the current period
+              schema:
+                type: integer`
+	var target struct {
+		RequestBody RequestBody `yaml:"requestBody"`
+	}
+	if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := target.RequestBody.content["multipart/mixed"]; !ok {
+		t.Error("requestBody.content.multipart/mixed is not found")
+		return
+	}
+	schema := target.RequestBody.content["multipart/mixed"].schema
+	if schema.type_ != "object" {
+		t.Errorf("unexpected requestBody.content.multipart/mixed.schema.type: %s", schema.type_)
+		return
+	}
+	id, ok := schema.properties["id"]
+	if !ok {
+		t.Error("requestBody.content.multipart/mixed.schema.properties.id is not found")
+		return
+	}
+	if id.type_ != "string" {
+		t.Errorf("unexpected id.type: %s", id.type_)
+		return
+	}
+	if id.format != "uuid" {
+		t.Errorf("unexpected id.format: %s", id.format)
+		return
+	}
+	address, ok := schema.properties["address"]
+	if !ok {
+		t.Error("requestBody.content.multipart/mixed.schema.properties.address is not found")
+		return
+	}
+	if address.type_ != "object" {
+		t.Errorf("unexpected id.type: %s", id.type_)
+		return
+	}
+	historyMetadata, ok := schema.properties["historyMetadata"]
+	if !ok {
+		t.Error("requestBody.content.multipart/mixed.schema.properties.historyMetadata is not found")
+		return
+	}
+	if historyMetadata.description != "metadata in XML format" {
+		t.Errorf("unexpected historyMetadata.description: %s", historyMetadata.description)
+		return
+	}
+	if historyMetadata.type_ != "object" {
+		t.Errorf("unexpected historyMetadata.type: %s", historyMetadata.type_)
+		return
+	}
+	profileImage, ok := schema.properties["profileImage"]
+	if !ok {
+		t.Error("requestBody.content.multipart/mixed.schema.properties.profileImage is not found")
+		return
+	}
+	if profileImage.type_ != "string" {
+		t.Errorf("unexpected id.type: %s", id.type_)
+		return
+	}
+	if profileImage.format != "binary" {
+		t.Errorf("unexpected id.format: %s", id.format)
+		return
+	}
+	t.Run("historyMetadata", func(t *testing.T) {
+		encoding := target.RequestBody.content["multipart/mixed"].encoding["historyMetadata"]
+		if encoding.contentType != "application/xml; charset=utf-8" {
+			t.Errorf("unexpected encoding.contentType: %s", encoding.contentType)
+			return
+		}
+	})
+	t.Run("profileImage", func(t *testing.T) {
+		encoding := target.RequestBody.content["multipart/mixed"].encoding["profileImage"]
+		if encoding.contentType != "image/png, image/jpeg" {
+			t.Errorf("unexpected encoding.contentType: %s", encoding.contentType)
+			return
+		}
+		xRateLimitLimit, ok := encoding.headers["X-Rate-Limit-Limit"]
+		if !ok {
+			t.Error("encoding.headers.X-Rate-Limit-Limit is not found")
+			return
+		}
+		if xRateLimitLimit.description != "The number of allowed requests in the current period" {
+			t.Errorf("unexpeceted encoding.headers.X-Rate-Limit-Limit.description: %s", xRateLimitLimit.description)
+			return
+		}
+		if xRateLimitLimit.schema.type_ != "integer" {
+			t.Errorf("unexpected encoding.headers.X-Rate-Limit-Limit.schema.type: %s", xRateLimitLimit.schema.type_)
+			return
+		}
+	})
+}
+
 func TestIsOneOf(t *testing.T) {
 	tests := []struct {
 		s    string
