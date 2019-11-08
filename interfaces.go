@@ -139,7 +139,7 @@ type Operation struct {
 	description  string                 `yaml:",omitempty"`
 	externalDocs *ExternalDocumentation `yaml:",omitempty"`
 	operationID  string                 `yaml:",omitempty"`
-	parameters   *Parameter             `yaml:",omitempty"`
+	parameters   []*Parameter           `yaml:",omitempty"`
 	requestBody  *RequestBody           `yaml:",omitempty"`
 	responses    *Responses             `required:"yes"`
 	callbacks    map[string]*Callback   `yaml:",omitempty"`
@@ -258,7 +258,7 @@ type Response struct {
 type Callback struct {
 	root *OpenAPI `yaml:"-"`
 
-	callback map[string]*PathItem `yaml:",omitempty" format:"runtime"`
+	callback map[string]*PathItem `yaml:",omitempty,inline" format:"runtime"`
 
 	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 

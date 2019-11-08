@@ -6,7 +6,6 @@ import (
 	"errors"
 	"net/url"
 	"regexp"
-	"strconv"
 	"strings"
 
 	yaml "github.com/goccy/go-yaml"
@@ -22,14 +21,11 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"openapi" field is required`)
 	}
-	v.openapi = string(openapiBytes)
-	if submatch := singleQuotedRegexp.FindStringSubmatch(v.openapi); submatch != nil {
-		v.openapi = submatch[1]
-	} else {
-		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.openapi); submatch != nil {
-			v.openapi = submatch[1]
-		}
+	var openapiVal string
+	if err := yaml.Unmarshal(openapiBytes, &openapiVal); err != nil {
+		return err
 	}
+	v.openapi = openapiVal
 
 	if !isValidSemVer(v.openapi) {
 		return errors.New(`"openapi" field must be a valid semantic version but not`)
@@ -39,60 +35,60 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"info" field is required`)
 	}
-	var info Info
-	if err := yaml.Unmarshal(infoBytes, &info); err != nil {
+	var infoVal Info
+	if err := yaml.Unmarshal(infoBytes, &infoVal); err != nil {
 		return err
 	}
-	v.info = &info
+	v.info = &infoVal
 
 	if serversBytes, ok := proxy["servers"]; ok {
-		var servers []*Server
-		if err := yaml.Unmarshal(serversBytes, &servers); err != nil {
+		var serversVal []*Server
+		if err := yaml.Unmarshal(serversBytes, &serversVal); err != nil {
 			return err
 		}
-		v.servers = servers
+		v.servers = serversVal
 	}
 
 	pathsBytes, ok := proxy["paths"]
 	if !ok {
 		return errors.New(`"paths" field is required`)
 	}
-	var paths Paths
-	if err := yaml.Unmarshal(pathsBytes, &paths); err != nil {
+	var pathsVal Paths
+	if err := yaml.Unmarshal(pathsBytes, &pathsVal); err != nil {
 		return err
 	}
-	v.paths = &paths
+	v.paths = &pathsVal
 
 	if componentsBytes, ok := proxy["components"]; ok {
-		var components Components
-		if err := yaml.Unmarshal(componentsBytes, &components); err != nil {
+		var componentsVal Components
+		if err := yaml.Unmarshal(componentsBytes, &componentsVal); err != nil {
 			return err
 		}
-		v.components = &components
+		v.components = &componentsVal
 	}
 
 	if securityBytes, ok := proxy["security"]; ok {
-		var security []*SecurityRequirement
-		if err := yaml.Unmarshal(securityBytes, &security); err != nil {
+		var securityVal []*SecurityRequirement
+		if err := yaml.Unmarshal(securityBytes, &securityVal); err != nil {
 			return err
 		}
-		v.security = security
+		v.security = securityVal
 	}
 
 	if tagsBytes, ok := proxy["tags"]; ok {
-		var tags []*Tag
-		if err := yaml.Unmarshal(tagsBytes, &tags); err != nil {
+		var tagsVal []*Tag
+		if err := yaml.Unmarshal(tagsBytes, &tagsVal); err != nil {
 			return err
 		}
-		v.tags = tags
+		v.tags = tagsVal
 	}
 
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
-		var externalDocs ExternalDocumentation
-		if err := yaml.Unmarshal(externalDocsBytes, &externalDocs); err != nil {
+		var externalDocsVal ExternalDocumentation
+		if err := yaml.Unmarshal(externalDocsBytes, &externalDocsVal); err != nil {
 			return err
 		}
-		v.externalDocs = &externalDocs
+		v.externalDocs = &externalDocsVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -121,35 +117,26 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"title" field is required`)
 	}
-	v.title = string(titleBytes)
-	if submatch := singleQuotedRegexp.FindStringSubmatch(v.title); submatch != nil {
-		v.title = submatch[1]
-	} else {
-		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.title); submatch != nil {
-			v.title = submatch[1]
-		}
+	var titleVal string
+	if err := yaml.Unmarshal(titleBytes, &titleVal); err != nil {
+		return err
 	}
+	v.title = titleVal
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 
 	if termsOfServiceBytes, ok := proxy["termsOfService"]; ok {
-		v.termsOfService = string(termsOfServiceBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.termsOfService); submatch != nil {
-			v.termsOfService = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.termsOfService); submatch != nil {
-				v.termsOfService = submatch[1]
-			}
+		var termsOfServiceVal string
+		if err := yaml.Unmarshal(termsOfServiceBytes, &termsOfServiceVal); err != nil {
+			return err
 		}
+		v.termsOfService = termsOfServiceVal
 	}
 
 	if v.termsOfService != "" {
@@ -159,33 +146,30 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 	}
 
 	if contactBytes, ok := proxy["contact"]; ok {
-		var contact Contact
-		if err := yaml.Unmarshal(contactBytes, &contact); err != nil {
+		var contactVal Contact
+		if err := yaml.Unmarshal(contactBytes, &contactVal); err != nil {
 			return err
 		}
-		v.contact = &contact
+		v.contact = &contactVal
 	}
 
 	if licenseBytes, ok := proxy["license"]; ok {
-		var license License
-		if err := yaml.Unmarshal(licenseBytes, &license); err != nil {
+		var licenseVal License
+		if err := yaml.Unmarshal(licenseBytes, &licenseVal); err != nil {
 			return err
 		}
-		v.license = &license
+		v.license = &licenseVal
 	}
 
 	versionBytes, ok := proxy["version"]
 	if !ok {
 		return errors.New(`"version" field is required`)
 	}
-	v.version = string(versionBytes)
-	if submatch := singleQuotedRegexp.FindStringSubmatch(v.version); submatch != nil {
-		v.version = submatch[1]
-	} else {
-		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.version); submatch != nil {
-			v.version = submatch[1]
-		}
+	var versionVal string
+	if err := yaml.Unmarshal(versionBytes, &versionVal); err != nil {
+		return err
 	}
+	v.version = versionVal
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
 		if !strings.HasPrefix(key, "x-") {
@@ -210,25 +194,19 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
-		v.name = string(nameBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-			v.name = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-				v.name = submatch[1]
-			}
+		var nameVal string
+		if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
+			return err
 		}
+		v.name = nameVal
 	}
 
 	if urlBytes, ok := proxy["url"]; ok {
-		v.url = string(urlBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
-			v.url = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
-				v.url = submatch[1]
-			}
+		var urlVal string
+		if err := yaml.Unmarshal(urlBytes, &urlVal); err != nil {
+			return err
 		}
+		v.url = urlVal
 	}
 
 	if v.url != "" {
@@ -238,14 +216,11 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 	}
 
 	if emailBytes, ok := proxy["email"]; ok {
-		v.email = string(emailBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.email); submatch != nil {
-			v.email = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.email); submatch != nil {
-				v.email = submatch[1]
-			}
+		var emailVal string
+		if err := yaml.Unmarshal(emailBytes, &emailVal); err != nil {
+			return err
 		}
+		v.email = emailVal
 	}
 
 	if v.email != "" {
@@ -281,24 +256,18 @@ func (v *License) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"name" field is required`)
 	}
-	v.name = string(nameBytes)
-	if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-		v.name = submatch[1]
-	} else {
-		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-			v.name = submatch[1]
-		}
+	var nameVal string
+	if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
+		return err
 	}
+	v.name = nameVal
 
 	if urlBytes, ok := proxy["url"]; ok {
-		v.url = string(urlBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
-			v.url = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
-				v.url = submatch[1]
-			}
+		var urlVal string
+		if err := yaml.Unmarshal(urlBytes, &urlVal); err != nil {
+			return err
 		}
+		v.url = urlVal
 	}
 
 	if v.url != "" {
@@ -333,36 +302,30 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"url" field is required`)
 	}
-	v.url = string(urlBytes)
-	if submatch := singleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
-		v.url = submatch[1]
-	} else {
-		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
-			v.url = submatch[1]
-		}
+	var urlVal string
+	if err := yaml.Unmarshal(urlBytes, &urlVal); err != nil {
+		return err
 	}
+	v.url = urlVal
 
 	if _, err := url.Parse(urlTemplateVarRegexp.ReplaceAllLiteralString(v.url, `1111`)); err != nil {
 		return err
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 
 	if variablesBytes, ok := proxy["variables"]; ok {
-		var variables map[string]*ServerVariable
-		if err := yaml.Unmarshal(variablesBytes, &variables); err != nil {
+		var variablesVal map[string]*ServerVariable
+		if err := yaml.Unmarshal(variablesBytes, &variablesVal); err != nil {
 			return err
 		}
-		v.variables = variables
+		v.variables = variablesVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -388,35 +351,29 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 	}
 
 	if enumBytes, ok := proxy["enum"]; ok {
-		var enum []string
-		if err := yaml.Unmarshal(enumBytes, &enum); err != nil {
+		var enumVal []string
+		if err := yaml.Unmarshal(enumBytes, &enumVal); err != nil {
 			return err
 		}
-		v.enum = enum
+		v.enum = enumVal
 	}
 
 	default_Bytes, ok := proxy["default"]
 	if !ok {
 		return errors.New(`"default" field is required`)
 	}
-	v.default_ = string(default_Bytes)
-	if submatch := singleQuotedRegexp.FindStringSubmatch(v.default_); submatch != nil {
-		v.default_ = submatch[1]
-	} else {
-		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.default_); submatch != nil {
-			v.default_ = submatch[1]
-		}
+	var default_Val string
+	if err := yaml.Unmarshal(default_Bytes, &default_Val); err != nil {
+		return err
 	}
+	v.default_ = default_Val
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -442,75 +399,75 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 	}
 
 	if schemasBytes, ok := proxy["schemas"]; ok {
-		var schemas map[string]*Schema
-		if err := yaml.Unmarshal(schemasBytes, &schemas); err != nil {
+		var schemasVal map[string]*Schema
+		if err := yaml.Unmarshal(schemasBytes, &schemasVal); err != nil {
 			return err
 		}
-		v.schemas = schemas
+		v.schemas = schemasVal
 	}
 
 	if responsesBytes, ok := proxy["responses"]; ok {
-		var responses map[string]*Response
-		if err := yaml.Unmarshal(responsesBytes, &responses); err != nil {
+		var responsesVal map[string]*Response
+		if err := yaml.Unmarshal(responsesBytes, &responsesVal); err != nil {
 			return err
 		}
-		v.responses = responses
+		v.responses = responsesVal
 	}
 
 	if parametersBytes, ok := proxy["parameters"]; ok {
-		var parameters map[string]*Parameter
-		if err := yaml.Unmarshal(parametersBytes, &parameters); err != nil {
+		var parametersVal map[string]*Parameter
+		if err := yaml.Unmarshal(parametersBytes, &parametersVal); err != nil {
 			return err
 		}
-		v.parameters = parameters
+		v.parameters = parametersVal
 	}
 
 	if examplesBytes, ok := proxy["examples"]; ok {
-		var examples map[string]*Example
-		if err := yaml.Unmarshal(examplesBytes, &examples); err != nil {
+		var examplesVal map[string]*Example
+		if err := yaml.Unmarshal(examplesBytes, &examplesVal); err != nil {
 			return err
 		}
-		v.examples = examples
+		v.examples = examplesVal
 	}
 
 	if requestBodiesBytes, ok := proxy["requestBodies"]; ok {
-		var requestBodies map[string]*RequestBody
-		if err := yaml.Unmarshal(requestBodiesBytes, &requestBodies); err != nil {
+		var requestBodiesVal map[string]*RequestBody
+		if err := yaml.Unmarshal(requestBodiesBytes, &requestBodiesVal); err != nil {
 			return err
 		}
-		v.requestBodies = requestBodies
+		v.requestBodies = requestBodiesVal
 	}
 
 	if headersBytes, ok := proxy["headers"]; ok {
-		var headers map[string]*Header
-		if err := yaml.Unmarshal(headersBytes, &headers); err != nil {
+		var headersVal map[string]*Header
+		if err := yaml.Unmarshal(headersBytes, &headersVal); err != nil {
 			return err
 		}
-		v.headers = headers
+		v.headers = headersVal
 	}
 
 	if securitySchemesBytes, ok := proxy["securitySchemes"]; ok {
-		var securitySchemes map[string]*SecurityScheme
-		if err := yaml.Unmarshal(securitySchemesBytes, &securitySchemes); err != nil {
+		var securitySchemesVal map[string]*SecurityScheme
+		if err := yaml.Unmarshal(securitySchemesBytes, &securitySchemesVal); err != nil {
 			return err
 		}
-		v.securitySchemes = securitySchemes
+		v.securitySchemes = securitySchemesVal
 	}
 
 	if linksBytes, ok := proxy["links"]; ok {
-		var links map[string]*Link
-		if err := yaml.Unmarshal(linksBytes, &links); err != nil {
+		var linksVal map[string]*Link
+		if err := yaml.Unmarshal(linksBytes, &linksVal); err != nil {
 			return err
 		}
-		v.links = links
+		v.links = linksVal
 	}
 
 	if callbacksBytes, ok := proxy["callbacks"]; ok {
-		var callbacks map[string]*Callback
-		if err := yaml.Unmarshal(callbacksBytes, &callbacks); err != nil {
+		var callbacksVal map[string]*Callback
+		if err := yaml.Unmarshal(callbacksBytes, &callbacksVal); err != nil {
 			return err
 		}
-		v.callbacks = callbacks
+		v.callbacks = callbacksVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -572,105 +529,99 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	}
 
 	if summaryBytes, ok := proxy["summary"]; ok {
-		v.summary = string(summaryBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.summary); submatch != nil {
-			v.summary = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.summary); submatch != nil {
-				v.summary = submatch[1]
-			}
+		var summaryVal string
+		if err := yaml.Unmarshal(summaryBytes, &summaryVal); err != nil {
+			return err
 		}
+		v.summary = summaryVal
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 
 	if getBytes, ok := proxy["get"]; ok {
-		var get Operation
-		if err := yaml.Unmarshal(getBytes, &get); err != nil {
+		var getVal Operation
+		if err := yaml.Unmarshal(getBytes, &getVal); err != nil {
 			return err
 		}
-		v.get = &get
+		v.get = &getVal
 	}
 
 	if putBytes, ok := proxy["put"]; ok {
-		var put Operation
-		if err := yaml.Unmarshal(putBytes, &put); err != nil {
+		var putVal Operation
+		if err := yaml.Unmarshal(putBytes, &putVal); err != nil {
 			return err
 		}
-		v.put = &put
+		v.put = &putVal
 	}
 
 	if postBytes, ok := proxy["post"]; ok {
-		var post Operation
-		if err := yaml.Unmarshal(postBytes, &post); err != nil {
+		var postVal Operation
+		if err := yaml.Unmarshal(postBytes, &postVal); err != nil {
 			return err
 		}
-		v.post = &post
+		v.post = &postVal
 	}
 
 	if deleteBytes, ok := proxy["delete"]; ok {
-		var delete Operation
-		if err := yaml.Unmarshal(deleteBytes, &delete); err != nil {
+		var deleteVal Operation
+		if err := yaml.Unmarshal(deleteBytes, &deleteVal); err != nil {
 			return err
 		}
-		v.delete = &delete
+		v.delete = &deleteVal
 	}
 
 	if optionsBytes, ok := proxy["options"]; ok {
-		var options Operation
-		if err := yaml.Unmarshal(optionsBytes, &options); err != nil {
+		var optionsVal Operation
+		if err := yaml.Unmarshal(optionsBytes, &optionsVal); err != nil {
 			return err
 		}
-		v.options = &options
+		v.options = &optionsVal
 	}
 
 	if headBytes, ok := proxy["head"]; ok {
-		var head Operation
-		if err := yaml.Unmarshal(headBytes, &head); err != nil {
+		var headVal Operation
+		if err := yaml.Unmarshal(headBytes, &headVal); err != nil {
 			return err
 		}
-		v.head = &head
+		v.head = &headVal
 	}
 
 	if patchBytes, ok := proxy["patch"]; ok {
-		var patch Operation
-		if err := yaml.Unmarshal(patchBytes, &patch); err != nil {
+		var patchVal Operation
+		if err := yaml.Unmarshal(patchBytes, &patchVal); err != nil {
 			return err
 		}
-		v.patch = &patch
+		v.patch = &patchVal
 	}
 
 	if traceBytes, ok := proxy["trace"]; ok {
-		var trace Operation
-		if err := yaml.Unmarshal(traceBytes, &trace); err != nil {
+		var traceVal Operation
+		if err := yaml.Unmarshal(traceBytes, &traceVal); err != nil {
 			return err
 		}
-		v.trace = &trace
+		v.trace = &traceVal
 	}
 
 	if serversBytes, ok := proxy["servers"]; ok {
-		var servers []*Server
-		if err := yaml.Unmarshal(serversBytes, &servers); err != nil {
+		var serversVal []*Server
+		if err := yaml.Unmarshal(serversBytes, &serversVal); err != nil {
 			return err
 		}
-		v.servers = servers
+		v.servers = serversVal
 	}
 
 	if parametersBytes, ok := proxy["parameters"]; ok {
-		var parameters []*Parameter
-		if err := yaml.Unmarshal(parametersBytes, &parameters); err != nil {
+		var parametersVal []*Parameter
+		if err := yaml.Unmarshal(parametersBytes, &parametersVal); err != nil {
 			return err
 		}
-		v.parameters = parameters
+		v.parameters = parametersVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -696,110 +647,101 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	}
 
 	if tagsBytes, ok := proxy["tags"]; ok {
-		var tags []string
-		if err := yaml.Unmarshal(tagsBytes, &tags); err != nil {
+		var tagsVal []string
+		if err := yaml.Unmarshal(tagsBytes, &tagsVal); err != nil {
 			return err
 		}
-		v.tags = tags
+		v.tags = tagsVal
 	}
 
 	if summaryBytes, ok := proxy["summary"]; ok {
-		v.summary = string(summaryBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.summary); submatch != nil {
-			v.summary = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.summary); submatch != nil {
-				v.summary = submatch[1]
-			}
+		var summaryVal string
+		if err := yaml.Unmarshal(summaryBytes, &summaryVal); err != nil {
+			return err
 		}
+		v.summary = summaryVal
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
-		var externalDocs ExternalDocumentation
-		if err := yaml.Unmarshal(externalDocsBytes, &externalDocs); err != nil {
+		var externalDocsVal ExternalDocumentation
+		if err := yaml.Unmarshal(externalDocsBytes, &externalDocsVal); err != nil {
 			return err
 		}
-		v.externalDocs = &externalDocs
+		v.externalDocs = &externalDocsVal
 	}
 
 	if operationIDBytes, ok := proxy["operationID"]; ok {
-		v.operationID = string(operationIDBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.operationID); submatch != nil {
-			v.operationID = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.operationID); submatch != nil {
-				v.operationID = submatch[1]
-			}
+		var operationIDVal string
+		if err := yaml.Unmarshal(operationIDBytes, &operationIDVal); err != nil {
+			return err
 		}
+		v.operationID = operationIDVal
 	}
 
 	if parametersBytes, ok := proxy["parameters"]; ok {
-		var parameters Parameter
-		if err := yaml.Unmarshal(parametersBytes, &parameters); err != nil {
+		var parametersVal []*Parameter
+		if err := yaml.Unmarshal(parametersBytes, &parametersVal); err != nil {
 			return err
 		}
-		v.parameters = &parameters
+		v.parameters = parametersVal
 	}
 
 	if requestBodyBytes, ok := proxy["requestBody"]; ok {
-		var requestBody RequestBody
-		if err := yaml.Unmarshal(requestBodyBytes, &requestBody); err != nil {
+		var requestBodyVal RequestBody
+		if err := yaml.Unmarshal(requestBodyBytes, &requestBodyVal); err != nil {
 			return err
 		}
-		v.requestBody = &requestBody
+		v.requestBody = &requestBodyVal
 	}
 
 	responsesBytes, ok := proxy["responses"]
 	if !ok {
 		return errors.New(`"responses" field is required`)
 	}
-	var responses Responses
-	if err := yaml.Unmarshal(responsesBytes, &responses); err != nil {
+	var responsesVal Responses
+	if err := yaml.Unmarshal(responsesBytes, &responsesVal); err != nil {
 		return err
 	}
-	v.responses = &responses
+	v.responses = &responsesVal
 
 	if callbacksBytes, ok := proxy["callbacks"]; ok {
-		var callbacks map[string]*Callback
-		if err := yaml.Unmarshal(callbacksBytes, &callbacks); err != nil {
+		var callbacksVal map[string]*Callback
+		if err := yaml.Unmarshal(callbacksBytes, &callbacksVal); err != nil {
 			return err
 		}
-		v.callbacks = callbacks
+		v.callbacks = callbacksVal
 	}
 
 	if deprecatedBytes, ok := proxy["deprecated"]; ok {
-		t, err := strconv.ParseBool(string(deprecatedBytes))
-		if err != nil {
+		var deprecatedVal bool
+		if err := yaml.Unmarshal(deprecatedBytes, &deprecatedVal); err != nil {
 			return err
 		}
-		v.deprecated = t
+		v.deprecated = deprecatedVal
 	}
 
 	if securityBytes, ok := proxy["security"]; ok {
-		var security []*SecurityRequirement
-		if err := yaml.Unmarshal(securityBytes, &security); err != nil {
+		var securityVal []*SecurityRequirement
+		if err := yaml.Unmarshal(securityBytes, &securityVal); err != nil {
 			return err
 		}
-		v.security = security
+		v.security = securityVal
 	}
 
 	if serversBytes, ok := proxy["servers"]; ok {
-		var servers []*Server
-		if err := yaml.Unmarshal(serversBytes, &servers); err != nil {
+		var serversVal []*Server
+		if err := yaml.Unmarshal(serversBytes, &serversVal); err != nil {
 			return err
 		}
-		v.servers = servers
+		v.servers = serversVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -825,28 +767,22 @@ func (v *ExternalDocumentation) UnmarshalYAML(b []byte) error {
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 
 	urlBytes, ok := proxy["url"]
 	if !ok {
 		return errors.New(`"url" field is required`)
 	}
-	v.url = string(urlBytes)
-	if submatch := singleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
-		v.url = submatch[1]
-	} else {
-		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.url); submatch != nil {
-			v.url = submatch[1]
-		}
+	var urlVal string
+	if err := yaml.Unmarshal(urlBytes, &urlVal); err != nil {
+		return err
 	}
+	v.url = urlVal
 
 	if _, err := url.ParseRequestURI(v.url); err != nil {
 		return err
@@ -878,124 +814,112 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"name" field is required`)
 	}
-	v.name = string(nameBytes)
-	if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-		v.name = submatch[1]
-	} else {
-		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-			v.name = submatch[1]
-		}
+	var nameVal string
+	if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
+		return err
 	}
+	v.name = nameVal
 
 	inBytes, ok := proxy["in"]
 	if !ok {
 		return errors.New(`"in" field is required`)
 	}
-	v.in = string(inBytes)
-	if submatch := singleQuotedRegexp.FindStringSubmatch(v.in); submatch != nil {
-		v.in = submatch[1]
-	} else {
-		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.in); submatch != nil {
-			v.in = submatch[1]
-		}
+	var inVal string
+	if err := yaml.Unmarshal(inBytes, &inVal); err != nil {
+		return err
 	}
+	v.in = inVal
 
-	if isOneOf(v.in, []string{"query", "header", "path", "cookie"}) {
+	if !isOneOf(v.in, []string{"query", "header", "path", "cookie"}) {
 		return errors.New(`"in" field must be one of ["query", "header", "path", "cookie"]`)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 
 	if requiredBytes, ok := proxy["required"]; ok {
-		t, err := strconv.ParseBool(string(requiredBytes))
-		if err != nil {
+		var requiredVal bool
+		if err := yaml.Unmarshal(requiredBytes, &requiredVal); err != nil {
 			return err
 		}
-		v.required = t
+		v.required = requiredVal
 	}
 
 	if deprecatedBytes, ok := proxy["deprecated"]; ok {
-		t, err := strconv.ParseBool(string(deprecatedBytes))
-		if err != nil {
+		var deprecatedVal bool
+		if err := yaml.Unmarshal(deprecatedBytes, &deprecatedVal); err != nil {
 			return err
 		}
-		v.deprecated = t
+		v.deprecated = deprecatedVal
 	}
 
 	if allowEmptyValueBytes, ok := proxy["allowEmptyValue"]; ok {
-		t, err := strconv.ParseBool(string(allowEmptyValueBytes))
-		if err != nil {
+		var allowEmptyValueVal bool
+		if err := yaml.Unmarshal(allowEmptyValueBytes, &allowEmptyValueVal); err != nil {
 			return err
 		}
-		v.allowEmptyValue = t
+		v.allowEmptyValue = allowEmptyValueVal
 	}
 
 	if styleBytes, ok := proxy["style"]; ok {
-		v.style = string(styleBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.style); submatch != nil {
-			v.style = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.style); submatch != nil {
-				v.style = submatch[1]
-			}
+		var styleVal string
+		if err := yaml.Unmarshal(styleBytes, &styleVal); err != nil {
+			return err
 		}
+		v.style = styleVal
 	}
 
 	if explodeBytes, ok := proxy["explode"]; ok {
-		t, err := strconv.ParseBool(string(explodeBytes))
-		if err != nil {
+		var explodeVal bool
+		if err := yaml.Unmarshal(explodeBytes, &explodeVal); err != nil {
 			return err
 		}
-		v.explode = t
+		v.explode = explodeVal
 	}
 
 	if allowReservedBytes, ok := proxy["allowReserved"]; ok {
-		t, err := strconv.ParseBool(string(allowReservedBytes))
-		if err != nil {
+		var allowReservedVal bool
+		if err := yaml.Unmarshal(allowReservedBytes, &allowReservedVal); err != nil {
 			return err
 		}
-		v.allowReserved = t
+		v.allowReserved = allowReservedVal
 	}
 
 	if schemaBytes, ok := proxy["schema"]; ok {
-		var schema Schema
-		if err := yaml.Unmarshal(schemaBytes, &schema); err != nil {
+		var schemaVal Schema
+		if err := yaml.Unmarshal(schemaBytes, &schemaVal); err != nil {
 			return err
 		}
-		v.schema = &schema
+		v.schema = &schemaVal
 	}
 
 	if exampleBytes, ok := proxy["example"]; ok {
-		var example interface{}
-		if err := yaml.Unmarshal(exampleBytes, &example); err != nil {
+		var exampleVal interface{}
+		if err := yaml.Unmarshal(exampleBytes, &exampleVal); err != nil {
 			return err
 		}
-		v.example = example
+		v.example = exampleVal
 	}
 
 	if examplesBytes, ok := proxy["examples"]; ok {
-		var examples map[string]*Example
-		if err := yaml.Unmarshal(examplesBytes, &examples); err != nil {
+		var examplesVal map[string]*Example
+		if err := yaml.Unmarshal(examplesBytes, &examplesVal); err != nil {
 			return err
 		}
-		v.examples = examples
+		v.examples = examplesVal
 	}
 
 	if contentBytes, ok := proxy["content"]; ok {
-		var content map[string]*MediaType
-		if err := yaml.Unmarshal(contentBytes, &content); err != nil {
+		var contentVal map[string]*MediaType
+		if err := yaml.Unmarshal(contentBytes, &contentVal); err != nil {
 			return err
 		}
-		v.content = content
+		v.content = contentVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1013,14 +937,11 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-			v.reference = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-				v.reference = submatch[1]
-			}
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
 		}
+		v.reference = referenceVal
 	}
 	return nil
 }
@@ -1032,32 +953,29 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 
 	contentBytes, ok := proxy["content"]
 	if !ok {
 		return errors.New(`"content" field is required`)
 	}
-	var content map[string]*MediaType
-	if err := yaml.Unmarshal(contentBytes, &content); err != nil {
+	var contentVal map[string]*MediaType
+	if err := yaml.Unmarshal(contentBytes, &contentVal); err != nil {
 		return err
 	}
-	v.content = content
+	v.content = contentVal
 
 	if requiredBytes, ok := proxy["required"]; ok {
-		t, err := strconv.ParseBool(string(requiredBytes))
-		if err != nil {
+		var requiredVal bool
+		if err := yaml.Unmarshal(requiredBytes, &requiredVal); err != nil {
 			return err
 		}
-		v.required = t
+		v.required = requiredVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1075,14 +993,11 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-			v.reference = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-				v.reference = submatch[1]
-			}
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
 		}
+		v.reference = referenceVal
 	}
 	return nil
 }
@@ -1094,35 +1009,35 @@ func (v *MediaType) UnmarshalYAML(b []byte) error {
 	}
 
 	if schemaBytes, ok := proxy["schema"]; ok {
-		var schema Schema
-		if err := yaml.Unmarshal(schemaBytes, &schema); err != nil {
+		var schemaVal Schema
+		if err := yaml.Unmarshal(schemaBytes, &schemaVal); err != nil {
 			return err
 		}
-		v.schema = &schema
+		v.schema = &schemaVal
 	}
 
 	if exampleBytes, ok := proxy["example"]; ok {
-		var example interface{}
-		if err := yaml.Unmarshal(exampleBytes, &example); err != nil {
+		var exampleVal interface{}
+		if err := yaml.Unmarshal(exampleBytes, &exampleVal); err != nil {
 			return err
 		}
-		v.example = example
+		v.example = exampleVal
 	}
 
 	if examplesBytes, ok := proxy["examples"]; ok {
-		var examples map[string]*Example
-		if err := yaml.Unmarshal(examplesBytes, &examples); err != nil {
+		var examplesVal map[string]*Example
+		if err := yaml.Unmarshal(examplesBytes, &examplesVal); err != nil {
 			return err
 		}
-		v.examples = examples
+		v.examples = examplesVal
 	}
 
 	if encodingBytes, ok := proxy["encoding"]; ok {
-		var encoding map[string]*Encoding
-		if err := yaml.Unmarshal(encodingBytes, &encoding); err != nil {
+		var encodingVal map[string]*Encoding
+		if err := yaml.Unmarshal(encodingBytes, &encodingVal); err != nil {
 			return err
 		}
-		v.encoding = encoding
+		v.encoding = encodingVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1148,52 +1063,43 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 	}
 
 	if contentTypeBytes, ok := proxy["contentType"]; ok {
-		v.contentType = string(contentTypeBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.contentType); submatch != nil {
-			v.contentType = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.contentType); submatch != nil {
-				v.contentType = submatch[1]
-			}
+		var contentTypeVal string
+		if err := yaml.Unmarshal(contentTypeBytes, &contentTypeVal); err != nil {
+			return err
 		}
+		v.contentType = contentTypeVal
 	}
 
 	if headersBytes, ok := proxy["headers"]; ok {
-		var headers map[string]*Header
-		if err := yaml.Unmarshal(headersBytes, &headers); err != nil {
+		var headersVal map[string]*Header
+		if err := yaml.Unmarshal(headersBytes, &headersVal); err != nil {
 			return err
 		}
-		v.headers = headers
+		v.headers = headersVal
 	}
 
 	if styleBytes, ok := proxy["style"]; ok {
-		v.style = string(styleBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.style); submatch != nil {
-			v.style = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.style); submatch != nil {
-				v.style = submatch[1]
-			}
+		var styleVal string
+		if err := yaml.Unmarshal(styleBytes, &styleVal); err != nil {
+			return err
 		}
+		v.style = styleVal
 	}
 
 	if explodeBytes, ok := proxy["explode"]; ok {
-		v.explode = string(explodeBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.explode); submatch != nil {
-			v.explode = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.explode); submatch != nil {
-				v.explode = submatch[1]
-			}
+		var explodeVal string
+		if err := yaml.Unmarshal(explodeBytes, &explodeVal); err != nil {
+			return err
 		}
+		v.explode = explodeVal
 	}
 
 	if allowReservedBytes, ok := proxy["allowReserved"]; ok {
-		t, err := strconv.ParseBool(string(allowReservedBytes))
-		if err != nil {
+		var allowReservedVal bool
+		if err := yaml.Unmarshal(allowReservedBytes, &allowReservedVal); err != nil {
 			return err
 		}
-		v.allowReserved = t
+		v.allowReserved = allowReservedVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1259,37 +1165,34 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"description" field is required`)
 	}
-	v.description = string(descriptionBytes)
-	if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-		v.description = submatch[1]
-	} else {
-		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		}
+	var descriptionVal string
+	if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+		return err
 	}
+	v.description = descriptionVal
 
 	if headersBytes, ok := proxy["headers"]; ok {
-		var headers map[string]*Header
-		if err := yaml.Unmarshal(headersBytes, &headers); err != nil {
+		var headersVal map[string]*Header
+		if err := yaml.Unmarshal(headersBytes, &headersVal); err != nil {
 			return err
 		}
-		v.headers = headers
+		v.headers = headersVal
 	}
 
 	if contentBytes, ok := proxy["content"]; ok {
-		var content map[string]*MediaType
-		if err := yaml.Unmarshal(contentBytes, &content); err != nil {
+		var contentVal map[string]*MediaType
+		if err := yaml.Unmarshal(contentBytes, &contentVal); err != nil {
 			return err
 		}
-		v.content = content
+		v.content = contentVal
 	}
 
 	if linksBytes, ok := proxy["links"]; ok {
-		var links map[string]*Link
-		if err := yaml.Unmarshal(linksBytes, &links); err != nil {
+		var linksVal map[string]*Link
+		if err := yaml.Unmarshal(linksBytes, &linksVal); err != nil {
 			return err
 		}
-		v.links = links
+		v.links = linksVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1307,14 +1210,11 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-			v.reference = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-				v.reference = submatch[1]
-			}
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
 		}
+		v.reference = referenceVal
 	}
 	return nil
 }
@@ -1324,19 +1224,16 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
 		return err
 	}
-
-	if callbackBytes, ok := proxy["callback"]; ok {
-		var callback map[string]*PathItem
-		if err := yaml.Unmarshal(callbackBytes, &callback); err != nil {
+	callback := map[string]*PathItem{}
+	for key, val := range proxy {
+		var callbackv PathItem
+		if err := yaml.Unmarshal(val, &callbackv); err != nil {
 			return err
 		}
-		v.callback = callback
+		callback[key] = &callbackv
 	}
-
-	for key := range v.callback {
-		if !matchRuntimeExpr(key) {
-			return errors.New(`the keys of "callback" must be a runtime expression`)
-		}
+	if len(callback) != 0 {
+		v.callback = callback
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1354,14 +1251,11 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-			v.reference = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-				v.reference = submatch[1]
-			}
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
 		}
+		v.reference = referenceVal
 	}
 	return nil
 }
@@ -1373,44 +1267,35 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	}
 
 	if summaryBytes, ok := proxy["summary"]; ok {
-		v.summary = string(summaryBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.summary); submatch != nil {
-			v.summary = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.summary); submatch != nil {
-				v.summary = submatch[1]
-			}
+		var summaryVal string
+		if err := yaml.Unmarshal(summaryBytes, &summaryVal); err != nil {
+			return err
 		}
+		v.summary = summaryVal
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 
 	if valueBytes, ok := proxy["value"]; ok {
-		var value interface{}
-		if err := yaml.Unmarshal(valueBytes, &value); err != nil {
+		var valueVal interface{}
+		if err := yaml.Unmarshal(valueBytes, &valueVal); err != nil {
 			return err
 		}
-		v.value = value
+		v.value = valueVal
 	}
 
 	if externalValeBytes, ok := proxy["externalVale"]; ok {
-		v.externalVale = string(externalValeBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.externalVale); submatch != nil {
-			v.externalVale = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.externalVale); submatch != nil {
-				v.externalVale = submatch[1]
-			}
+		var externalValeVal string
+		if err := yaml.Unmarshal(externalValeBytes, &externalValeVal); err != nil {
+			return err
 		}
+		v.externalVale = externalValeVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1428,14 +1313,11 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-			v.reference = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-				v.reference = submatch[1]
-			}
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
 		}
+		v.reference = referenceVal
 	}
 	return nil
 }
@@ -1447,60 +1329,51 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	}
 
 	if operationreferenceBytes, ok := proxy["operationreference"]; ok {
-		v.operationreference = string(operationreferenceBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.operationreference); submatch != nil {
-			v.operationreference = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.operationreference); submatch != nil {
-				v.operationreference = submatch[1]
-			}
+		var operationreferenceVal string
+		if err := yaml.Unmarshal(operationreferenceBytes, &operationreferenceVal); err != nil {
+			return err
 		}
+		v.operationreference = operationreferenceVal
 	}
 
 	if operationIDBytes, ok := proxy["operationId"]; ok {
-		v.operationID = string(operationIDBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.operationID); submatch != nil {
-			v.operationID = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.operationID); submatch != nil {
-				v.operationID = submatch[1]
-			}
+		var operationIDVal string
+		if err := yaml.Unmarshal(operationIDBytes, &operationIDVal); err != nil {
+			return err
 		}
+		v.operationID = operationIDVal
 	}
 
 	if parametersBytes, ok := proxy["parameters"]; ok {
-		var parameters map[string]interface{}
-		if err := yaml.Unmarshal(parametersBytes, &parameters); err != nil {
+		var parametersVal map[string]interface{}
+		if err := yaml.Unmarshal(parametersBytes, &parametersVal); err != nil {
 			return err
 		}
-		v.parameters = parameters
+		v.parameters = parametersVal
 	}
 
 	if requestBodyBytes, ok := proxy["requestBody"]; ok {
-		var requestBody interface{}
-		if err := yaml.Unmarshal(requestBodyBytes, &requestBody); err != nil {
+		var requestBodyVal interface{}
+		if err := yaml.Unmarshal(requestBodyBytes, &requestBodyVal); err != nil {
 			return err
 		}
-		v.requestBody = requestBody
+		v.requestBody = requestBodyVal
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 
 	if serverBytes, ok := proxy["server"]; ok {
-		var server Server
-		if err := yaml.Unmarshal(serverBytes, &server); err != nil {
+		var serverVal Server
+		if err := yaml.Unmarshal(serverBytes, &serverVal); err != nil {
 			return err
 		}
-		v.server = &server
+		v.server = &serverVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1518,14 +1391,11 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-			v.reference = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-				v.reference = submatch[1]
-			}
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
 		}
+		v.reference = referenceVal
 	}
 	return nil
 }
@@ -1537,119 +1407,107 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
-		v.name = string(nameBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-			v.name = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-				v.name = submatch[1]
-			}
+		var nameVal string
+		if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
+			return err
 		}
+		v.name = nameVal
 	}
 
 	if inBytes, ok := proxy["in"]; ok {
-		v.in = string(inBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.in); submatch != nil {
-			v.in = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.in); submatch != nil {
-				v.in = submatch[1]
-			}
+		var inVal string
+		if err := yaml.Unmarshal(inBytes, &inVal); err != nil {
+			return err
 		}
+		v.in = inVal
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 
 	if requiredBytes, ok := proxy["required"]; ok {
-		t, err := strconv.ParseBool(string(requiredBytes))
-		if err != nil {
+		var requiredVal bool
+		if err := yaml.Unmarshal(requiredBytes, &requiredVal); err != nil {
 			return err
 		}
-		v.required = t
+		v.required = requiredVal
 	}
 
 	if deprecatedBytes, ok := proxy["deprecated"]; ok {
-		t, err := strconv.ParseBool(string(deprecatedBytes))
-		if err != nil {
+		var deprecatedVal bool
+		if err := yaml.Unmarshal(deprecatedBytes, &deprecatedVal); err != nil {
 			return err
 		}
-		v.deprecated = t
+		v.deprecated = deprecatedVal
 	}
 
 	if allowEmptyValueBytes, ok := proxy["allowEmptyValue"]; ok {
-		t, err := strconv.ParseBool(string(allowEmptyValueBytes))
-		if err != nil {
+		var allowEmptyValueVal bool
+		if err := yaml.Unmarshal(allowEmptyValueBytes, &allowEmptyValueVal); err != nil {
 			return err
 		}
-		v.allowEmptyValue = t
+		v.allowEmptyValue = allowEmptyValueVal
 	}
 
 	if styleBytes, ok := proxy["style"]; ok {
-		v.style = string(styleBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.style); submatch != nil {
-			v.style = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.style); submatch != nil {
-				v.style = submatch[1]
-			}
+		var styleVal string
+		if err := yaml.Unmarshal(styleBytes, &styleVal); err != nil {
+			return err
 		}
+		v.style = styleVal
 	}
 
 	if explodeBytes, ok := proxy["explode"]; ok {
-		t, err := strconv.ParseBool(string(explodeBytes))
-		if err != nil {
+		var explodeVal bool
+		if err := yaml.Unmarshal(explodeBytes, &explodeVal); err != nil {
 			return err
 		}
-		v.explode = t
+		v.explode = explodeVal
 	}
 
 	if allowReservedBytes, ok := proxy["allowReserved"]; ok {
-		t, err := strconv.ParseBool(string(allowReservedBytes))
-		if err != nil {
+		var allowReservedVal bool
+		if err := yaml.Unmarshal(allowReservedBytes, &allowReservedVal); err != nil {
 			return err
 		}
-		v.allowReserved = t
+		v.allowReserved = allowReservedVal
 	}
 
 	if schemaBytes, ok := proxy["schema"]; ok {
-		var schema Schema
-		if err := yaml.Unmarshal(schemaBytes, &schema); err != nil {
+		var schemaVal Schema
+		if err := yaml.Unmarshal(schemaBytes, &schemaVal); err != nil {
 			return err
 		}
-		v.schema = &schema
+		v.schema = &schemaVal
 	}
 
 	if exampleBytes, ok := proxy["example"]; ok {
-		var example interface{}
-		if err := yaml.Unmarshal(exampleBytes, &example); err != nil {
+		var exampleVal interface{}
+		if err := yaml.Unmarshal(exampleBytes, &exampleVal); err != nil {
 			return err
 		}
-		v.example = example
+		v.example = exampleVal
 	}
 
 	if examplesBytes, ok := proxy["examples"]; ok {
-		var examples map[string]*Example
-		if err := yaml.Unmarshal(examplesBytes, &examples); err != nil {
+		var examplesVal map[string]*Example
+		if err := yaml.Unmarshal(examplesBytes, &examplesVal); err != nil {
 			return err
 		}
-		v.examples = examples
+		v.examples = examplesVal
 	}
 
 	if contentBytes, ok := proxy["content"]; ok {
-		var content map[string]*MediaType
-		if err := yaml.Unmarshal(contentBytes, &content); err != nil {
+		var contentVal map[string]*MediaType
+		if err := yaml.Unmarshal(contentBytes, &contentVal); err != nil {
 			return err
 		}
-		v.content = content
+		v.content = contentVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1667,14 +1525,11 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-			v.reference = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-				v.reference = submatch[1]
-			}
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
 		}
+		v.reference = referenceVal
 	}
 	return nil
 }
@@ -1689,32 +1544,26 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 	if !ok {
 		return errors.New(`"name" field is required`)
 	}
-	v.name = string(nameBytes)
-	if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-		v.name = submatch[1]
-	} else {
-		if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-			v.name = submatch[1]
-		}
+	var nameVal string
+	if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
+		return err
 	}
+	v.name = nameVal
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
-		var externalDocs ExternalDocumentation
-		if err := yaml.Unmarshal(externalDocsBytes, &externalDocs); err != nil {
+		var externalDocsVal ExternalDocumentation
+		if err := yaml.Unmarshal(externalDocsBytes, &externalDocsVal); err != nil {
 			return err
 		}
-		v.externalDocs = &externalDocs
+		v.externalDocs = &externalDocsVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1740,293 +1589,275 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	}
 
 	if titleBytes, ok := proxy["title"]; ok {
-		v.title = string(titleBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.title); submatch != nil {
-			v.title = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.title); submatch != nil {
-				v.title = submatch[1]
-			}
+		var titleVal string
+		if err := yaml.Unmarshal(titleBytes, &titleVal); err != nil {
+			return err
 		}
+		v.title = titleVal
 	}
 
 	if multipleOfBytes, ok := proxy["multipleOf"]; ok {
-		i, err := strconv.Atoi(string(multipleOfBytes))
-		if err != nil {
+		var multipleOfVal int
+		if err := yaml.Unmarshal(multipleOfBytes, &multipleOfVal); err != nil {
 			return err
 		}
-		v.multipleOf = i
+		v.multipleOf = multipleOfVal
 	}
 
 	if maximumBytes, ok := proxy["maximum"]; ok {
-		i, err := strconv.Atoi(string(maximumBytes))
-		if err != nil {
+		var maximumVal int
+		if err := yaml.Unmarshal(maximumBytes, &maximumVal); err != nil {
 			return err
 		}
-		v.maximum = i
+		v.maximum = maximumVal
 	}
 
 	if exclusiveMaximumBytes, ok := proxy["exclusiveMaximum"]; ok {
-		t, err := strconv.ParseBool(string(exclusiveMaximumBytes))
-		if err != nil {
+		var exclusiveMaximumVal bool
+		if err := yaml.Unmarshal(exclusiveMaximumBytes, &exclusiveMaximumVal); err != nil {
 			return err
 		}
-		v.exclusiveMaximum = t
+		v.exclusiveMaximum = exclusiveMaximumVal
 	}
 
 	if minimumBytes, ok := proxy["minimum"]; ok {
-		i, err := strconv.Atoi(string(minimumBytes))
-		if err != nil {
+		var minimumVal int
+		if err := yaml.Unmarshal(minimumBytes, &minimumVal); err != nil {
 			return err
 		}
-		v.minimum = i
+		v.minimum = minimumVal
 	}
 
 	if exclusiveMinimumBytes, ok := proxy["exclusiveMinimum"]; ok {
-		t, err := strconv.ParseBool(string(exclusiveMinimumBytes))
-		if err != nil {
+		var exclusiveMinimumVal bool
+		if err := yaml.Unmarshal(exclusiveMinimumBytes, &exclusiveMinimumVal); err != nil {
 			return err
 		}
-		v.exclusiveMinimum = t
+		v.exclusiveMinimum = exclusiveMinimumVal
 	}
 
 	if maxLengthBytes, ok := proxy["maxLength"]; ok {
-		i, err := strconv.Atoi(string(maxLengthBytes))
-		if err != nil {
+		var maxLengthVal int
+		if err := yaml.Unmarshal(maxLengthBytes, &maxLengthVal); err != nil {
 			return err
 		}
-		v.maxLength = i
+		v.maxLength = maxLengthVal
 	}
 
 	if minLengthBytes, ok := proxy["minLength"]; ok {
-		i, err := strconv.Atoi(string(minLengthBytes))
-		if err != nil {
+		var minLengthVal int
+		if err := yaml.Unmarshal(minLengthBytes, &minLengthVal); err != nil {
 			return err
 		}
-		v.minLength = i
+		v.minLength = minLengthVal
 	}
 
 	if patternBytes, ok := proxy["pattern"]; ok {
-		v.pattern = string(patternBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.pattern); submatch != nil {
-			v.pattern = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.pattern); submatch != nil {
-				v.pattern = submatch[1]
-			}
+		var patternVal string
+		if err := yaml.Unmarshal(patternBytes, &patternVal); err != nil {
+			return err
 		}
+		v.pattern = patternVal
 	}
 
 	if maxItemsBytes, ok := proxy["maxItems"]; ok {
-		i, err := strconv.Atoi(string(maxItemsBytes))
-		if err != nil {
+		var maxItemsVal int
+		if err := yaml.Unmarshal(maxItemsBytes, &maxItemsVal); err != nil {
 			return err
 		}
-		v.maxItems = i
+		v.maxItems = maxItemsVal
 	}
 
 	if minItemsBytes, ok := proxy["minItems"]; ok {
-		i, err := strconv.Atoi(string(minItemsBytes))
-		if err != nil {
+		var minItemsVal int
+		if err := yaml.Unmarshal(minItemsBytes, &minItemsVal); err != nil {
 			return err
 		}
-		v.minItems = i
+		v.minItems = minItemsVal
 	}
 
 	if maxPropertiesBytes, ok := proxy["maxProperties"]; ok {
-		i, err := strconv.Atoi(string(maxPropertiesBytes))
-		if err != nil {
+		var maxPropertiesVal int
+		if err := yaml.Unmarshal(maxPropertiesBytes, &maxPropertiesVal); err != nil {
 			return err
 		}
-		v.maxProperties = i
+		v.maxProperties = maxPropertiesVal
 	}
 
 	if minPropertiesBytes, ok := proxy["minProperties"]; ok {
-		i, err := strconv.Atoi(string(minPropertiesBytes))
-		if err != nil {
+		var minPropertiesVal int
+		if err := yaml.Unmarshal(minPropertiesBytes, &minPropertiesVal); err != nil {
 			return err
 		}
-		v.minProperties = i
+		v.minProperties = minPropertiesVal
 	}
 
 	if requiredBytes, ok := proxy["required"]; ok {
-		var required []string
-		if err := yaml.Unmarshal(requiredBytes, &required); err != nil {
+		var requiredVal []string
+		if err := yaml.Unmarshal(requiredBytes, &requiredVal); err != nil {
 			return err
 		}
-		v.required = required
+		v.required = requiredVal
 	}
 
 	if enumBytes, ok := proxy["enum"]; ok {
-		var enum []string
-		if err := yaml.Unmarshal(enumBytes, &enum); err != nil {
+		var enumVal []string
+		if err := yaml.Unmarshal(enumBytes, &enumVal); err != nil {
 			return err
 		}
-		v.enum = enum
+		v.enum = enumVal
 	}
 
 	if type_Bytes, ok := proxy["type"]; ok {
-		v.type_ = string(type_Bytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.type_); submatch != nil {
-			v.type_ = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.type_); submatch != nil {
-				v.type_ = submatch[1]
-			}
+		var type_Val string
+		if err := yaml.Unmarshal(type_Bytes, &type_Val); err != nil {
+			return err
 		}
+		v.type_ = type_Val
 	}
 
 	if allOfBytes, ok := proxy["allOf"]; ok {
-		var allOf []*Schema
-		if err := yaml.Unmarshal(allOfBytes, &allOf); err != nil {
+		var allOfVal []*Schema
+		if err := yaml.Unmarshal(allOfBytes, &allOfVal); err != nil {
 			return err
 		}
-		v.allOf = allOf
+		v.allOf = allOfVal
 	}
 
 	if oneOfBytes, ok := proxy["oneOf"]; ok {
-		var oneOf []*Schema
-		if err := yaml.Unmarshal(oneOfBytes, &oneOf); err != nil {
+		var oneOfVal []*Schema
+		if err := yaml.Unmarshal(oneOfBytes, &oneOfVal); err != nil {
 			return err
 		}
-		v.oneOf = oneOf
+		v.oneOf = oneOfVal
 	}
 
 	if anyOfBytes, ok := proxy["anyOf"]; ok {
-		var anyOf []*Schema
-		if err := yaml.Unmarshal(anyOfBytes, &anyOf); err != nil {
+		var anyOfVal []*Schema
+		if err := yaml.Unmarshal(anyOfBytes, &anyOfVal); err != nil {
 			return err
 		}
-		v.anyOf = anyOf
+		v.anyOf = anyOfVal
 	}
 
 	if notBytes, ok := proxy["not"]; ok {
-		var not Schema
-		if err := yaml.Unmarshal(notBytes, &not); err != nil {
+		var notVal Schema
+		if err := yaml.Unmarshal(notBytes, &notVal); err != nil {
 			return err
 		}
-		v.not = &not
+		v.not = &notVal
 	}
 
 	if itemsBytes, ok := proxy["items"]; ok {
-		var items Schema
-		if err := yaml.Unmarshal(itemsBytes, &items); err != nil {
+		var itemsVal Schema
+		if err := yaml.Unmarshal(itemsBytes, &itemsVal); err != nil {
 			return err
 		}
-		v.items = &items
+		v.items = &itemsVal
 	}
 
 	if propertiesBytes, ok := proxy["properties"]; ok {
-		var properties map[string]*Schema
-		if err := yaml.Unmarshal(propertiesBytes, &properties); err != nil {
+		var propertiesVal map[string]*Schema
+		if err := yaml.Unmarshal(propertiesBytes, &propertiesVal); err != nil {
 			return err
 		}
-		v.properties = properties
+		v.properties = propertiesVal
 	}
 
 	if additionalPropertiesBytes, ok := proxy["additionalProperties"]; ok {
-		var additionalProperties Schema
-		if err := yaml.Unmarshal(additionalPropertiesBytes, &additionalProperties); err != nil {
+		var additionalPropertiesVal Schema
+		if err := yaml.Unmarshal(additionalPropertiesBytes, &additionalPropertiesVal); err != nil {
 			return err
 		}
-		v.additionalProperties = &additionalProperties
+		v.additionalProperties = &additionalPropertiesVal
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 
 	if formatBytes, ok := proxy["format"]; ok {
-		v.format = string(formatBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.format); submatch != nil {
-			v.format = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.format); submatch != nil {
-				v.format = submatch[1]
-			}
+		var formatVal string
+		if err := yaml.Unmarshal(formatBytes, &formatVal); err != nil {
+			return err
 		}
+		v.format = formatVal
 	}
 
 	if default_Bytes, ok := proxy["default"]; ok {
-		v.default_ = string(default_Bytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.default_); submatch != nil {
-			v.default_ = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.default_); submatch != nil {
-				v.default_ = submatch[1]
-			}
+		var default_Val string
+		if err := yaml.Unmarshal(default_Bytes, &default_Val); err != nil {
+			return err
 		}
+		v.default_ = default_Val
 	}
 
 	if nullableBytes, ok := proxy["nullable"]; ok {
-		t, err := strconv.ParseBool(string(nullableBytes))
-		if err != nil {
+		var nullableVal bool
+		if err := yaml.Unmarshal(nullableBytes, &nullableVal); err != nil {
 			return err
 		}
-		v.nullable = t
+		v.nullable = nullableVal
 	}
 
 	if discriminatorBytes, ok := proxy["discriminator"]; ok {
-		var discriminator Discriminator
-		if err := yaml.Unmarshal(discriminatorBytes, &discriminator); err != nil {
+		var discriminatorVal Discriminator
+		if err := yaml.Unmarshal(discriminatorBytes, &discriminatorVal); err != nil {
 			return err
 		}
-		v.discriminator = &discriminator
+		v.discriminator = &discriminatorVal
 	}
 
 	if readOnlyBytes, ok := proxy["readOnly"]; ok {
-		t, err := strconv.ParseBool(string(readOnlyBytes))
-		if err != nil {
+		var readOnlyVal bool
+		if err := yaml.Unmarshal(readOnlyBytes, &readOnlyVal); err != nil {
 			return err
 		}
-		v.readOnly = t
+		v.readOnly = readOnlyVal
 	}
 
 	if writeOnlyBytes, ok := proxy["writeOnly"]; ok {
-		t, err := strconv.ParseBool(string(writeOnlyBytes))
-		if err != nil {
+		var writeOnlyVal bool
+		if err := yaml.Unmarshal(writeOnlyBytes, &writeOnlyVal); err != nil {
 			return err
 		}
-		v.writeOnly = t
+		v.writeOnly = writeOnlyVal
 	}
 
 	if xmlBytes, ok := proxy["xml"]; ok {
-		var xml XML
-		if err := yaml.Unmarshal(xmlBytes, &xml); err != nil {
+		var xmlVal XML
+		if err := yaml.Unmarshal(xmlBytes, &xmlVal); err != nil {
 			return err
 		}
-		v.xml = &xml
+		v.xml = &xmlVal
 	}
 
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
-		var externalDocs ExternalDocumentation
-		if err := yaml.Unmarshal(externalDocsBytes, &externalDocs); err != nil {
+		var externalDocsVal ExternalDocumentation
+		if err := yaml.Unmarshal(externalDocsBytes, &externalDocsVal); err != nil {
 			return err
 		}
-		v.externalDocs = &externalDocs
+		v.externalDocs = &externalDocsVal
 	}
 
 	if exampleBytes, ok := proxy["example"]; ok {
-		var example interface{}
-		if err := yaml.Unmarshal(exampleBytes, &example); err != nil {
+		var exampleVal interface{}
+		if err := yaml.Unmarshal(exampleBytes, &exampleVal); err != nil {
 			return err
 		}
-		v.example = example
+		v.example = exampleVal
 	}
 
 	if deprecatedBytes, ok := proxy["deprecated"]; ok {
-		t, err := strconv.ParseBool(string(deprecatedBytes))
-		if err != nil {
+		var deprecatedVal bool
+		if err := yaml.Unmarshal(deprecatedBytes, &deprecatedVal); err != nil {
 			return err
 		}
-		v.deprecated = t
+		v.deprecated = deprecatedVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -2044,14 +1875,11 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-			v.reference = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-				v.reference = submatch[1]
-			}
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
 		}
+		v.reference = referenceVal
 	}
 	return nil
 }
@@ -2063,22 +1891,19 @@ func (v *Discriminator) UnmarshalYAML(b []byte) error {
 	}
 
 	if propertyNameBytes, ok := proxy["propertyName"]; ok {
-		v.propertyName = string(propertyNameBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.propertyName); submatch != nil {
-			v.propertyName = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.propertyName); submatch != nil {
-				v.propertyName = submatch[1]
-			}
+		var propertyNameVal string
+		if err := yaml.Unmarshal(propertyNameBytes, &propertyNameVal); err != nil {
+			return err
 		}
+		v.propertyName = propertyNameVal
 	}
 
 	if mappingBytes, ok := proxy["mapping"]; ok {
-		var mapping map[string]string
-		if err := yaml.Unmarshal(mappingBytes, &mapping); err != nil {
+		var mappingVal map[string]string
+		if err := yaml.Unmarshal(mappingBytes, &mappingVal); err != nil {
 			return err
 		}
-		v.mapping = mapping
+		v.mapping = mappingVal
 	}
 	return nil
 }
@@ -2090,52 +1915,43 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
-		v.name = string(nameBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-			v.name = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-				v.name = submatch[1]
-			}
+		var nameVal string
+		if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
+			return err
 		}
+		v.name = nameVal
 	}
 
 	if namespaceBytes, ok := proxy["namespace"]; ok {
-		v.namespace = string(namespaceBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.namespace); submatch != nil {
-			v.namespace = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.namespace); submatch != nil {
-				v.namespace = submatch[1]
-			}
+		var namespaceVal string
+		if err := yaml.Unmarshal(namespaceBytes, &namespaceVal); err != nil {
+			return err
 		}
+		v.namespace = namespaceVal
 	}
 
 	if prefixBytes, ok := proxy["prefix"]; ok {
-		v.prefix = string(prefixBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.prefix); submatch != nil {
-			v.prefix = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.prefix); submatch != nil {
-				v.prefix = submatch[1]
-			}
+		var prefixVal string
+		if err := yaml.Unmarshal(prefixBytes, &prefixVal); err != nil {
+			return err
 		}
+		v.prefix = prefixVal
 	}
 
 	if attributeBytes, ok := proxy["attribute"]; ok {
-		t, err := strconv.ParseBool(string(attributeBytes))
-		if err != nil {
+		var attributeVal bool
+		if err := yaml.Unmarshal(attributeBytes, &attributeVal); err != nil {
 			return err
 		}
-		v.attribute = t
+		v.attribute = attributeVal
 	}
 
 	if wrappedBytes, ok := proxy["wrapped"]; ok {
-		t, err := strconv.ParseBool(string(wrappedBytes))
-		if err != nil {
+		var wrappedVal bool
+		if err := yaml.Unmarshal(wrappedBytes, &wrappedVal); err != nil {
 			return err
 		}
-		v.wrapped = t
+		v.wrapped = wrappedVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -2161,100 +1977,79 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if type_Bytes, ok := proxy["type"]; ok {
-		v.type_ = string(type_Bytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.type_); submatch != nil {
-			v.type_ = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.type_); submatch != nil {
-				v.type_ = submatch[1]
-			}
+		var type_Val string
+		if err := yaml.Unmarshal(type_Bytes, &type_Val); err != nil {
+			return err
 		}
+		v.type_ = type_Val
 	}
 
 	if v.type_ != "" {
-		if isOneOf(v.type_, []string{"apiKey", "http", "oauth2", "openIdConnect"}) {
+		if !isOneOf(v.type_, []string{"apiKey", "http", "oauth2", "openIdConnect"}) {
 			return errors.New(`"type" field must be one of ["apiKey", "http", "oauth2", "openIdConnect"]`)
 		}
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
-		v.description = string(descriptionBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-			v.description = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.description); submatch != nil {
-				v.description = submatch[1]
-			}
+		var descriptionVal string
+		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
+			return err
 		}
+		v.description = descriptionVal
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
-		v.name = string(nameBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-			v.name = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.name); submatch != nil {
-				v.name = submatch[1]
-			}
+		var nameVal string
+		if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
+			return err
 		}
+		v.name = nameVal
 	}
 
 	if inBytes, ok := proxy["in"]; ok {
-		v.in = string(inBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.in); submatch != nil {
-			v.in = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.in); submatch != nil {
-				v.in = submatch[1]
-			}
+		var inVal string
+		if err := yaml.Unmarshal(inBytes, &inVal); err != nil {
+			return err
 		}
+		v.in = inVal
 	}
 
 	if v.in != "" {
-		if isOneOf(v.in, []string{"query", "header", "cookie"}) {
+		if !isOneOf(v.in, []string{"query", "header", "cookie"}) {
 			return errors.New(`"in" field must be one of ["query", "header", "cookie"]`)
 		}
 	}
 
 	if schemeBytes, ok := proxy["scheme"]; ok {
-		v.scheme = string(schemeBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.scheme); submatch != nil {
-			v.scheme = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.scheme); submatch != nil {
-				v.scheme = submatch[1]
-			}
+		var schemeVal string
+		if err := yaml.Unmarshal(schemeBytes, &schemeVal); err != nil {
+			return err
 		}
+		v.scheme = schemeVal
 	}
 
 	if bearerFormatBytes, ok := proxy["bearerFormat"]; ok {
-		v.bearerFormat = string(bearerFormatBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.bearerFormat); submatch != nil {
-			v.bearerFormat = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.bearerFormat); submatch != nil {
-				v.bearerFormat = submatch[1]
-			}
+		var bearerFormatVal string
+		if err := yaml.Unmarshal(bearerFormatBytes, &bearerFormatVal); err != nil {
+			return err
 		}
+		v.bearerFormat = bearerFormatVal
 	}
 
 	if flowsBytes, ok := proxy["flows"]; ok {
-		var flows OAuthFlows
-		if err := yaml.Unmarshal(flowsBytes, &flows); err != nil {
+		var flowsVal OAuthFlows
+		if err := yaml.Unmarshal(flowsBytes, &flowsVal); err != nil {
 			return err
 		}
-		v.flows = &flows
+		v.flows = &flowsVal
 	}
 
 	if openIDConnectURLBytes, ok := proxy["openIdConnectUrl"]; ok {
-		v.openIDConnectURL = string(openIDConnectURLBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.openIDConnectURL); submatch != nil {
-			v.openIDConnectURL = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.openIDConnectURL); submatch != nil {
-				v.openIDConnectURL = submatch[1]
-			}
+		var openIDConnectURLVal string
+		if err := yaml.Unmarshal(openIDConnectURLBytes, &openIDConnectURLVal); err != nil {
+			return err
 		}
+		v.openIDConnectURL = openIDConnectURLVal
 	}
 
 	if v.openIDConnectURL != "" {
@@ -2278,14 +2073,11 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if referenceBytes, ok := proxy["$ref"]; ok {
-		v.reference = string(referenceBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-			v.reference = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.reference); submatch != nil {
-				v.reference = submatch[1]
-			}
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
 		}
+		v.reference = referenceVal
 	}
 	return nil
 }
@@ -2297,35 +2089,35 @@ func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 	}
 
 	if implicitBytes, ok := proxy["implicit"]; ok {
-		var implicit OAuthFlow
-		if err := yaml.Unmarshal(implicitBytes, &implicit); err != nil {
+		var implicitVal OAuthFlow
+		if err := yaml.Unmarshal(implicitBytes, &implicitVal); err != nil {
 			return err
 		}
-		v.implicit = &implicit
+		v.implicit = &implicitVal
 	}
 
 	if passwordBytes, ok := proxy["password"]; ok {
-		var password OAuthFlow
-		if err := yaml.Unmarshal(passwordBytes, &password); err != nil {
+		var passwordVal OAuthFlow
+		if err := yaml.Unmarshal(passwordBytes, &passwordVal); err != nil {
 			return err
 		}
-		v.password = &password
+		v.password = &passwordVal
 	}
 
 	if clientCredentialsBytes, ok := proxy["clientCredentials"]; ok {
-		var clientCredentials OAuthFlow
-		if err := yaml.Unmarshal(clientCredentialsBytes, &clientCredentials); err != nil {
+		var clientCredentialsVal OAuthFlow
+		if err := yaml.Unmarshal(clientCredentialsBytes, &clientCredentialsVal); err != nil {
 			return err
 		}
-		v.clientCredentials = &clientCredentials
+		v.clientCredentials = &clientCredentialsVal
 	}
 
 	if authorizationCodeBytes, ok := proxy["authorizationCode"]; ok {
-		var authorizationCode OAuthFlow
-		if err := yaml.Unmarshal(authorizationCodeBytes, &authorizationCode); err != nil {
+		var authorizationCodeVal OAuthFlow
+		if err := yaml.Unmarshal(authorizationCodeBytes, &authorizationCodeVal); err != nil {
 			return err
 		}
-		v.authorizationCode = &authorizationCode
+		v.authorizationCode = &authorizationCodeVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -2351,14 +2143,11 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	}
 
 	if authorizationURLBytes, ok := proxy["authorizationUrl"]; ok {
-		v.authorizationURL = string(authorizationURLBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.authorizationURL); submatch != nil {
-			v.authorizationURL = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.authorizationURL); submatch != nil {
-				v.authorizationURL = submatch[1]
-			}
+		var authorizationURLVal string
+		if err := yaml.Unmarshal(authorizationURLBytes, &authorizationURLVal); err != nil {
+			return err
 		}
+		v.authorizationURL = authorizationURLVal
 	}
 
 	if v.authorizationURL != "" {
@@ -2368,14 +2157,11 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	}
 
 	if tokenURLBytes, ok := proxy["tokenUrl"]; ok {
-		v.tokenURL = string(tokenURLBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.tokenURL); submatch != nil {
-			v.tokenURL = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.tokenURL); submatch != nil {
-				v.tokenURL = submatch[1]
-			}
+		var tokenURLVal string
+		if err := yaml.Unmarshal(tokenURLBytes, &tokenURLVal); err != nil {
+			return err
 		}
+		v.tokenURL = tokenURLVal
 	}
 
 	if v.tokenURL != "" {
@@ -2385,14 +2171,11 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	}
 
 	if refreshURLBytes, ok := proxy["refreshUrl"]; ok {
-		v.refreshURL = string(refreshURLBytes)
-		if submatch := singleQuotedRegexp.FindStringSubmatch(v.refreshURL); submatch != nil {
-			v.refreshURL = submatch[1]
-		} else {
-			if submatch := doubleQuotedRegexp.FindStringSubmatch(v.refreshURL); submatch != nil {
-				v.refreshURL = submatch[1]
-			}
+		var refreshURLVal string
+		if err := yaml.Unmarshal(refreshURLBytes, &refreshURLVal); err != nil {
+			return err
 		}
+		v.refreshURL = refreshURLVal
 	}
 
 	if v.refreshURL != "" {
@@ -2402,11 +2185,11 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	}
 
 	if scopesBytes, ok := proxy["scopes"]; ok {
-		var scopes map[string]string
-		if err := yaml.Unmarshal(scopesBytes, &scopes); err != nil {
+		var scopesVal map[string]string
+		if err := yaml.Unmarshal(scopesBytes, &scopesVal); err != nil {
 			return err
 		}
-		v.scopes = scopes
+		v.scopes = scopesVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {

@@ -27,7 +27,6 @@ func main() {
 	outf("\n\"errors\"")
 	outf("\n\"net/url\"")
 	outf("\n\"regexp\"")
-	outf("\n\"strconv\"")
 	outf("\n\"strings\"")
 	outf("\n")
 	outf("\nyaml \"github.com/goccy/go-yaml\"")
@@ -113,7 +112,7 @@ func main() {
 				}
 
 				unmarshalField := func() {
-					outf("\nif err := yaml.Unmarshal(%sBytes, &%[1]s); err != nil {", fn)
+					outf("\nif err := yaml.Unmarshal(%sBytes, &%[1]sVal); err != nil {", fn)
 					outf("\nreturn err")
 					outf("\n}")
 				}
@@ -128,42 +127,14 @@ func main() {
 					outf("if %sBytes, ok := proxy[\"%s\"]; ok {", fn, yn)
 				}
 
-				switch t := field.Type.(type) {
-				case *ast.Ident: // built-in type
-					switch t.Name {
-					case "string":
-						outf("\nv.%s = string(%[1]sBytes)", fn)
-						outf("\nif submatch := singleQuotedRegexp.FindStringSubmatch(v.%s); submatch != nil {", fn)
-						outf("\nv.%s = submatch[1]", fn)
-						outf("\n} else {")
-						outf("\nif submatch := doubleQuotedRegexp.FindStringSubmatch(v.%s); submatch != nil {", fn)
-						outf("\nv.%s = submatch[1]", fn)
-						outf("\n}")
-						outf("\n}")
-					case "bool":
-						outf("\nt, err := strconv.ParseBool(string(%sBytes))", fn)
-						outf("\nif err != nil {")
-						outf("\nreturn err")
-						outf("\n}")
-						outf("\nv.%s = t", fn)
-					case "int":
-						outf("\ni, err := strconv.Atoi(string(%sBytes))", fn)
-						outf("\nif err != nil {")
-						outf("\nreturn err")
-						outf("\n}")
-						outf("\nv.%s = i", fn)
-					default:
-						log.Fatalf("unknown type for %s: %s", fn, t.Name)
-					}
-				default:
-					outf("\nvar %s %s", fn, strings.TrimPrefix(ast2type(t), "*"))
-					unmarshalField()
-					outf("\nv.%s = ", fn)
-					if _, ok := t.(*ast.StarExpr); ok {
-						outf("&")
-					}
-					outf("%s", fn)
+				outf("\nvar %sVal %s", fn, strings.TrimPrefix(ast2type(field.Type), "*"))
+				unmarshalField()
+				outf("\nv.%s = ", fn)
+				if _, ok := field.Type.(*ast.StarExpr); ok {
+					outf("&")
 				}
+				outf("%sVal", fn)
+
 				if !required {
 					outf("\n}")
 				}
@@ -239,7 +210,7 @@ func formatValidation(outf func(string, ...interface{}), fieldname, yamlname str
 		if !required {
 			outf("\nif v.%s != \"\" {", fieldname)
 		}
-		outf("\nif isOneOf(v.%s, %#v) {", fieldname, list)
+		outf("\nif !isOneOf(v.%s, %#v) {", fieldname, list)
 		outf("\nreturn errors.New(`\"%s\" field must be one of [%s]`)", yamlname, strings.Join(quoteEachString(list), ", "))
 		outf("\n}")
 		if !required {

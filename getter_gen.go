@@ -354,10 +354,7 @@ func (v *Operation) OperationID() string {
 	return v.operationID
 }
 
-func (v *Operation) Parameters() *Parameter {
-	if v.parameters == nil {
-		return &Parameter{}
-	}
+func (v *Operation) Parameters() []*Parameter {
 	return v.parameters
 }
 
