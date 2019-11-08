@@ -678,7 +678,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 		v.externalDocs = &externalDocsVal
 	}
 
-	if operationIDBytes, ok := proxy["operationID"]; ok {
+	if operationIDBytes, ok := proxy["operationId"]; ok {
 		var operationIDVal string
 		if err := yaml.Unmarshal(operationIDBytes, &operationIDVal); err != nil {
 			return err

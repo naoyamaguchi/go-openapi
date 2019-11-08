@@ -138,7 +138,7 @@ type Operation struct {
 	summary      string                 `yaml:",omitempty"`
 	description  string                 `yaml:",omitempty"`
 	externalDocs *ExternalDocumentation `yaml:",omitempty"`
-	operationID  string                 `yaml:",omitempty"`
+	operationID  string                 `yaml:"operationId,omitempty"`
 	parameters   []*Parameter           `yaml:",omitempty"`
 	requestBody  *RequestBody           `yaml:",omitempty"`
 	responses    *Responses             `required:"yes"`

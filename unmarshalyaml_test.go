@@ -587,6 +587,129 @@ func TestPathsUnmarshalYAML(t *testing.T) {
 	}
 }
 
+func TestPathItemUnmarshalYAML(t *testing.T) {
+	yml := `get:
+  description: Returns pets based on ID
+  summary: Find pets by ID
+  operationId: getPetsById
+  responses:
+    '200':
+      description: pet response
+      content:
+        '*/*' :
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Pet'
+    default:
+      description: error payload
+      content:
+        'text/html':
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+parameters:
+- name: id
+  in: path
+  description: ID of pet to use
+  required: true
+  schema:
+    type: array
+    # This is in example but maybe mistake
+    # style: simple
+    items:
+      type: string  `
+	var pathItem PathItem
+	if err := yaml.Unmarshal([]byte(yml), &pathItem); err != nil {
+		t.Fatal(err)
+	}
+	t.Run("get", func(t *testing.T) {
+		op := pathItem.get
+		if op.description != "Returns pets based on ID" {
+			t.Errorf("unexpected get.description: %s", op.description)
+			return
+		}
+		if op.summary != "Find pets by ID" {
+			t.Errorf("unexpected get.summary: %s", op.summary)
+			return
+		}
+		if op.operationID != "getPetsById" {
+			t.Errorf("unexpected get.operationId: %s", op.operationID)
+			return
+		}
+		t.Run("200", func(t *testing.T) {
+			response, ok := pathItem.get.responses.responses["200"]
+			if !ok {
+				t.Error("get.responses.200 is not found")
+				return
+			}
+			if response.description != "pet response" {
+				t.Errorf("unexpected get.responses.200.description: %s", response.description)
+				return
+			}
+			if _, ok := response.content["*/*"]; !ok {
+				t.Error("get.responses.200.content.*/* is not found")
+				return
+			}
+			schema := response.content["*/*"].schema
+			if schema.type_ != "array" {
+				t.Errorf("unexpected get.responses.200.content.*/*.schema.type: %s", schema.type_)
+				return
+			}
+			if schema.items.reference != "#/components/schemas/Pet" {
+				t.Errorf("unexpected get.responses.200.content.*/*.schema.items.$ref: %s", schema.items.reference)
+				return
+			}
+		})
+		t.Run("default", func(t *testing.T) {
+			response, ok := pathItem.get.responses.responses["default"]
+			if !ok {
+				t.Error("get.responses.default is not found")
+				return
+			}
+			if response.description != "error payload" {
+				t.Errorf("unexpected get.responses.default.description: %s", response.description)
+				return
+			}
+			if _, ok := response.content["text/html"]; !ok {
+				t.Error("get.responses.default.content.text/html is not found")
+				return
+			}
+			if response.content["text/html"].schema.reference != "#/components/schemas/ErrorModel" {
+				t.Errorf("unexpected get.responses.default.content.text/html.schema.$ref: %s", response.content["text/html"].schema.reference)
+				return
+			}
+		})
+	})
+	t.Run("parameters", func(t *testing.T) {
+		parameters := pathItem.parameters
+		id := parameters[0]
+		if id.name != "id" {
+			t.Errorf("unexpected parameters.0.name: %s", id.name)
+			return
+		}
+		if id.in != "path" {
+			t.Errorf("unexpected parameters.0.in: %s", id.in)
+			return
+		}
+		if id.description != "ID of pet to use" {
+			t.Errorf("unexpected parameters.0.description: %s", id.description)
+			return
+		}
+		if id.required != true {
+			t.Errorf("unexpected parameters.0.required: %t", id.required)
+			return
+		}
+		if id.schema.type_ != "array" {
+			t.Errorf("unexpected parameters.0.schema.type: %s", id.schema.type_)
+			return
+		}
+		if id.schema.items.type_ != "string" {
+			t.Errorf("unexpected parameters.0.schema.items.type: %s", id.schema.items.type_)
+			return
+		}
+	})
+}
+
 func TestIsOneOf(t *testing.T) {
 	tests := []struct {
 		s    string
