@@ -316,66 +316,66 @@ func TestComponentsUnmarshalYAML(t *testing.T) {
 	t.Run("schemas.GeneralError", func(t *testing.T) {
 		generalError, ok := schemas["GeneralError"]
 		if !ok {
-			t.Error("schemas.GeneralError is not found")
+			t.Error("components.schemas.GeneralError is not found")
 			return
 		}
 		if generalError.type_ != "object" {
-			t.Errorf("unexpected schema.type: %s", generalError.type_)
+			t.Errorf("unexpected components.schema.type: %s", generalError.type_)
 			return
 		}
 		code, ok := generalError.properties["code"]
 		if !ok {
-			t.Error("schemas.GeneralError.properties.code is not found")
+			t.Error("components.schemas.GeneralError.properties.code is not found")
 			return
 		}
 		if code.type_ != "integer" {
-			t.Errorf("unexpected schemas.GeneralError.properties.code.type: %s", code.type_)
+			t.Errorf("unexpected components.schemas.GeneralError.properties.code.type: %s", code.type_)
 			return
 		}
 		if code.format != "int32" {
-			t.Errorf("unexpected schemas.GeneralError.properties.code.format: %s", code.format)
+			t.Errorf("unexpected components.schemas.GeneralError.properties.code.format: %s", code.format)
 			return
 		}
 		message, ok := generalError.properties["message"]
 		if !ok {
-			t.Error("schemas.GeneralError.properties.message is not found")
+			t.Error("components.schemas.GeneralError.properties.message is not found")
 			return
 		}
 		if message.type_ != "string" {
-			t.Errorf("unexpected schemas.GeneralError.properties.message.type: %s", message.type_)
+			t.Errorf("unexpected components.schemas.GeneralError.properties.message.type: %s", message.type_)
 			return
 		}
 	})
 	t.Run("schemas.Category", func(t *testing.T) {
 		category, ok := schemas["Category"]
 		if !ok {
-			t.Error("schemas.Category is not found")
+			t.Error("components.schemas.Category is not found")
 			return
 		}
 		if category.type_ != "object" {
-			t.Errorf("unexpected schema.Category.type: %s", category.type_)
+			t.Errorf("unexpected components.schema.Category.type: %s", category.type_)
 			return
 		}
 		id, ok := category.properties["id"]
 		if !ok {
-			t.Error("schemas.Category.properties.id is not found")
+			t.Error("components.schemas.Category.properties.id is not found")
 			return
 		}
 		if id.type_ != "integer" {
-			t.Errorf("unexpected schemas.Category.properties.id.type: %s", id.type_)
+			t.Errorf("unexpected components.schemas.Category.properties.id.type: %s", id.type_)
 			return
 		}
 		if id.format != "int64" {
-			t.Errorf("unexpected schemas.Category.properties.id.format: %s", id.format)
+			t.Errorf("unexpected components.schemas.Category.properties.id.format: %s", id.format)
 			return
 		}
 		name, ok := category.properties["name"]
 		if !ok {
-			t.Error("schemas.Category.properties.name is not found")
+			t.Error("components.schemas.Category.properties.name is not found")
 			return
 		}
 		if name.type_ != "string" {
-			t.Errorf("unexpected schemas.Category.properties.name.type: %s", name.type_)
+			t.Errorf("unexpected components.schemas.Category.properties.name.type: %s", name.type_)
 			return
 		}
 	})
@@ -383,64 +383,64 @@ func TestComponentsUnmarshalYAML(t *testing.T) {
 	t.Run("parameters.skipParam", func(t *testing.T) {
 		skipParam, ok := parameters["skipParam"]
 		if !ok {
-			t.Error("parameters.skipParam is not found")
+			t.Error("components.parameters.skipParam is not found")
 			return
 		}
 		if skipParam.name != "skip" {
-			t.Errorf("unexpected parameters.skipParam.name: %s", skipParam.name)
+			t.Errorf("unexpected components.parameters.skipParam.name: %s", skipParam.name)
 			return
 		}
 		if skipParam.in != "query" {
-			t.Errorf("unexpected parameters.skipParam.in: %s", skipParam.in)
+			t.Errorf("unexpected components.parameters.skipParam.in: %s", skipParam.in)
 			return
 		}
 		if skipParam.description != "number of items to skip" {
-			t.Errorf("unexpected parameters.skipParam.description: %s", skipParam.description)
+			t.Errorf("unexpected components.parameters.skipParam.description: %s", skipParam.description)
 			return
 		}
 		if skipParam.required != true {
-			t.Errorf("unexpected parameters.skipParam.required: %t", skipParam.required)
+			t.Errorf("unexpected components.parameters.skipParam.required: %t", skipParam.required)
 			return
 		}
 		schema := skipParam.schema
 		if schema.type_ != "integer" {
-			t.Errorf("unexpected parameters.skipParam.schema.type: %s", schema.type_)
+			t.Errorf("unexpected components.parameters.skipParam.schema.type: %s", schema.type_)
 			return
 		}
 		if schema.format != "int32" {
-			t.Errorf("unexpected parameters.skipParam.schema.format: %s", schema.format)
+			t.Errorf("unexpected components.parameters.skipParam.schema.format: %s", schema.format)
 			return
 		}
 	})
 	t.Run("parameters.limitParam", func(t *testing.T) {
 		limitParam, ok := parameters["limitParam"]
 		if !ok {
-			t.Error("parameters.limitParam is not found")
+			t.Error("components.parameters.limitParam is not found")
 			return
 		}
 		if limitParam.name != "limit" {
-			t.Errorf("unexpected parameters.limitParam.name: %s", limitParam.name)
+			t.Errorf("unexpected components.parameters.limitParam.name: %s", limitParam.name)
 			return
 		}
 		if limitParam.in != "query" {
-			t.Errorf("unexpected parameters.limitParam.in: %s", limitParam.in)
+			t.Errorf("unexpected components.parameters.limitParam.in: %s", limitParam.in)
 			return
 		}
 		if limitParam.description != "max records to return" {
-			t.Errorf("unexpected parameters.limitParam.description: %s", limitParam.description)
+			t.Errorf("unexpected components.parameters.limitParam.description: %s", limitParam.description)
 			return
 		}
 		if limitParam.required != true {
-			t.Errorf("unexpected parameters.limitParam.required: %t", limitParam.required)
+			t.Errorf("unexpected components.parameters.limitParam.required: %t", limitParam.required)
 			return
 		}
 		schema := limitParam.schema
 		if schema.type_ != "integer" {
-			t.Errorf("unexpected parameters.limitParam.schema.type: %s", schema.type_)
+			t.Errorf("unexpected components.parameters.limitParam.schema.type: %s", schema.type_)
 			return
 		}
 		if schema.format != "int32" {
-			t.Errorf("unexpected parameters.limitParam.schema.format: %s", schema.format)
+			t.Errorf("unexpected components.parameters.limitParam.schema.format: %s", schema.format)
 			return
 		}
 	})
@@ -448,42 +448,42 @@ func TestComponentsUnmarshalYAML(t *testing.T) {
 	t.Run("responses.NotFound", func(t *testing.T) {
 		notFound, ok := responses["NotFound"]
 		if !ok {
-			t.Error("responses.NotFound is not found")
+			t.Error("components.responses.NotFound is not found")
 			return
 		}
 		if notFound.description != "Entity not found." {
-			t.Errorf("unexpected responses.NotFound.description: %s", notFound.description)
+			t.Errorf("unexpected components.responses.NotFound.description: %s", notFound.description)
 			return
 		}
 	})
 	t.Run("responses.IllegalInput", func(t *testing.T) {
 		illegalInput, ok := responses["IllegalInput"]
 		if !ok {
-			t.Error("responses.IllegalInput is not found")
+			t.Error("components.responses.IllegalInput is not found")
 			return
 		}
 		if illegalInput.description != "Illegal input for operation." {
-			t.Errorf("unexpected responses.IllegalInput.description: %s", illegalInput.description)
+			t.Errorf("unexpected components.responses.IllegalInput.description: %s", illegalInput.description)
 			return
 		}
 	})
 	t.Run("responses.GeneralError", func(t *testing.T) {
 		generalError, ok := responses["GeneralError"]
 		if !ok {
-			t.Error("responses.GeneralError is not found")
+			t.Error("components.responses.GeneralError is not found")
 			return
 		}
 		if generalError.description != "General Error" {
-			t.Errorf("unexpected responses.GeneralError.description: %s", generalError.description)
+			t.Errorf("unexpected components.responses.GeneralError.description: %s", generalError.description)
 			return
 		}
 		mediaType, ok := generalError.content["application/json"]
 		if !ok {
-			t.Error("responses.GeneralError.content.application/json is not found")
+			t.Error("components.responses.GeneralError.content.application/json is not found")
 			return
 		}
 		if mediaType.schema.reference != "#/components/schemas/GeneralError" {
-			t.Errorf("unexpected responses.GeneralError.content.application/json.schema.$ref")
+			t.Errorf("unexpected components.responses.GeneralError.content.application/json.schema.$ref")
 			return
 		}
 	})
@@ -491,52 +491,52 @@ func TestComponentsUnmarshalYAML(t *testing.T) {
 	t.Run("securitySchemes.api_key", func(t *testing.T) {
 		apiKey, ok := securitySchemes["api_key"]
 		if !ok {
-			t.Error("securitySchemes.api_key is not found")
+			t.Error("components.securitySchemes.api_key is not found")
 			return
 		}
 		if apiKey.type_ != "apiKey" {
-			t.Errorf("unexpected securitySchemes.api_key.type: %s", apiKey.type_)
+			t.Errorf("unexpected components.securitySchemes.api_key.type: %s", apiKey.type_)
 			return
 		}
 		if apiKey.name != "api_key" {
-			t.Errorf("unexpected securitySchemes.api_key.name: %s", apiKey.name)
+			t.Errorf("unexpected components.securitySchemes.api_key.name: %s", apiKey.name)
 			return
 		}
 		if apiKey.in != "header" {
-			t.Errorf("unexpected securitySchemes.api_key.in: %s", apiKey.in)
+			t.Errorf("unexpected components.securitySchemes.api_key.in: %s", apiKey.in)
 			return
 		}
 	})
 	t.Run("securitySchemes.petstore_auth", func(t *testing.T) {
 		petstoreAuth, ok := securitySchemes["petstore_auth"]
 		if !ok {
-			t.Error("securitySchemes.petstore_auth is not found")
+			t.Error("components.securitySchemes.petstore_auth is not found")
 			return
 		}
 		if petstoreAuth.type_ != "oauth2" {
-			t.Errorf("unexpected securitySchemes.petstore_auth.type: %s", petstoreAuth.type_)
+			t.Errorf("unexpected components.securitySchemes.petstore_auth.type: %s", petstoreAuth.type_)
 			return
 		}
 		if petstoreAuth.flows.implicit.authorizationURL != "http://example.org/api/oauth/dialog" {
-			t.Errorf("unexpected securitySchemes.petstore_auth.flows.implicit.authorizationURL: %s", petstoreAuth.flows.implicit.authorizationURL)
+			t.Errorf("unexpected components.securitySchemes.petstore_auth.flows.implicit.authorizationURL: %s", petstoreAuth.flows.implicit.authorizationURL)
 			return
 		}
 		scopes := petstoreAuth.flows.implicit.scopes
 		write, ok := scopes["write:pets"]
 		if !ok {
-			t.Error("securitySchemes.petstore_auth.flows.implicit.scopes.write:pets is not found")
+			t.Error("components.securitySchemes.petstore_auth.flows.implicit.scopes.write:pets is not found")
 			return
 		}
 		if write != "modify pets in your account" {
-			t.Errorf("unexpected securitySchemes.petstore_auth.flows.implicit.scopes.write:pets: %s", write)
+			t.Errorf("unexpected components.securitySchemes.petstore_auth.flows.implicit.scopes.write:pets: %s", write)
 		}
 		read, ok := scopes["read:pets"]
 		if !ok {
-			t.Error("securitySchemes.petstore_auth.flows.implicit.scopes.read:pets is not found")
+			t.Error("components.securitySchemes.petstore_auth.flows.implicit.scopes.read:pets is not found")
 			return
 		}
 		if read != "read your pets" {
-			t.Errorf("unexpected securitySchemes.petstore_auth.flows.implicit.scopes.read:pets: %s", write)
+			t.Errorf("unexpected components.securitySchemes.petstore_auth.flows.implicit.scopes.read:pets: %s", write)
 		}
 	})
 }
@@ -623,59 +623,59 @@ parameters:
 		t.Fatal(err)
 	}
 	t.Run("get", func(t *testing.T) {
-		op := pathItem.get
-		if op.description != "Returns pets based on ID" {
-			t.Errorf("unexpected get.description: %s", op.description)
+		operation := pathItem.get
+		if operation.description != "Returns pets based on ID" {
+			t.Errorf("unexpected pathItem.get.description: %s", operation.description)
 			return
 		}
-		if op.summary != "Find pets by ID" {
-			t.Errorf("unexpected get.summary: %s", op.summary)
+		if operation.summary != "Find pets by ID" {
+			t.Errorf("unexpected pathItem.get.summary: %s", operation.summary)
 			return
 		}
-		if op.operationID != "getPetsById" {
-			t.Errorf("unexpected get.operationId: %s", op.operationID)
+		if operation.operationID != "getPetsById" {
+			t.Errorf("unexpected pathItem.get.operationId: %s", operation.operationID)
 			return
 		}
 		t.Run("200", func(t *testing.T) {
 			response, ok := pathItem.get.responses.responses["200"]
 			if !ok {
-				t.Error("get.responses.200 is not found")
+				t.Error("pathItem.get.responses.200 is not found")
 				return
 			}
 			if response.description != "pet response" {
-				t.Errorf("unexpected get.responses.200.description: %s", response.description)
+				t.Errorf("unexpected pathItem.get.responses.200.description: %s", response.description)
 				return
 			}
 			if _, ok := response.content["*/*"]; !ok {
-				t.Error("get.responses.200.content.*/* is not found")
+				t.Error("pathItem.get.responses.200.content.*/* is not found")
 				return
 			}
 			schema := response.content["*/*"].schema
 			if schema.type_ != "array" {
-				t.Errorf("unexpected get.responses.200.content.*/*.schema.type: %s", schema.type_)
+				t.Errorf("unexpected pathItem.get.responses.200.content.*/*.schema.type: %s", schema.type_)
 				return
 			}
 			if schema.items.reference != "#/components/schemas/Pet" {
-				t.Errorf("unexpected get.responses.200.content.*/*.schema.items.$ref: %s", schema.items.reference)
+				t.Errorf("unexpected pathItem.get.responses.200.content.*/*.schema.items.$ref: %s", schema.items.reference)
 				return
 			}
 		})
 		t.Run("default", func(t *testing.T) {
 			response, ok := pathItem.get.responses.responses["default"]
 			if !ok {
-				t.Error("get.responses.default is not found")
+				t.Error("pathItem.get.responses.default is not found")
 				return
 			}
 			if response.description != "error payload" {
-				t.Errorf("unexpected get.responses.default.description: %s", response.description)
+				t.Errorf("unexpected pathItem.get.responses.default.description: %s", response.description)
 				return
 			}
 			if _, ok := response.content["text/html"]; !ok {
-				t.Error("get.responses.default.content.text/html is not found")
+				t.Error("pathItem.get.responses.default.content.text/html is not found")
 				return
 			}
 			if response.content["text/html"].schema.reference != "#/components/schemas/ErrorModel" {
-				t.Errorf("unexpected get.responses.default.content.text/html.schema.$ref: %s", response.content["text/html"].schema.reference)
+				t.Errorf("unexpected pathItem.get.responses.default.content.text/html.schema.$ref: %s", response.content["text/html"].schema.reference)
 				return
 			}
 		})
@@ -684,27 +684,710 @@ parameters:
 		parameters := pathItem.parameters
 		id := parameters[0]
 		if id.name != "id" {
-			t.Errorf("unexpected parameters.0.name: %s", id.name)
+			t.Errorf("unexpected pathItem.parameters.0.name: %s", id.name)
 			return
 		}
 		if id.in != "path" {
-			t.Errorf("unexpected parameters.0.in: %s", id.in)
+			t.Errorf("unexpected pathItem.parameters.0.in: %s", id.in)
 			return
 		}
 		if id.description != "ID of pet to use" {
-			t.Errorf("unexpected parameters.0.description: %s", id.description)
+			t.Errorf("unexpected pathItem.parameters.0.description: %s", id.description)
 			return
 		}
 		if id.required != true {
-			t.Errorf("unexpected parameters.0.required: %t", id.required)
+			t.Errorf("unexpected pathItem.parameters.0.required: %t", id.required)
 			return
 		}
 		if id.schema.type_ != "array" {
-			t.Errorf("unexpected parameters.0.schema.type: %s", id.schema.type_)
+			t.Errorf("unexpected pathItem.parameters.0.schema.type: %s", id.schema.type_)
 			return
 		}
 		if id.schema.items.type_ != "string" {
-			t.Errorf("unexpected parameters.0.schema.items.type: %s", id.schema.items.type_)
+			t.Errorf("unexpected pathItem.parameters.0.schema.items.type: %s", id.schema.items.type_)
+			return
+		}
+	})
+}
+
+func TestOperationUnmarshalYAML(t *testing.T) {
+	yml := `tags:
+- pet
+summary: Updates a pet in the store with form data
+operationId: updatePetWithForm
+parameters:
+- name: petId
+  in: path
+  description: ID of pet that needs to be updated
+  required: true
+  schema:
+    type: string
+requestBody:
+  content:
+    'application/x-www-form-urlencoded':
+      schema:
+       properties:
+          name:
+            description: Updated name of the pet
+            type: string
+          status:
+            description: Updated status of the pet
+            type: string
+       required:
+         - status
+responses:
+  '200':
+    description: Pet updated.
+    content:
+      'application/json': {}
+      'application/xml': {}
+  '405':
+    description: Method Not Allowed
+    content:
+      'application/json': {}
+      'application/xml': {}
+security:
+- petstore_auth:
+  - write:pets
+  - read:pets`
+	var operation Operation
+	if err := yaml.Unmarshal([]byte(yml), &operation); err != nil {
+		t.Fatal(err)
+	}
+	if operation.tags[0] != "pet" {
+		t.Errorf("unexpected operation.tags.0: %s", operation.tags[0])
+		return
+	}
+	if operation.summary != "Updates a pet in the store with form data" {
+		t.Errorf("unexpected opration.summary: %s", operation.summary)
+		return
+	}
+	if operation.operationID != "updatePetWithForm" {
+		t.Errorf("unexpected operation.operationId: %s", operation.operationID)
+		return
+	}
+	parameter := operation.parameters[0]
+	if parameter.name != "petId" {
+		t.Errorf("unexpected operation.parameters.0.name: %s", parameter.name)
+		return
+	}
+	if parameter.in != "path" {
+		t.Errorf("unexpected operation.parameters.0.in: %s", parameter.in)
+		return
+	}
+	if parameter.description != "ID of pet that needs to be updated" {
+		t.Errorf("unexpected operation.parameters.0.description: %s", parameter.description)
+		return
+	}
+	if parameter.required != true {
+		t.Errorf("unexpected operation.parameters.0.required: %t", parameter.required)
+		return
+	}
+	if parameter.schema.type_ != "string" {
+		t.Errorf("unexpected operation.parameters.0.schema.type: %s", parameter.schema.type_)
+		return
+	}
+	if _, ok := operation.requestBody.content["application/x-www-form-urlencoded"]; !ok {
+		t.Error("operation.requestBody.content.application/x-www-form-urlencoded is not found")
+		return
+	}
+	schema := operation.requestBody.content["application/x-www-form-urlencoded"].schema
+	name, ok := schema.properties["name"]
+	if !ok {
+		t.Error("operation.requestBody.content.application/x-www-form-urlencoded.schema.properties.name is not found")
+		return
+	}
+	if name.description != "Updated name of the pet" {
+		t.Errorf("unexpected operation.requestBody.content.application/x-www-form-urlencoded.schema.properties.name.description: %s", name.description)
+		return
+	}
+	if name.type_ != "string" {
+		t.Errorf("unexpected operation.requestBody.content.application/x-www-form-urlencoded.schema.properties.name.type: %s", name.type_)
+		return
+	}
+	status, ok := schema.properties["status"]
+	if !ok {
+		t.Error("operation.requestBody.content.application/x-www-form-urlencoded.schema.properties.status is not found")
+		return
+	}
+	if status.description != "Updated status of the pet" {
+		t.Errorf("unexpected operation.requestBody.content.application/x-www-form-urlencoded.schema.properties.status.description: %s", status.description)
+		return
+	}
+	if status.type_ != "string" {
+		t.Errorf("unexpected operation.requestBody.content.application/x-www-form-urlencoded.schema.properties.status.type: %s", status.type_)
+		return
+	}
+	if schema.required[0] != "status" {
+		t.Errorf("unexpected operation.requestBody.content.application/x-www-form-urlencoded.schema.required.0: %s", schema.required[0])
+		return
+	}
+	if _, ok := operation.responses.responses["200"]; !ok {
+		t.Error("operation.responses.200 is not found")
+		return
+	}
+	if operation.responses.responses["200"].description != "Pet updated." {
+		t.Errorf("unexpected operation.responses.200.description: %s", operation.responses.responses["200"].description)
+		return
+	}
+	if _, ok := operation.responses.responses["200"].content["application/json"]; !ok {
+		t.Error("operation.responses.200.content.application/json is not found")
+	}
+	if _, ok := operation.responses.responses["200"].content["application/xml"]; !ok {
+		t.Error("operation.responses.200.content.application/xml is not found")
+		return
+	}
+	if _, ok := operation.responses.responses["405"]; !ok {
+		t.Error("operation.responses.405 is not found")
+		return
+	}
+	if operation.responses.responses["405"].description != "Method Not Allowed" {
+		t.Errorf("unexpected operation.responses.405.description: %s", operation.responses.responses["405"].description)
+		return
+	}
+	if _, ok := operation.responses.responses["405"].content["application/json"]; !ok {
+		t.Error("operation.responses.405.content.application/json is not found")
+	}
+	if _, ok := operation.responses.responses["405"].content["application/xml"]; !ok {
+		t.Error("operation.responses.405.content.application/xml is not found")
+		return
+	}
+	securityRequirement, ok := operation.security[0].securityRequirement["petstore_auth"]
+	if !ok {
+		t.Error("operation.security.0.petstore_auth is not found")
+		return
+	}
+	if securityRequirement[0] != "write:pets" {
+		t.Errorf("unexpected operation.security.0.petstore_auth.0: %s", securityRequirement[0])
+		return
+	}
+	if securityRequirement[1] != "read:pets" {
+		t.Errorf("unexpected operation.security.0.petstore_auth.1: %s", securityRequirement[1])
+		return
+	}
+}
+
+func TestExternalDocumentationUnmarshalYAML(t *testing.T) {
+	yml := `description: Find more info here
+url: https://example.com`
+	var externalDocumentation ExternalDocumentation
+	if err := yaml.Unmarshal([]byte(yml), &externalDocumentation); err != nil {
+		t.Fatal(err)
+	}
+	if externalDocumentation.description != "Find more info here" {
+		t.Errorf("unexpected externalDocumentation.description: %s", externalDocumentation.description)
+		return
+	}
+	if externalDocumentation.url != "https://example.com" {
+		t.Errorf("unexpected externalDocumentation.url: %s", externalDocumentation.url)
+		return
+	}
+}
+
+func TestParameterUnmarshalYAML(t *testing.T) {
+	t.Run("header parameter", func(t *testing.T) {
+		yml := `name: token
+in: header
+description: token to be passed as a header
+required: true
+schema:
+  type: array
+  items:
+    type: integer
+    format: int64
+style: simple`
+		var parameter Parameter
+		if err := yaml.Unmarshal([]byte(yml), &parameter); err != nil {
+			t.Fatal(err)
+		}
+		if parameter.name != "token" {
+			t.Errorf("unexpected paramater.name: %s", parameter.name)
+			return
+		}
+		if parameter.in != "header" {
+			t.Errorf("unexpected parameter.in: %s", parameter.in)
+			return
+		}
+		if parameter.description != "token to be passed as a header" {
+			t.Errorf("unexpected parameter.description: %s", parameter.description)
+			return
+		}
+		if parameter.required != true {
+			t.Errorf("unexpected parameter.required: %t", parameter.required)
+			return
+		}
+		if parameter.schema.type_ != "array" {
+			t.Errorf("unexpected parameter.schema.type: %s", parameter.schema.type_)
+			return
+		}
+		if parameter.schema.items.type_ != "integer" {
+			t.Errorf("unexpected parameter.schema.items.type: %s", parameter.schema.items.type_)
+			return
+		}
+		if parameter.schema.items.format != "int64" {
+			t.Errorf("unexpected parameter.schema.items.format: %s", parameter.schema.items.format)
+			return
+		}
+		if parameter.style != "simple" {
+			t.Errorf("unexpected paarameter.style: %s", parameter.style)
+			return
+		}
+	})
+	t.Run("path parameter", func(t *testing.T) {
+		yml := `name: username
+in: path
+description: username to fetch
+required: true
+schema:
+  type: string`
+		var parameter Parameter
+		if err := yaml.Unmarshal([]byte(yml), &parameter); err != nil {
+			t.Fatal(err)
+		}
+		if parameter.name != "username" {
+			t.Errorf("unexpected parameter.name: %s", parameter.name)
+			return
+		}
+		if parameter.in != "path" {
+			t.Errorf("unexpected parameter.in: %s", parameter.in)
+			return
+		}
+		if parameter.description != "username to fetch" {
+			t.Errorf("unexpected parameter.description: %s", parameter.description)
+			return
+		}
+		if parameter.required != true {
+			t.Errorf("unexpected parameter.required: %t", parameter.required)
+			return
+		}
+		if parameter.schema.type_ != "string" {
+			t.Errorf("unexpected parameter.schema.type: %s", parameter.schema.type_)
+			return
+		}
+	})
+	t.Run("optional query parameter", func(t *testing.T) {
+		yml := `name: id
+in: query
+description: ID of the object to fetch
+required: false
+schema:
+  type: array
+  items:
+    type: string
+style: form
+explode: true`
+		var parameter Parameter
+		if err := yaml.Unmarshal([]byte(yml), &parameter); err != nil {
+			t.Fatal(err)
+		}
+		if parameter.name != "id" {
+			t.Errorf("unexpected parameter.name: %s", parameter.name)
+			return
+		}
+		if parameter.in != "query" {
+			t.Errorf("unexpected parameter.in: %s", parameter.in)
+			return
+		}
+		if parameter.description != "ID of the object to fetch" {
+			t.Errorf("unexpected parameter.description: %s", parameter.description)
+			return
+		}
+		if parameter.required != false {
+			t.Errorf("unexpected parameter.required: %t", parameter.required)
+			return
+		}
+		if parameter.schema.type_ != "array" {
+			t.Errorf("unexpected parameter.schema.type: %s", parameter.schema.type_)
+			return
+		}
+		if parameter.schema.items.type_ != "string" {
+			t.Errorf("unexpected parameter.schema.items.type: %s", parameter.schema.items.type_)
+			return
+		}
+		if parameter.style != "form" {
+			t.Errorf("unexpected parameter.style: %s", parameter.style)
+			return
+		}
+		if parameter.explode != true {
+			t.Errorf("unexpected parameter.explode: %t", parameter.explode)
+			return
+		}
+	})
+	t.Run("free form", func(t *testing.T) {
+		yml := `in: query
+name: freeForm
+schema:
+  type: object
+  additionalProperties:
+    type: integer
+style: form`
+		var parameter Parameter
+		if err := yaml.Unmarshal([]byte(yml), &parameter); err != nil {
+			t.Fatal(err)
+		}
+		if parameter.in != "query" {
+			t.Errorf("unexpected parameter.in: %s", parameter.in)
+			return
+		}
+		if parameter.name != "freeForm" {
+			t.Errorf("unexpected parameter.name: %s", parameter.name)
+			return
+		}
+		if parameter.schema.type_ != "object" {
+			t.Errorf("unexpected parameter.schema.type_: %s", parameter.schema.type_)
+			return
+		}
+		if parameter.schema.additionalProperties.type_ != "integer" {
+			t.Errorf("unexpected parameter.schema.additionalProperties.type_: %s", parameter.schema.additionalProperties.type_)
+			return
+		}
+		if parameter.style != "form" {
+			t.Errorf("unexpected parameter.style: %s", parameter.style)
+			return
+		}
+	})
+	t.Run("complex parameter", func(t *testing.T) {
+		yml := `in: query
+name: coordinates
+content:
+  application/json:
+    schema:
+      type: object
+      required:
+        - lat
+        - long
+      properties:
+        lat:
+          type: number
+        long:
+          type: number`
+		var parameter Parameter
+		if err := yaml.Unmarshal([]byte(yml), &parameter); err != nil {
+			t.Fatal(err)
+		}
+		if parameter.in != "query" {
+			t.Errorf("unexpected parameter.in: %s", parameter.in)
+			return
+		}
+		if parameter.name != "coordinates" {
+			t.Errorf("unexpected parameter.name: %s", parameter.name)
+			return
+		}
+		if parameter.content["application/json"].schema.type_ != "object" {
+			t.Errorf("unexpected parameter.content.application/json.schema.type_: %s", parameter.content["application/json"].schema.type_)
+			return
+		}
+		if parameter.content["application/json"].schema.required[0] != "lat" {
+			t.Errorf("unexpected parameter.content.application/json.schema.required.0: %s", parameter.content["application/json"].schema.required[0])
+			return
+		}
+		if parameter.content["application/json"].schema.required[1] != "long" {
+			t.Errorf("unexpected parameter.content.application/json..schema.required.1: %s", parameter.content["application/json"].schema.required[1])
+			return
+		}
+		if parameter.content["application/json"].schema.properties["lat"].type_ != "number" {
+			t.Errorf("unexpected parameter.content.application/json.schema.properties.lat.type: %s", parameter.content["application/json"].schema.properties["lat"].type_)
+			return
+		}
+		if parameter.content["application/json"].schema.properties["long"].type_ != "number" {
+			t.Errorf("unexpected parameter.content.application/json.schema.properties.long.type: %s", parameter.content["application/json"].schema.properties["long"].type_)
+			return
+		}
+	})
+}
+
+func TestRequestBodyUnmarshalYAML(t *testing.T) {
+	t.Run("with a referenced model", func(t *testing.T) {
+		yml := `description: user to add to the system
+content:
+  'application/json':
+    schema:
+      $ref: '#/components/schemas/User'
+    examples:
+      user:
+        summary: User Example
+        externalValue: 'http://foo.bar/examples/user-example.json'
+  'application/xml':
+    schema:
+      $ref: '#/components/schemas/User'
+    examples:
+      user:
+        summary: User Example in XML
+        externalValue: 'http://foo.bar/examples/user-example.xml'
+  'text/plain':
+    examples:
+      user:
+        summary: User example in text plain format
+        externalValue: 'http://foo.bar/examples/user-example.txt'
+  '*/*':
+    examples:
+      user:
+        summary: User example in other format
+        externalValue: 'http://foo.bar/examples/user-example.whatever'`
+		var requestBody RequestBody
+		if err := yaml.Unmarshal([]byte(yml), &requestBody); err != nil {
+			t.Fatal(err)
+		}
+		if requestBody.description != "user to add to the system" {
+			t.Errorf("unexpected requestBody.description: %s", requestBody.description)
+			return
+		}
+		t.Run("application/json", func(t *testing.T) {
+			mediaType, ok := requestBody.content["application/json"]
+			if !ok {
+				t.Error("requestBody.content.application/json is not found")
+				return
+			}
+			if mediaType.schema.reference != "#/components/schemas/User" {
+				t.Errorf("unexpected requestBody.content.application/json.schema.$ref: %s", mediaType.schema.reference)
+				return
+			}
+			example, ok := mediaType.examples["user"]
+			if !ok {
+				t.Error("requestBody.content.application/json.examples.user is not found")
+				return
+			}
+			if example.summary != "User Example" {
+				t.Errorf("unexpected requestBody.content.application/json.examples.user.summary: %s", example.summary)
+				return
+			}
+			if example.externalValue != "http://foo.bar/examples/user-example.json" {
+				t.Errorf("unexpected requestBody.content.application/json.examples.user.externalValue: %s", example.externalValue)
+				return
+			}
+		})
+		t.Run("application/xml", func(t *testing.T) {
+			mediaType, ok := requestBody.content["application/xml"]
+			if !ok {
+				t.Error("requestBody.content.application/xml is not found")
+				return
+			}
+			if mediaType.schema.reference != "#/components/schemas/User" {
+				t.Errorf("unexpected requestBody.content.application/xml.schema.$ref: %s", mediaType.schema.reference)
+				return
+			}
+			example, ok := mediaType.examples["user"]
+			if !ok {
+				t.Error("requestBody.content.application/xml.examples.user is not found")
+				return
+			}
+			if example.summary != "User Example in XML" {
+				t.Errorf("unexpected requestBody.content.application/xml.examples.user.summary: %s", example.summary)
+				return
+			}
+			if example.externalValue != "http://foo.bar/examples/user-example.xml" {
+				t.Errorf("unexpected requestBody.content.application/xml.examples.user.externalValue: %s", example.externalValue)
+				return
+			}
+		})
+		t.Run("text/plain", func(t *testing.T) {
+			mediaType, ok := requestBody.content["text/plain"]
+			if !ok {
+				t.Error("requestBody.content.text/plain is not found")
+				return
+			}
+			example, ok := mediaType.examples["user"]
+			if !ok {
+				t.Error("requestBody.content.text/plain.examples.user is not found")
+				return
+			}
+			if example.summary != "User example in text plain format" {
+				t.Errorf("unexpected requestBody.content.text/plain.examples.user.summary: %s", example.summary)
+				return
+			}
+			if example.externalValue != "http://foo.bar/examples/user-example.txt" {
+				t.Errorf("unexpected requestBody.content.text/plain.examples.user.externalValue: %s", example.externalValue)
+				return
+			}
+		})
+		t.Run("*/*", func(t *testing.T) {
+			mediaType, ok := requestBody.content["*/*"]
+			if !ok {
+				t.Error("requestBody.content.*/* is not found")
+				return
+			}
+			example, ok := mediaType.examples["user"]
+			if !ok {
+				t.Error("requestBody.content.*/*.examples.user is not found")
+				return
+			}
+			if example.summary != "User example in other format" {
+				t.Errorf("unexpected requestBody.content.*/*.examples.user.summary: %s", example.summary)
+				return
+			}
+			if example.externalValue != "http://foo.bar/examples/user-example.whatever" {
+				t.Errorf("unexpected requestBody.content.*/*.examples.user.externalValue: %s", example.externalValue)
+				return
+			}
+		})
+	})
+	t.Run("array of string", func(t *testing.T) {
+		yml := `description: user to add to the system
+required: true
+content:
+  text/plain:
+    schema:
+      type: array
+      items:
+        type: string`
+		var requestBody RequestBody
+		if err := yaml.Unmarshal([]byte(yml), &requestBody); err != nil {
+			t.Fatal(err)
+		}
+		if requestBody.description != "user to add to the system" {
+			t.Errorf("unexpected requestBody.description: %s", requestBody.description)
+			return
+		}
+		if requestBody.required != true {
+			t.Errorf("unexpected requestBody.required: %t", requestBody.required)
+			return
+		}
+		mediaType, ok := requestBody.content["text/plain"]
+		if !ok {
+			t.Error("requestBody.content.text/plain is not found")
+			return
+		}
+		if mediaType.schema.type_ != "array" {
+			t.Errorf("unexpected mediaType.schema.type: %s", mediaType.schema.type_)
+			return
+		}
+		if mediaType.schema.items.type_ != "string" {
+			t.Errorf("unexpected mediaType.schema.items.type: %s", mediaType.schema.items.type_)
+			return
+		}
+	})
+}
+
+func TestMediaTypeUnmarshalYAML(t *testing.T) {
+	yml := `application/json:
+  schema:
+    $ref: "#/components/schemas/Pet"
+  examples:
+    cat:
+      summary: An example of a cat
+      value:
+        name: Fluffy
+        petType: Cat
+        color: White
+        gender: male
+        breed: Persian
+    dog:
+      summary: An example of a dog with a cat's name
+      value:
+        name: Puma
+        petType: Dog
+        color: Black
+        gender: Female
+        breed: Mixed
+    frog:
+      $ref: "#/components/examples/frog-example"`
+	var target map[string]*MediaType
+	if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+		t.Fatal(err)
+	}
+	mediaType, ok := target["application/json"]
+	if !ok {
+		t.Error("application/json is not found")
+		return
+	}
+	if mediaType.schema.reference != "#/components/schemas/Pet" {
+		t.Errorf("unexpected mediaType.schema.$ref: %s", mediaType.schema.reference)
+		return
+	}
+	t.Run("cat", func(t *testing.T) {
+		example, ok := mediaType.examples["cat"]
+		if !ok {
+			t.Error("mediaType.examples.cat is not found")
+			return
+		}
+		value, ok := example.value.(map[string]interface{})
+		if !ok {
+			t.Errorf("mediaType.examples.cat.value is assumed map[string]interface but %v", reflect.TypeOf(example.value))
+			return
+		}
+		if name, ok := value["name"]; !ok {
+			t.Error("mediaType.examples.cat.value.name is not found")
+			return
+		} else if name != "Fluffy" {
+			t.Errorf("unexpected mediaType.examples.cat.value.name: %s", name)
+		}
+		if petType, ok := value["petType"]; !ok {
+			t.Error("mediaType.examples.cat.value.petType is not found")
+			return
+		} else if petType != "Cat" {
+			t.Errorf("unexpected mediaType.examples.cat.value.petType: %s", petType)
+		}
+		if color, ok := value["color"]; !ok {
+			t.Error("mediaType.examples.cat.value.color is not found")
+			return
+		} else if color != "White" {
+			t.Errorf("unexpected mediaType.examples.cat.value.color: %s", color)
+		}
+		if gender, ok := value["gender"]; !ok {
+			t.Error("mediaType.examples.cat.value.gender is not found")
+			return
+		} else if gender != "male" {
+			t.Errorf("unexpected mediaType.examples.cat.value.gender: %s", gender)
+		}
+		if breed, ok := value["breed"]; !ok {
+			t.Error("mediaType.examples.cat.value.breed is not found")
+			return
+		} else if breed != "Persian" {
+			t.Errorf("unexpected mediaType.examples.cat.value.breed: %s", breed)
+			return
+		}
+	})
+	t.Run("dog", func(t *testing.T) {
+		example, ok := mediaType.examples["dog"]
+		if !ok {
+			t.Error("mediaType.examples.dog is not found")
+			return
+		}
+		value, ok := example.value.(map[string]interface{})
+		if !ok {
+			t.Errorf("mediaType.examples.dog.value is assumed map[string]interface but %v", reflect.TypeOf(example.value))
+			return
+		}
+		if name, ok := value["name"]; !ok {
+			t.Error("mediaType.examples.dog.value.name is not found")
+			return
+		} else if name != "Puma" {
+			t.Errorf("unexpected mediaType.examples.dog.value.name: %s", name)
+		}
+		if petType, ok := value["petType"]; !ok {
+			t.Error("mediaType.examples.dog.value.petType is not found")
+			return
+		} else if petType != "Dog" {
+			t.Errorf("unexpected mediaType.examples.dog.value.petType: %s", petType)
+		}
+		if color, ok := value["color"]; !ok {
+			t.Error("mediaType.examples.dog.value.color is not found")
+			return
+		} else if color != "Black" {
+			t.Errorf("unexpected mediaType.examples.dog.value.color: %s", color)
+		}
+		if gender, ok := value["gender"]; !ok {
+			t.Error("mediaType.examples.dog.value.gender is not found")
+			return
+		} else if gender != "Female" {
+			t.Errorf("unexpected mediaType.examples.dog.value.gender: %s", gender)
+		}
+		if breed, ok := value["breed"]; !ok {
+			t.Error("mediaType.examples.dog.value.breed is not found")
+			return
+		} else if breed != "Mixed" {
+			t.Errorf("unexpected mediaType.examples.dog.value.breed: %s", breed)
+			return
+		}
+	})
+	t.Run("frog", func(t *testing.T) {
+		example, ok := mediaType.examples["frog"]
+		if !ok {
+			t.Error("mediaType.examples.frog is not found")
+			return
+		}
+		if example.reference != "#/components/examples/frog-example" {
+			t.Errorf("unexpected mediaType.examples.frog.$ref: %s", example.reference)
 			return
 		}
 	})

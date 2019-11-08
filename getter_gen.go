@@ -653,8 +653,8 @@ func (v *Example) Value() interface{} {
 	return v.value
 }
 
-func (v *Example) ExternalVale() string {
-	return v.externalVale
+func (v *Example) ExternalValue() string {
+	return v.externalValue
 }
 
 func (v *Example) Extension() map[string]interface{} {

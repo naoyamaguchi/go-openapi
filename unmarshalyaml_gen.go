@@ -1290,12 +1290,12 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 		v.value = valueVal
 	}
 
-	if externalValeBytes, ok := proxy["externalVale"]; ok {
-		var externalValeVal string
-		if err := yaml.Unmarshal(externalValeBytes, &externalValeVal); err != nil {
+	if externalValueBytes, ok := proxy["externalValue"]; ok {
+		var externalValueVal string
+		if err := yaml.Unmarshal(externalValueBytes, &externalValueVal); err != nil {
 			return err
 		}
-		v.externalVale = externalValeVal
+		v.externalValue = externalValueVal
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {

@@ -270,10 +270,10 @@ type Callback struct {
 type Example struct {
 	root *OpenAPI `yaml:"-"`
 
-	summary      string      `yaml:",omitempty"`
-	description  string      `yaml:",omitempty"`
-	value        interface{} `yaml:",omitempty"`
-	externalVale string      `yaml:",omitempty"`
+	summary       string      `yaml:",omitempty"`
+	description   string      `yaml:",omitempty"`
+	value         interface{} `yaml:",omitempty"`
+	externalValue string      `yaml:",omitempty"`
 
 	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 
