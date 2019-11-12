@@ -1521,6 +1521,762 @@ func TestEncodingUnmarshalYAML(t *testing.T) {
 	})
 }
 
+func TestResponsesUnmarshalYAML(t *testing.T) {
+	yml := `'200':
+  description: a pet to be returned
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/Pet'
+default:
+  description: Unexpected error
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/ErrorModel'`
+	var responses Responses
+	if err := yaml.Unmarshal([]byte(yml), &responses); err != nil {
+		t.Fatal(err)
+	}
+	t.Run("200", func(t *testing.T) {
+		response, ok := responses.responses["200"]
+		if !ok {
+			t.Error("responses.200 is not found")
+			return
+		}
+		if response.description != "a pet to be returned" {
+			t.Errorf("unexpected responses.200.description: %s", response.description)
+			return
+		}
+		mediaType, ok := response.content["application/json"]
+		if !ok {
+			t.Error("responses.200.content.application/json is not found")
+			return
+		}
+		if mediaType.schema.reference != "#/components/schemas/Pet" {
+			t.Errorf("unexpected responses.200.content.application/json.schema.$ref: %s", mediaType.schema.reference)
+			return
+		}
+	})
+	t.Run("default", func(t *testing.T) {
+		response, ok := responses.responses["default"]
+		if !ok {
+			t.Error("responses.default is not found")
+			return
+		}
+		if response.description != "Unexpected error" {
+			t.Errorf("unexpected responses.default.description: %s", response.description)
+			return
+		}
+		mediaType, ok := response.content["application/json"]
+		if !ok {
+			t.Error("responses.default.content.application/json is not found")
+			return
+		}
+		if mediaType.schema.reference != "#/components/schemas/ErrorModel" {
+			t.Errorf("unexpected responses.default.content.application/json.schema.$ref: %s", mediaType.schema.reference)
+			return
+		}
+	})
+}
+
+func TestResponseUnmarshalYAML(t *testing.T) {
+	t.Run("array of complex type", func(t *testing.T) {
+		yml := `description: A complex object array response
+content:
+  application/json:
+    schema:
+      type: array
+      items:
+        $ref: '#/components/schemas/VeryComplexType'`
+		var response Response
+		if err := yaml.Unmarshal([]byte(yml), &response); err != nil {
+			t.Fatal(err)
+		}
+		if response.description != "A complex object array response" {
+			t.Errorf("unexpected response.description: %s", response.description)
+			return
+		}
+		mediaType, ok := response.content["application/json"]
+		if !ok {
+			t.Error("response.content.application/json is not found")
+			return
+		}
+		if mediaType.schema.type_ != "array" {
+			t.Errorf("unexpected response.content.application/json.schema.type: %s", mediaType.schema.type_)
+			return
+		}
+		if mediaType.schema.items.reference != "#/components/schemas/VeryComplexType" {
+			t.Errorf("unexpected response.content.application/json.schema.items.$ref: %s", mediaType.schema.items.reference)
+			return
+		}
+	})
+	t.Run("string", func(t *testing.T) {
+		yml := `description: A simple string response
+content:
+  text/plain:
+    schema:
+      type: string`
+		var response Response
+		if err := yaml.Unmarshal([]byte(yml), &response); err != nil {
+			t.Fatal(err)
+		}
+		if response.description != "A simple string response" {
+			t.Errorf("unexpected response.description: %s", response.description)
+			return
+		}
+		mediaType, ok := response.content["text/plain"]
+		if !ok {
+			t.Error("response.content.text/plain is not found")
+			return
+		}
+		if mediaType.schema.type_ != "string" {
+			t.Errorf("unexpected  response.content.text/plain.schema.type: %s", mediaType.schema.type_)
+			return
+		}
+	})
+	t.Run("plain text with headers", func(t *testing.T) {
+		yml := `description: A simple string response
+content:
+  text/plain:
+    schema:
+      type: string
+    example: 'whoa!'
+headers:
+  X-Rate-Limit-Limit:
+    description: The number of allowed requests in the current period
+    schema:
+      type: integer
+  X-Rate-Limit-Remaining:
+    description: The number of remaining requests in the current period
+    schema:
+      type: integer
+  X-Rate-Limit-Reset:
+    description: The number of seconds left in the current period
+    schema:
+      type: integer`
+		var response Response
+		if err := yaml.Unmarshal([]byte(yml), &response); err != nil {
+			t.Fatal(err)
+		}
+		if response.description != "A simple string response" {
+			t.Errorf("unexpected response.description: %s", response.description)
+			return
+		}
+		mediaType, ok := response.content["text/plain"]
+		if !ok {
+			t.Error("response.content.text/plain is not found")
+			return
+		}
+		if mediaType.schema.type_ != "string" {
+			t.Errorf("unexpected response.content.text/plain.schema.type: %s", mediaType.schema.type_)
+			return
+		}
+		t.Run("X-Rate-Limit-Limit", func(t *testing.T) {
+			header, ok := response.headers["X-Rate-Limit-Limit"]
+			if !ok {
+				t.Error("response.headers.X-Rate-Limit-Limit is not found")
+				return
+			}
+			if header.description != "The number of allowed requests in the current period" {
+				t.Errorf("unexpected response.headers.X-Rate-Limit-Limit.description: %s", header.description)
+				return
+			}
+			if header.schema.type_ != "integer" {
+				t.Errorf("unexpected response.headers.X-Rate-Limit-Limit.schema.type: %s", header.schema.type_)
+				return
+			}
+		})
+		t.Run("X-Rate-Limit-Remaining", func(t *testing.T) {
+			header, ok := response.headers["X-Rate-Limit-Remaining"]
+			if !ok {
+				t.Error("response.headers.X-Rate-Limit-Remaining is not found")
+				return
+			}
+			if header.description != "The number of remaining requests in the current period" {
+				t.Errorf("unexpected response.headers.X-Rate-Limit-Remaining.description: %s", header.description)
+				return
+			}
+			if header.schema.type_ != "integer" {
+				t.Errorf("unexpected response.headers.X-Rate-Limit-Remaining.schema.type: %s", header.schema.type_)
+				return
+			}
+		})
+		t.Run("X-Rate-Limit-Reset", func(t *testing.T) {
+			header, ok := response.headers["X-Rate-Limit-Reset"]
+			if !ok {
+				t.Error("response.headers.X-Rate-Limit-Reset is not found")
+				return
+			}
+			if header.description != "The number of seconds left in the current period" {
+				t.Errorf("unexpected response.headers.X-Rate-Limit-Reset.description: %s", header.description)
+				return
+			}
+			if header.schema.type_ != "integer" {
+				t.Errorf("unexpected response.headers.X-Rate-Limit-Reset.schema.type: %s", header.schema.type_)
+				return
+			}
+		})
+	})
+	t.Run("no return value", func(t *testing.T) {
+		yml := `description: object created`
+		var response Response
+		if err := yaml.Unmarshal([]byte(yml), &response); err != nil {
+			t.Fatal(err)
+		}
+		if response.description != "object created" {
+			t.Errorf("unexpected response.description: %s", response.description)
+			return
+		}
+	})
+}
+
+func TestCallbackUnmarshalYAML(t *testing.T) {
+	yml := `myWebhook:
+  'http://notificationServer.com?transactionId={$request.body#/id}&email={$request.body#/email}':
+    post:
+      requestBody:
+        description: Callback payload
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/SomePayload'
+      responses:
+        '200':
+          description: webhook successfully processed and no retries will be performed`
+	var target map[string]*Callback
+	if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+		t.Fatal(err)
+	}
+	callback, ok := target["myWebhook"]
+	if !ok {
+		t.Error("myWebhook is not found")
+		return
+	}
+	pathItem, ok := callback.callback["http://notificationServer.com?transactionId={$request.body#/id}&email={$request.body#/email}"]
+	if !ok {
+		t.Error("myWebhook.http://notificationServer.com?transactionId={$request.body#/id}&email={$request.body#/email} is not found")
+		return
+	}
+	if pathItem.post.requestBody.description != "Callback payload" {
+	}
+	mediaType, ok := pathItem.post.requestBody.content["application/json"]
+	if !ok {
+		t.Error("myWebhook.http://notificationServer.com?transactionId={$request.body#/id}&email={$request.body#/email}.post.requestBody.content.application/json is not found")
+		return
+	}
+	if mediaType.schema.reference != "#/components/schemas/SomePayload" {
+		t.Errorf("unexpected myWebhook.http://notificationServer.com?transactionId={$request.body#/id}&email={$request.body#/email}.post.requestBody.schema.$ref: %s", mediaType.schema.reference)
+		return
+	}
+	response, ok := pathItem.post.responses.responses["200"]
+	if !ok {
+		t.Error("myWebhook.http://notificationServer.com?transactionId={$request.body#/id}&email={$request.body#/email}.post.responses.200 is not found")
+		return
+	}
+	if response.description != "webhook successfully processed and no retries will be performed" {
+		t.Errorf("unexpected myWebhook.http://notificationServer.com?transactionId={$request.body#/id}&email={$request.body#/email}.post.responses.200.description: %s", response.description)
+		return
+	}
+}
+
+func TestExampleUnmarshalYAML(t *testing.T) {
+	/* This is invalid example: https://github.com/OAI/OpenAPI-Specification/pull/2042
+	t.Run("in a model", func(t *testing.T) {
+		yml := `schemas:
+		  properties:
+		    name:
+		      type: string
+		      examples:
+		        name:
+		          $ref: http://example.org/petapi-examples/openapi.json#/components/examples/name-example`
+	})
+	*/
+	t.Run("in a request body", func(t *testing.T) {
+		yml := `requestBody:
+  content:
+    'application/json':
+      schema:
+        $ref: '#/components/schemas/Address'
+      examples:
+        foo:
+          summary: A foo example
+          value: {"foo": "bar"}
+        bar:
+          summary: A bar example
+          value: {"bar": "baz"}
+    'application/xml':
+      examples:
+        xmlExample:
+          summary: This is an example in XML
+          externalValue: 'http://example.org/examples/address-example.xml'
+    'text/plain':
+      examples:
+        textExample:
+          summary: This is a text example
+          externalValue: 'http://foo.bar/examples/address-example.txt'`
+		var target struct {
+			RequestBody RequestBody `yaml:"requestBody"`
+		}
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		t.Run("application/json", func(t *testing.T) {
+			mediaType, ok := target.RequestBody.content["application/json"]
+			if !ok {
+				t.Error("requestBody.content.application/json is not found")
+				return
+			}
+			if mediaType.schema.reference != "#/components/schemas/Address" {
+				t.Errorf("unexpected requestBody.content.application/json.schema.$ref: %s", mediaType.schema.reference)
+				return
+			}
+			t.Run("foo", func(t *testing.T) {
+				example, ok := mediaType.examples["foo"]
+				if !ok {
+					t.Error("requestBody.content.application/json.examples.foo is not found")
+					return
+				}
+				if example.summary != "A foo example" {
+					t.Errorf("unexpected requestBody.content.application/json.examples.foo.summary: %s", example.summary)
+					return
+				}
+				if !reflect.DeepEqual(example.value, map[string]interface{}{"foo": "bar"}) {
+					t.Errorf("unexpected requestBody.content.application/json.examples.foo.value: %v", example.value)
+					return
+				}
+			})
+			t.Run("bar", func(t *testing.T) {
+				example, ok := mediaType.examples["bar"]
+				if !ok {
+					t.Error("requestBody.content.application/json.examples.bar is not found")
+					return
+				}
+				if example.summary != "A bar example" {
+					t.Errorf("unexpected requestBody.content.application/json.examples.bar.summary: %s", example.summary)
+					return
+				}
+				if !reflect.DeepEqual(example.value, map[string]interface{}{"bar": "baz"}) {
+					t.Errorf("unexpected requestBody.content.application/json.examples.bar.value: %v", example.value)
+					return
+				}
+			})
+		})
+		t.Run("application/xml", func(t *testing.T) {
+			mediaType, ok := target.RequestBody.content["application/xml"]
+			if !ok {
+				t.Error("requestBody.content.application/xml is not found")
+				return
+			}
+			example, ok := mediaType.examples["xmlExample"]
+			if !ok {
+				t.Error("requestBody.content.application/xml.examples.xmlExample is not found")
+				return
+			}
+			if example.summary != "This is an example in XML" {
+				t.Errorf("unexpected requestBody.content.application/xml.examples.xmlExample.summary: %s", example.summary)
+				return
+			}
+			if example.externalValue != "http://example.org/examples/address-example.xml" {
+				t.Errorf("unexpected requestBody.content.application/xml.examples.xmlExample.externalValue: %s", example.externalValue)
+				return
+			}
+		})
+		t.Run("text/plain", func(t *testing.T) {
+			mediaType, ok := target.RequestBody.content["text/plain"]
+			if !ok {
+				t.Error("requestBody.content.text/plain is not found")
+				return
+			}
+			example, ok := mediaType.examples["textExample"]
+			if !ok {
+				t.Error("requestBody.content.text/plain.examples.textExample is not found")
+				return
+			}
+			if example.summary != "This is a text example" {
+				t.Errorf("unexpected requestBody.content.text/plain.examples.textExample.summary: %s", example.summary)
+				return
+			}
+			if example.externalValue != "http://foo.bar/examples/address-example.txt" {
+				t.Errorf("unexpected requestBody.content.text/plain.examples.textExample.externalValue: %s", example.externalValue)
+				return
+			}
+		})
+	})
+	t.Run("in a parameter", func(t *testing.T) {
+		yml := `parameters:
+  - name: 'zipCode'
+    in: 'query'
+    schema:
+      type: 'string'
+      format: 'zip-code'
+      examples:
+        zip-example:
+          $ref: '#/components/examples/zip-example'`
+		var target struct {
+			Parameters []*Parameter
+		}
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		parameter := target.Parameters[0]
+		if parameter.name != "zipCode" {
+			t.Errorf("unexpected parameters.0.name: %s", parameter.name)
+			return
+		}
+		if parameter.in != "query" {
+			t.Errorf("unexpected parameters.0.in: %s", parameter.in)
+			return
+		}
+		if parameter.schema.type_ != "string" {
+			t.Errorf("unexpected parameters.0.schema.type: %s", parameter.schema.type_)
+			return
+		}
+		if parameter.schema.format != "zip-code" {
+			t.Errorf("unexpected parameters.0.schema.format: %s", parameter.schema.format)
+			return
+		}
+		// parameter.schema.examples maybe mistake
+	})
+	t.Run("in a response", func(t *testing.T) {
+		yml := `responses:
+  '200':
+    description: your car appointment has been booked
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/SuccessResponse'
+        examples:
+          confirmation-success:
+            $ref: '#/components/examples/confirmation-success'`
+		var target struct {
+			Responses Responses
+		}
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		response, ok := target.Responses.responses["200"]
+		if !ok {
+			t.Error("responses.200 is not found")
+			return
+		}
+		if response.description != "your car appointment has been booked" {
+			t.Errorf("unexpected responses.200.description: %s", response.description)
+			return
+		}
+		mediaType, ok := response.content["application/json"]
+		if !ok {
+			t.Error("responses.200.content.application/json is not found")
+			return
+		}
+		if mediaType.schema.reference != "#/components/schemas/SuccessResponse" {
+			t.Errorf("unexpected responses.200.content.application/json.schema.$ref: %s", mediaType.schema.reference)
+			return
+		}
+		example, ok := mediaType.examples["confirmation-success"]
+		if !ok {
+			t.Error("responses.200.content.application/json.examples.confirmation-success is not found")
+			return
+		}
+		if example.reference != "#/components/examples/confirmation-success" {
+			t.Errorf("unexpected responses.200.content.application/json.examples.confirmation-success.$ref: %s", example.reference)
+			return
+		}
+	})
+}
+
+func TestLinkUnmarshalYAML(t *testing.T) {
+	t.Run("$request.path.id", func(t *testing.T) {
+		yml := `paths:
+  /users/{id}:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: the user identifier, as userId
+      schema:
+        type: string
+    get:
+      responses:
+        '200':
+          description: the user being returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid: # the unique user id
+                    type: string
+                    format: uuid
+          links:
+            address:
+              # the target link operationId
+              operationId: getUserAddress
+              parameters:
+                # get the "id" field from the request path parameter named "id"
+                userId: $request.path.id
+  # the path item of the linked operation
+  /users/{userid}/address:
+    parameters:
+    - name: userid
+      in: path
+      required: true
+      description: the user identifier, as userId
+      schema:
+        type: string
+    # linked operation
+    get:
+      operationId: getUserAddress
+      responses:
+        '200':
+          description: the user's address`
+		var target struct {
+			Paths Paths
+		}
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		t.Run("/users/{id}", func(t *testing.T) {
+			pathItem, ok := target.Paths.paths["/users/{id}"]
+			if !ok {
+				t.Error("paths./users/{id} is not found")
+				return
+			}
+			id := pathItem.parameters[0]
+			if id.name != "id" {
+				t.Errorf("unexpected paths./users/{id}.parameters.0.name: %s", id.name)
+				return
+			}
+			if id.in != "path" {
+				t.Errorf("unexpected paths./users/{id}.parameters.0.in: %s", id.in)
+				return
+			}
+			if id.required != true {
+				t.Errorf("unexpected paths./users/{id}.parameters.0.required: %t", id.required)
+				return
+			}
+			if id.description != "the user identifier, as userId" {
+				t.Errorf("unexpected paths./users/{id}.parameters.0.description: %s", id.description)
+				return
+			}
+			if id.schema.type_ != "string" {
+				t.Errorf("unexpected paths./users/{id}.parameters.0.schema.type: %s", id.schema.type_)
+				return
+			}
+			response, ok := pathItem.get.responses.responses["200"]
+			if !ok {
+				t.Error("paths./users/{id}.get.responses.200 is not found")
+				return
+			}
+			if response.description != "the user being returned" {
+				t.Errorf("unexpected paths./users/{id}.get.responses.200.description: %s", response.description)
+				return
+			}
+			mediaType, ok := response.content["application/json"]
+			if !ok {
+				t.Error("paths./users/{id}.get.responses.200.content.application/json is not found")
+				return
+			}
+			if mediaType.schema.type_ != "object" {
+				t.Errorf("unexpected paths./users/{id}.get.responses.200.content.application/json.schema.type: %s", mediaType.schema.type_)
+				return
+			}
+			property, ok := mediaType.schema.properties["uuid"]
+			if !ok {
+				t.Error("paths./users/{id}.get.responses.200.content.application/json.schema.properties.uuid is not found")
+				return
+			}
+			if property.type_ != "string" {
+				t.Errorf("unexpected paths./users/{id}.get.responses.200.content.application/json.schema.properties.uuid.type: %s", property.type_)
+				return
+			}
+			if property.format != "uuid" {
+				t.Errorf("unexpected paths./users/{id}.get.responses.200.content.application/json.schema.properties.uuid.format: %s", property.format)
+				return
+			}
+			link, ok := response.links["address"]
+			if !ok {
+				t.Error("paths./users/{id}.get.responses.200.links.address is not found")
+				return
+			}
+			if link.operationID != "getUserAddress" {
+				t.Errorf("unexpected paths./users/{id}.get.responses.200.links.address.operationId: %s", link.operationID)
+				return
+			}
+			parameter, ok := link.parameters["userId"]
+			if !ok {
+				t.Error("paths./users/{id}.get.responses.200.links.address.parameters.userId is not found")
+				return
+			}
+			if parameter != "$request.path.id" {
+				t.Errorf("unexpected paths./users/{id}.get.responses.200.links.address.parameters.userId: %v", parameter)
+				return
+			}
+		})
+		t.Run("/users/{userid}/address", func(t *testing.T) {
+			pathItem, ok := target.Paths.paths["/users/{userid}/address"]
+			if !ok {
+				t.Error("paths./users/{userid}/address is not found")
+				return
+			}
+			userid := pathItem.parameters[0]
+			if userid.name != "userid" {
+				t.Errorf("unexpected paths./users/{userid}/address.name: %s", userid.name)
+				return
+			}
+			if userid.in != "path" {
+				t.Errorf("unexpected paths./users/{userid}/address.in: %s", userid.in)
+				return
+			}
+			if userid.required != true {
+				t.Errorf("unexpected paths./users/{userid}/address.required: %t", userid.required)
+				return
+			}
+			if userid.description != "the user identifier, as userId" {
+				t.Errorf("unexpected paths./users/{userid}/address.description: %s", userid.description)
+				return
+			}
+			if userid.schema.type_ != "string" {
+				t.Errorf("unexpected paths./users/{userid}/address.schema.type: %s", userid.schema.type_)
+				return
+			}
+			if pathItem.get.operationID != "getUserAddress" {
+				t.Errorf("unexpected paths./users/{userid}/address.get.operationId: %s", pathItem.get.operationID)
+				return
+			}
+			response, ok := pathItem.get.responses.responses["200"]
+			if !ok {
+				t.Error("paths./users/{userid}/address.get.responses.200 is not found")
+				return
+			}
+			if response.description != "the user's address" {
+				t.Errorf("unexpected paths./users/{userid}/address.get.responses.200.description: %s", response.description)
+				return
+			}
+		})
+	})
+	t.Run("can use values from the response body", func(t *testing.T) {
+		yml := `links:
+  address:
+    operationId: getUserAddressByUUID
+    parameters:
+      # get the "uuid" field from the "uuid" field in the response body
+      userUuid: $response.body#/uuid`
+		var target struct {
+			Links map[string]*Link
+		}
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		link, ok := target.Links["address"]
+		if !ok {
+			t.Error("links.address is not found")
+			return
+		}
+		if link.operationID != "getUserAddressByUUID" {
+			t.Errorf("unexpected links.address.operationId: %s", link.operationID)
+			return
+		}
+		/* according to yaml's spec, '#' without leading space must be treated as string but not
+		if link.parameters["userUuid"] != "$response.body#/uuid" {
+			t.Errorf("unexpected links.address.parameters.userUuid: %s", link.parameters["userUuid"])
+			return
+		}
+		*/
+	})
+	t.Run("relative operationRef", func(t *testing.T) {
+		yml := `links:
+  UserRepositories:
+    # returns array of '#/components/schemas/repository'
+    operationRef: '#/paths/~12.0~1repositories~1{username}/get'
+    parameters:
+      username: $response.body#/username`
+		var target struct {
+			Links map[string]*Link
+		}
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		link, ok := target.Links["UserRepositories"]
+		if !ok {
+			t.Error("links.UserRepositories is not found")
+		}
+		if link.operationRef != "#/paths/~12.0~1repositories~1{username}/get" {
+			t.Errorf("unexpected links.UserRepositories.operationRef: %s", link.operationRef)
+			return
+		}
+		/* according to yaml's spec, '#' without leading space must be treated as string but not
+		if link.parameters["username] != "$response.body#/username" {
+			t.Errorf("unexpected links.address.parameters.userUuid: %s", link.parameters["username"])
+			return
+		}
+		*/
+	})
+	t.Run("absolute operationRef", func(t *testing.T) {
+		yml := `links:
+  UserRepositories:
+    # returns array of '#/components/schemas/repository'
+    operationRef: 'https://na2.gigantic-server.com/#/paths/~12.0~1repositories~1{username}/get'
+    parameters:
+      username: $response.body#/username`
+		var target struct {
+			Links map[string]*Link
+		}
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		link, ok := target.Links["UserRepositories"]
+		if !ok {
+			t.Error("links.UserRepositories is not found")
+		}
+		if link.operationRef != "https://na2.gigantic-server.com/#/paths/~12.0~1repositories~1{username}/get" {
+			t.Errorf("unexpected links.UserRepositories.operationRef: %s", link.operationRef)
+			return
+		}
+		/* according to yaml's spec, '#' without leading space must be treated as string but not
+		if link.parameters["username] != "$response.body#/username" {
+			t.Errorf("unexpected links.address.parameters.userUuid: %s", link.parameters["username"])
+			return
+		}
+		*/
+	})
+}
+
+func TestHeaderUnmarshalYAML(t *testing.T) {
+	yml := `description: The number of allowed requests in the current period
+schema:
+  type: integer`
+	var header Header
+	if err := yaml.Unmarshal([]byte(yml), &header); err != nil {
+		t.Fatal(err)
+	}
+	if header.description != "The number of allowed requests in the current period" {
+		t.Errorf("unexpected header.description: %s", header.description)
+		return
+	}
+	if header.schema.type_ != "integer" {
+		t.Errorf("unexpected header.schema.type: %s", header.schema.type_)
+		return
+	}
+}
+
+func TestTagUnmarshal(t *testing.T) {
+	yml := `name: pet
+description: Pets operations`
+	var tag Tag
+	if err := yaml.Unmarshal([]byte(yml), &tag); err != nil {
+		t.Fatal(err)
+	}
+	if tag.name != "pet" {
+		t.Errorf("unexpected tag.name: %s", tag.name)
+		return
+	}
+	if tag.description != "Pets operations" {
+		t.Errorf("unexpected tag.description: %s", tag.description)
+		return
+	}
+}
+
 func TestExtension(t *testing.T) {
 	tests := []struct {
 		proxy map[string]raw
