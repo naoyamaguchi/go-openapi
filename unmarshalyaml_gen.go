@@ -1328,12 +1328,12 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 		return err
 	}
 
-	if operationreferenceBytes, ok := proxy["operationreference"]; ok {
-		var operationreferenceVal string
-		if err := yaml.Unmarshal(operationreferenceBytes, &operationreferenceVal); err != nil {
+	if operationRefBytes, ok := proxy["operationRef"]; ok {
+		var operationRefVal string
+		if err := yaml.Unmarshal(operationRefBytes, &operationRefVal); err != nil {
 			return err
 		}
-		v.operationreference = operationreferenceVal
+		v.operationRef = operationRefVal
 	}
 
 	if operationIDBytes, ok := proxy["operationId"]; ok {

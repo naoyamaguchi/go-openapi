@@ -672,8 +672,8 @@ func (v *Link) Root() *OpenAPI {
 	return v.root
 }
 
-func (v *Link) Operationreference() string {
-	return v.operationreference
+func (v *Link) OperationRef() string {
+	return v.operationRef
 }
 
 func (v *Link) OperationID() string {

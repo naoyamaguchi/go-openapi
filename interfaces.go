@@ -285,12 +285,12 @@ type Example struct {
 type Link struct {
 	root *OpenAPI `yaml:"-"`
 
-	operationreference string                 `yaml:",omitempty"`
-	operationID        string                 `yaml:"operationId,omitempty"`
-	parameters         map[string]interface{} `yaml:",omitempty"`
-	requestBody        interface{}            `yaml:",omitempty"`
-	description        string                 `yaml:",omitempty"`
-	server             *Server                `yaml:",omitempty"`
+	operationRef string                 `yaml:",omitempty"`
+	operationID  string                 `yaml:"operationId,omitempty"`
+	parameters   map[string]interface{} `yaml:",omitempty"`
+	requestBody  interface{}            `yaml:",omitempty"`
+	description  string                 `yaml:",omitempty"`
+	server       *Server                `yaml:",omitempty"`
 
 	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
 
