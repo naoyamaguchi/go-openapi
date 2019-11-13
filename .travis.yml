@@ -10,7 +10,7 @@ install:
   - curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh| sh -s -- -b ~/bin
 
 script:
-  - go test -v  -race -coverprofile=coverage.txt -covermode=atomic
+  - GO111MODULE=on go test -v  -race -coverprofile=coverage.txt -covermode=atomic
   - reviewdog -conf=.reviewdog.yml -reporter=github-pr-check
 
 after_success:
