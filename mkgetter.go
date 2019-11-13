@@ -49,6 +49,10 @@ func main() {
 				fn := field.Names[0].Name
 				ft := ast2type(field.Type)
 
+				if typ.Name.Name == expose(fn) {
+					continue
+				}
+
 				log.Printf("  generate %s.%s()", typ.Name.Name, expose(fn))
 
 				outf("\n\nfunc (v *%s) %s() %s {", typ.Name.Name, expose(fn), ft)
