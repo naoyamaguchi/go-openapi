@@ -9,9 +9,6 @@ var (
 	urlTemplateVarRegexp = regexp.MustCompile("{[^}]+}") // nolint[gocheckonglobals]
 
 	emailRegexp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$") //nolint[lll]
-
-	singleQuotedRegexp = regexp.MustCompile("^'(.+)'$")
-	doubleQuotedRegexp = regexp.MustCompile(`^"(.+)"$`)
 )
 
 type raw []byte
