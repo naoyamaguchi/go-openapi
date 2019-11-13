@@ -4,6 +4,7 @@ package openapi
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"regexp"
 	"strings"
@@ -26,6 +27,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.openapi = openapiVal
+	delete(proxy, `openapi`)
 
 	if !isValidSemVer(v.openapi) {
 		return errors.New(`"openapi" field must be a valid semantic version but not`)
@@ -40,6 +42,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.info = &infoVal
+	delete(proxy, `info`)
 
 	if serversBytes, ok := proxy["servers"]; ok {
 		var serversVal []*Server
@@ -47,6 +50,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.servers = serversVal
+		delete(proxy, `servers`)
 	}
 
 	pathsBytes, ok := proxy["paths"]
@@ -58,6 +62,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.paths = &pathsVal
+	delete(proxy, `paths`)
 
 	if componentsBytes, ok := proxy["components"]; ok {
 		var componentsVal Components
@@ -65,6 +70,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.components = &componentsVal
+		delete(proxy, `components`)
 	}
 
 	if securityBytes, ok := proxy["security"]; ok {
@@ -73,6 +79,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.security = securityVal
+		delete(proxy, `security`)
 	}
 
 	if tagsBytes, ok := proxy["tags"]; ok {
@@ -81,6 +88,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.tags = tagsVal
+		delete(proxy, `tags`)
 	}
 
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
@@ -89,6 +97,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.externalDocs = &externalDocsVal
+		delete(proxy, `externalDocs`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -100,9 +109,15 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -122,6 +137,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.title = titleVal
+	delete(proxy, `title`)
 
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
@@ -129,6 +145,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 
 	if termsOfServiceBytes, ok := proxy["termsOfService"]; ok {
@@ -137,6 +154,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.termsOfService = termsOfServiceVal
+		delete(proxy, `termsOfService`)
 	}
 
 	if v.termsOfService != "" {
@@ -151,6 +169,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.contact = &contactVal
+		delete(proxy, `contact`)
 	}
 
 	if licenseBytes, ok := proxy["license"]; ok {
@@ -159,6 +178,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.license = &licenseVal
+		delete(proxy, `license`)
 	}
 
 	versionBytes, ok := proxy["version"]
@@ -170,6 +190,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.version = versionVal
+	delete(proxy, `version`)
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
 		if !strings.HasPrefix(key, "x-") {
@@ -180,9 +201,15 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -199,6 +226,7 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.name = nameVal
+		delete(proxy, `name`)
 	}
 
 	if urlBytes, ok := proxy["url"]; ok {
@@ -207,6 +235,7 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.url = urlVal
+		delete(proxy, `url`)
 	}
 
 	if v.url != "" {
@@ -221,6 +250,7 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.email = emailVal
+		delete(proxy, `email`)
 	}
 
 	if v.email != "" {
@@ -239,9 +269,15 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -261,6 +297,7 @@ func (v *License) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.name = nameVal
+	delete(proxy, `name`)
 
 	if urlBytes, ok := proxy["url"]; ok {
 		var urlVal string
@@ -268,6 +305,7 @@ func (v *License) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.url = urlVal
+		delete(proxy, `url`)
 	}
 
 	if v.url != "" {
@@ -285,9 +323,15 @@ func (v *License) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -307,6 +351,7 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.url = urlVal
+	delete(proxy, `url`)
 
 	if _, err := url.Parse(urlTemplateVarRegexp.ReplaceAllLiteralString(v.url, `1111`)); err != nil {
 		return err
@@ -318,6 +363,7 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 
 	if variablesBytes, ok := proxy["variables"]; ok {
@@ -326,6 +372,7 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.variables = variablesVal
+		delete(proxy, `variables`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -337,9 +384,15 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -356,6 +409,7 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.enum = enumVal
+		delete(proxy, `enum`)
 	}
 
 	default_Bytes, ok := proxy["default"]
@@ -367,6 +421,7 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.default_ = default_Val
+	delete(proxy, `default`)
 
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
@@ -374,6 +429,7 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -385,9 +441,15 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -404,6 +466,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.schemas = schemasVal
+		delete(proxy, `schemas`)
 	}
 
 	if responsesBytes, ok := proxy["responses"]; ok {
@@ -412,6 +475,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.responses = responsesVal
+		delete(proxy, `responses`)
 	}
 
 	if parametersBytes, ok := proxy["parameters"]; ok {
@@ -420,6 +484,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.parameters = parametersVal
+		delete(proxy, `parameters`)
 	}
 
 	if examplesBytes, ok := proxy["examples"]; ok {
@@ -428,6 +493,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.examples = examplesVal
+		delete(proxy, `examples`)
 	}
 
 	if requestBodiesBytes, ok := proxy["requestBodies"]; ok {
@@ -436,6 +502,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.requestBodies = requestBodiesVal
+		delete(proxy, `requestBodies`)
 	}
 
 	if headersBytes, ok := proxy["headers"]; ok {
@@ -444,6 +511,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.headers = headersVal
+		delete(proxy, `headers`)
 	}
 
 	if securitySchemesBytes, ok := proxy["securitySchemes"]; ok {
@@ -452,6 +520,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.securitySchemes = securitySchemesVal
+		delete(proxy, `securitySchemes`)
 	}
 
 	if linksBytes, ok := proxy["links"]; ok {
@@ -460,6 +529,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.links = linksVal
+		delete(proxy, `links`)
 	}
 
 	if callbacksBytes, ok := proxy["callbacks"]; ok {
@@ -468,6 +538,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.callbacks = callbacksVal
+		delete(proxy, `callbacks`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -479,9 +550,15 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -501,6 +578,7 @@ func (v *Paths) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		paths[key] = &pathsv
+		delete(proxy, key)
 	}
 	if len(paths) != 0 {
 		v.paths = paths
@@ -515,9 +593,15 @@ func (v *Paths) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -534,6 +618,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.summary = summaryVal
+		delete(proxy, `summary`)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
@@ -542,6 +627,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 
 	if getBytes, ok := proxy["get"]; ok {
@@ -550,6 +636,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.get = &getVal
+		delete(proxy, `get`)
 	}
 
 	if putBytes, ok := proxy["put"]; ok {
@@ -558,6 +645,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.put = &putVal
+		delete(proxy, `put`)
 	}
 
 	if postBytes, ok := proxy["post"]; ok {
@@ -566,6 +654,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.post = &postVal
+		delete(proxy, `post`)
 	}
 
 	if deleteBytes, ok := proxy["delete"]; ok {
@@ -574,6 +663,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.delete = &deleteVal
+		delete(proxy, `delete`)
 	}
 
 	if optionsBytes, ok := proxy["options"]; ok {
@@ -582,6 +672,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.options = &optionsVal
+		delete(proxy, `options`)
 	}
 
 	if headBytes, ok := proxy["head"]; ok {
@@ -590,6 +681,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.head = &headVal
+		delete(proxy, `head`)
 	}
 
 	if patchBytes, ok := proxy["patch"]; ok {
@@ -598,6 +690,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.patch = &patchVal
+		delete(proxy, `patch`)
 	}
 
 	if traceBytes, ok := proxy["trace"]; ok {
@@ -606,6 +699,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.trace = &traceVal
+		delete(proxy, `trace`)
 	}
 
 	if serversBytes, ok := proxy["servers"]; ok {
@@ -614,6 +708,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.servers = serversVal
+		delete(proxy, `servers`)
 	}
 
 	if parametersBytes, ok := proxy["parameters"]; ok {
@@ -622,6 +717,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.parameters = parametersVal
+		delete(proxy, `parameters`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -633,9 +729,15 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -652,6 +754,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.tags = tagsVal
+		delete(proxy, `tags`)
 	}
 
 	if summaryBytes, ok := proxy["summary"]; ok {
@@ -660,6 +763,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.summary = summaryVal
+		delete(proxy, `summary`)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
@@ -668,6 +772,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
@@ -676,6 +781,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.externalDocs = &externalDocsVal
+		delete(proxy, `externalDocs`)
 	}
 
 	if operationIDBytes, ok := proxy["operationId"]; ok {
@@ -684,6 +790,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.operationID = operationIDVal
+		delete(proxy, `operationId`)
 	}
 
 	if parametersBytes, ok := proxy["parameters"]; ok {
@@ -692,6 +799,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.parameters = parametersVal
+		delete(proxy, `parameters`)
 	}
 
 	if requestBodyBytes, ok := proxy["requestBody"]; ok {
@@ -700,6 +808,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.requestBody = &requestBodyVal
+		delete(proxy, `requestBody`)
 	}
 
 	responsesBytes, ok := proxy["responses"]
@@ -711,6 +820,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.responses = &responsesVal
+	delete(proxy, `responses`)
 
 	if callbacksBytes, ok := proxy["callbacks"]; ok {
 		var callbacksVal map[string]*Callback
@@ -718,6 +828,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.callbacks = callbacksVal
+		delete(proxy, `callbacks`)
 	}
 
 	if deprecatedBytes, ok := proxy["deprecated"]; ok {
@@ -726,6 +837,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.deprecated = deprecatedVal
+		delete(proxy, `deprecated`)
 	}
 
 	if securityBytes, ok := proxy["security"]; ok {
@@ -734,6 +846,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.security = securityVal
+		delete(proxy, `security`)
 	}
 
 	if serversBytes, ok := proxy["servers"]; ok {
@@ -742,6 +855,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.servers = serversVal
+		delete(proxy, `servers`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -753,9 +867,15 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -772,6 +892,7 @@ func (v *ExternalDocumentation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 
 	urlBytes, ok := proxy["url"]
@@ -783,6 +904,7 @@ func (v *ExternalDocumentation) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.url = urlVal
+	delete(proxy, `url`)
 
 	if _, err := url.ParseRequestURI(v.url); err != nil {
 		return err
@@ -797,9 +919,15 @@ func (v *ExternalDocumentation) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -819,6 +947,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.name = nameVal
+	delete(proxy, `name`)
 
 	inBytes, ok := proxy["in"]
 	if !ok {
@@ -829,6 +958,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.in = inVal
+	delete(proxy, `in`)
 
 	if !isOneOf(v.in, []string{"query", "header", "path", "cookie"}) {
 		return errors.New(`"in" field must be one of ["query", "header", "path", "cookie"]`)
@@ -840,6 +970,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 
 	if requiredBytes, ok := proxy["required"]; ok {
@@ -848,6 +979,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.required = requiredVal
+		delete(proxy, `required`)
 	}
 
 	if deprecatedBytes, ok := proxy["deprecated"]; ok {
@@ -856,6 +988,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.deprecated = deprecatedVal
+		delete(proxy, `deprecated`)
 	}
 
 	if allowEmptyValueBytes, ok := proxy["allowEmptyValue"]; ok {
@@ -864,6 +997,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.allowEmptyValue = allowEmptyValueVal
+		delete(proxy, `allowEmptyValue`)
 	}
 
 	if styleBytes, ok := proxy["style"]; ok {
@@ -872,6 +1006,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.style = styleVal
+		delete(proxy, `style`)
 	}
 
 	if explodeBytes, ok := proxy["explode"]; ok {
@@ -880,6 +1015,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.explode = explodeVal
+		delete(proxy, `explode`)
 	}
 
 	if allowReservedBytes, ok := proxy["allowReserved"]; ok {
@@ -888,6 +1024,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.allowReserved = allowReservedVal
+		delete(proxy, `allowReserved`)
 	}
 
 	if schemaBytes, ok := proxy["schema"]; ok {
@@ -896,6 +1033,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.schema = &schemaVal
+		delete(proxy, `schema`)
 	}
 
 	if exampleBytes, ok := proxy["example"]; ok {
@@ -904,6 +1042,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.example = exampleVal
+		delete(proxy, `example`)
 	}
 
 	if examplesBytes, ok := proxy["examples"]; ok {
@@ -912,6 +1051,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.examples = examplesVal
+		delete(proxy, `examples`)
 	}
 
 	if contentBytes, ok := proxy["content"]; ok {
@@ -920,6 +1060,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.content = contentVal
+		delete(proxy, `content`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -931,6 +1072,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
@@ -942,6 +1084,12 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.reference = referenceVal
+		delete(proxy, `$ref`)
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -958,6 +1106,7 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 
 	contentBytes, ok := proxy["content"]
@@ -969,6 +1118,7 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.content = contentVal
+	delete(proxy, `content`)
 
 	if requiredBytes, ok := proxy["required"]; ok {
 		var requiredVal bool
@@ -976,6 +1126,7 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.required = requiredVal
+		delete(proxy, `required`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -987,6 +1138,7 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
@@ -998,6 +1150,12 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.reference = referenceVal
+		delete(proxy, `$ref`)
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -1014,6 +1172,7 @@ func (v *MediaType) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.schema = &schemaVal
+		delete(proxy, `schema`)
 	}
 
 	if exampleBytes, ok := proxy["example"]; ok {
@@ -1022,6 +1181,7 @@ func (v *MediaType) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.example = exampleVal
+		delete(proxy, `example`)
 	}
 
 	if examplesBytes, ok := proxy["examples"]; ok {
@@ -1030,6 +1190,7 @@ func (v *MediaType) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.examples = examplesVal
+		delete(proxy, `examples`)
 	}
 
 	if encodingBytes, ok := proxy["encoding"]; ok {
@@ -1038,6 +1199,7 @@ func (v *MediaType) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.encoding = encodingVal
+		delete(proxy, `encoding`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1049,9 +1211,15 @@ func (v *MediaType) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -1068,6 +1236,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.contentType = contentTypeVal
+		delete(proxy, `contentType`)
 	}
 
 	if headersBytes, ok := proxy["headers"]; ok {
@@ -1076,6 +1245,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.headers = headersVal
+		delete(proxy, `headers`)
 	}
 
 	if styleBytes, ok := proxy["style"]; ok {
@@ -1084,6 +1254,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.style = styleVal
+		delete(proxy, `style`)
 	}
 
 	if explodeBytes, ok := proxy["explode"]; ok {
@@ -1092,6 +1263,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.explode = explodeVal
+		delete(proxy, `explode`)
 	}
 
 	if allowReservedBytes, ok := proxy["allowReserved"]; ok {
@@ -1100,6 +1272,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.allowReserved = allowReservedVal
+		delete(proxy, `allowReserved`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1111,9 +1284,15 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -1134,6 +1313,7 @@ func (v *Responses) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		responses[key] = &responsesv
+		delete(proxy, key)
 	}
 	if len(responses) != 0 {
 		v.responses = responses
@@ -1148,9 +1328,15 @@ func (v *Responses) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -1170,6 +1356,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.description = descriptionVal
+	delete(proxy, `description`)
 
 	if headersBytes, ok := proxy["headers"]; ok {
 		var headersVal map[string]*Header
@@ -1177,6 +1364,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.headers = headersVal
+		delete(proxy, `headers`)
 	}
 
 	if contentBytes, ok := proxy["content"]; ok {
@@ -1185,6 +1373,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.content = contentVal
+		delete(proxy, `content`)
 	}
 
 	if linksBytes, ok := proxy["links"]; ok {
@@ -1193,6 +1382,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.links = linksVal
+		delete(proxy, `links`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1204,6 +1394,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
@@ -1215,6 +1406,12 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.reference = referenceVal
+		delete(proxy, `$ref`)
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -1231,6 +1428,7 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		callback[key] = &callbackv
+		delete(proxy, key)
 	}
 	if len(callback) != 0 {
 		v.callback = callback
@@ -1245,6 +1443,7 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
@@ -1256,6 +1455,12 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.reference = referenceVal
+		delete(proxy, `$ref`)
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -1272,6 +1477,7 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.summary = summaryVal
+		delete(proxy, `summary`)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
@@ -1280,6 +1486,7 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 
 	if valueBytes, ok := proxy["value"]; ok {
@@ -1288,6 +1495,7 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.value = valueVal
+		delete(proxy, `value`)
 	}
 
 	if externalValueBytes, ok := proxy["externalValue"]; ok {
@@ -1296,6 +1504,7 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.externalValue = externalValueVal
+		delete(proxy, `externalValue`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1307,6 +1516,7 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
@@ -1318,6 +1528,12 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.reference = referenceVal
+		delete(proxy, `$ref`)
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -1334,6 +1550,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.operationRef = operationRefVal
+		delete(proxy, `operationRef`)
 	}
 
 	if operationIDBytes, ok := proxy["operationId"]; ok {
@@ -1342,6 +1559,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.operationID = operationIDVal
+		delete(proxy, `operationId`)
 	}
 
 	if parametersBytes, ok := proxy["parameters"]; ok {
@@ -1350,6 +1568,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.parameters = parametersVal
+		delete(proxy, `parameters`)
 	}
 
 	if requestBodyBytes, ok := proxy["requestBody"]; ok {
@@ -1358,6 +1577,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.requestBody = requestBodyVal
+		delete(proxy, `requestBody`)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
@@ -1366,6 +1586,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 
 	if serverBytes, ok := proxy["server"]; ok {
@@ -1374,6 +1595,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.server = &serverVal
+		delete(proxy, `server`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1385,6 +1607,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
@@ -1396,6 +1619,12 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.reference = referenceVal
+		delete(proxy, `$ref`)
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -1412,6 +1641,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.name = nameVal
+		delete(proxy, `name`)
 	}
 
 	if inBytes, ok := proxy["in"]; ok {
@@ -1420,6 +1650,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.in = inVal
+		delete(proxy, `in`)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
@@ -1428,6 +1659,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 
 	if requiredBytes, ok := proxy["required"]; ok {
@@ -1436,6 +1668,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.required = requiredVal
+		delete(proxy, `required`)
 	}
 
 	if deprecatedBytes, ok := proxy["deprecated"]; ok {
@@ -1444,6 +1677,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.deprecated = deprecatedVal
+		delete(proxy, `deprecated`)
 	}
 
 	if allowEmptyValueBytes, ok := proxy["allowEmptyValue"]; ok {
@@ -1452,6 +1686,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.allowEmptyValue = allowEmptyValueVal
+		delete(proxy, `allowEmptyValue`)
 	}
 
 	if styleBytes, ok := proxy["style"]; ok {
@@ -1460,6 +1695,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.style = styleVal
+		delete(proxy, `style`)
 	}
 
 	if explodeBytes, ok := proxy["explode"]; ok {
@@ -1468,6 +1704,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.explode = explodeVal
+		delete(proxy, `explode`)
 	}
 
 	if allowReservedBytes, ok := proxy["allowReserved"]; ok {
@@ -1476,6 +1713,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.allowReserved = allowReservedVal
+		delete(proxy, `allowReserved`)
 	}
 
 	if schemaBytes, ok := proxy["schema"]; ok {
@@ -1484,6 +1722,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.schema = &schemaVal
+		delete(proxy, `schema`)
 	}
 
 	if exampleBytes, ok := proxy["example"]; ok {
@@ -1492,6 +1731,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.example = exampleVal
+		delete(proxy, `example`)
 	}
 
 	if examplesBytes, ok := proxy["examples"]; ok {
@@ -1500,6 +1740,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.examples = examplesVal
+		delete(proxy, `examples`)
 	}
 
 	if contentBytes, ok := proxy["content"]; ok {
@@ -1508,6 +1749,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.content = contentVal
+		delete(proxy, `content`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1519,6 +1761,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
@@ -1530,6 +1773,12 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.reference = referenceVal
+		delete(proxy, `$ref`)
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -1549,6 +1798,7 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 		return err
 	}
 	v.name = nameVal
+	delete(proxy, `name`)
 
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
@@ -1556,6 +1806,7 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
@@ -1564,6 +1815,7 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.externalDocs = &externalDocsVal
+		delete(proxy, `externalDocs`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1575,9 +1827,15 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -1594,6 +1852,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.title = titleVal
+		delete(proxy, `title`)
 	}
 
 	if multipleOfBytes, ok := proxy["multipleOf"]; ok {
@@ -1602,6 +1861,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.multipleOf = multipleOfVal
+		delete(proxy, `multipleOf`)
 	}
 
 	if maximumBytes, ok := proxy["maximum"]; ok {
@@ -1610,6 +1870,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.maximum = maximumVal
+		delete(proxy, `maximum`)
 	}
 
 	if exclusiveMaximumBytes, ok := proxy["exclusiveMaximum"]; ok {
@@ -1618,6 +1879,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.exclusiveMaximum = exclusiveMaximumVal
+		delete(proxy, `exclusiveMaximum`)
 	}
 
 	if minimumBytes, ok := proxy["minimum"]; ok {
@@ -1626,6 +1888,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.minimum = minimumVal
+		delete(proxy, `minimum`)
 	}
 
 	if exclusiveMinimumBytes, ok := proxy["exclusiveMinimum"]; ok {
@@ -1634,6 +1897,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.exclusiveMinimum = exclusiveMinimumVal
+		delete(proxy, `exclusiveMinimum`)
 	}
 
 	if maxLengthBytes, ok := proxy["maxLength"]; ok {
@@ -1642,6 +1906,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.maxLength = maxLengthVal
+		delete(proxy, `maxLength`)
 	}
 
 	if minLengthBytes, ok := proxy["minLength"]; ok {
@@ -1650,6 +1915,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.minLength = minLengthVal
+		delete(proxy, `minLength`)
 	}
 
 	if patternBytes, ok := proxy["pattern"]; ok {
@@ -1658,6 +1924,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.pattern = patternVal
+		delete(proxy, `pattern`)
 	}
 
 	if maxItemsBytes, ok := proxy["maxItems"]; ok {
@@ -1666,6 +1933,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.maxItems = maxItemsVal
+		delete(proxy, `maxItems`)
 	}
 
 	if minItemsBytes, ok := proxy["minItems"]; ok {
@@ -1674,6 +1942,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.minItems = minItemsVal
+		delete(proxy, `minItems`)
 	}
 
 	if maxPropertiesBytes, ok := proxy["maxProperties"]; ok {
@@ -1682,6 +1951,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.maxProperties = maxPropertiesVal
+		delete(proxy, `maxProperties`)
 	}
 
 	if minPropertiesBytes, ok := proxy["minProperties"]; ok {
@@ -1690,6 +1960,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.minProperties = minPropertiesVal
+		delete(proxy, `minProperties`)
 	}
 
 	if requiredBytes, ok := proxy["required"]; ok {
@@ -1698,6 +1969,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.required = requiredVal
+		delete(proxy, `required`)
 	}
 
 	if enumBytes, ok := proxy["enum"]; ok {
@@ -1706,6 +1978,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.enum = enumVal
+		delete(proxy, `enum`)
 	}
 
 	if type_Bytes, ok := proxy["type"]; ok {
@@ -1714,6 +1987,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.type_ = type_Val
+		delete(proxy, `type`)
 	}
 
 	if allOfBytes, ok := proxy["allOf"]; ok {
@@ -1722,6 +1996,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.allOf = allOfVal
+		delete(proxy, `allOf`)
 	}
 
 	if oneOfBytes, ok := proxy["oneOf"]; ok {
@@ -1730,6 +2005,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.oneOf = oneOfVal
+		delete(proxy, `oneOf`)
 	}
 
 	if anyOfBytes, ok := proxy["anyOf"]; ok {
@@ -1738,6 +2014,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.anyOf = anyOfVal
+		delete(proxy, `anyOf`)
 	}
 
 	if notBytes, ok := proxy["not"]; ok {
@@ -1746,6 +2023,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.not = &notVal
+		delete(proxy, `not`)
 	}
 
 	if itemsBytes, ok := proxy["items"]; ok {
@@ -1754,6 +2032,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.items = &itemsVal
+		delete(proxy, `items`)
 	}
 
 	if propertiesBytes, ok := proxy["properties"]; ok {
@@ -1762,6 +2041,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.properties = propertiesVal
+		delete(proxy, `properties`)
 	}
 
 	if additionalPropertiesBytes, ok := proxy["additionalProperties"]; ok {
@@ -1770,6 +2050,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.additionalProperties = &additionalPropertiesVal
+		delete(proxy, `additionalProperties`)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
@@ -1778,6 +2059,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 
 	if formatBytes, ok := proxy["format"]; ok {
@@ -1786,6 +2068,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.format = formatVal
+		delete(proxy, `format`)
 	}
 
 	if default_Bytes, ok := proxy["default"]; ok {
@@ -1794,6 +2077,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.default_ = default_Val
+		delete(proxy, `default`)
 	}
 
 	if nullableBytes, ok := proxy["nullable"]; ok {
@@ -1802,6 +2086,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.nullable = nullableVal
+		delete(proxy, `nullable`)
 	}
 
 	if discriminatorBytes, ok := proxy["discriminator"]; ok {
@@ -1810,6 +2095,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.discriminator = &discriminatorVal
+		delete(proxy, `discriminator`)
 	}
 
 	if readOnlyBytes, ok := proxy["readOnly"]; ok {
@@ -1818,6 +2104,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.readOnly = readOnlyVal
+		delete(proxy, `readOnly`)
 	}
 
 	if writeOnlyBytes, ok := proxy["writeOnly"]; ok {
@@ -1826,6 +2113,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.writeOnly = writeOnlyVal
+		delete(proxy, `writeOnly`)
 	}
 
 	if xmlBytes, ok := proxy["xml"]; ok {
@@ -1834,6 +2122,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.xml = &xmlVal
+		delete(proxy, `xml`)
 	}
 
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
@@ -1842,6 +2131,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.externalDocs = &externalDocsVal
+		delete(proxy, `externalDocs`)
 	}
 
 	if exampleBytes, ok := proxy["example"]; ok {
@@ -1850,6 +2140,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.example = exampleVal
+		delete(proxy, `example`)
 	}
 
 	if deprecatedBytes, ok := proxy["deprecated"]; ok {
@@ -1858,6 +2149,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.deprecated = deprecatedVal
+		delete(proxy, `deprecated`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1869,6 +2161,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
@@ -1880,6 +2173,12 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.reference = referenceVal
+		delete(proxy, `$ref`)
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -1896,6 +2195,7 @@ func (v *Discriminator) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.propertyName = propertyNameVal
+		delete(proxy, `propertyName`)
 	}
 
 	if mappingBytes, ok := proxy["mapping"]; ok {
@@ -1904,6 +2204,12 @@ func (v *Discriminator) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.mapping = mappingVal
+		delete(proxy, `mapping`)
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -1920,6 +2226,7 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.name = nameVal
+		delete(proxy, `name`)
 	}
 
 	if namespaceBytes, ok := proxy["namespace"]; ok {
@@ -1928,6 +2235,7 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.namespace = namespaceVal
+		delete(proxy, `namespace`)
 	}
 
 	if prefixBytes, ok := proxy["prefix"]; ok {
@@ -1936,6 +2244,7 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.prefix = prefixVal
+		delete(proxy, `prefix`)
 	}
 
 	if attributeBytes, ok := proxy["attribute"]; ok {
@@ -1944,6 +2253,7 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.attribute = attributeVal
+		delete(proxy, `attribute`)
 	}
 
 	if wrappedBytes, ok := proxy["wrapped"]; ok {
@@ -1952,6 +2262,7 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.wrapped = wrappedVal
+		delete(proxy, `wrapped`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -1963,9 +2274,15 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -1982,6 +2299,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.type_ = type_Val
+		delete(proxy, `type`)
 	}
 
 	if v.type_ != "" {
@@ -1996,6 +2314,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.description = descriptionVal
+		delete(proxy, `description`)
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
@@ -2004,6 +2323,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.name = nameVal
+		delete(proxy, `name`)
 	}
 
 	if inBytes, ok := proxy["in"]; ok {
@@ -2012,6 +2332,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.in = inVal
+		delete(proxy, `in`)
 	}
 
 	if v.in != "" {
@@ -2026,6 +2347,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.scheme = schemeVal
+		delete(proxy, `scheme`)
 	}
 
 	if bearerFormatBytes, ok := proxy["bearerFormat"]; ok {
@@ -2034,6 +2356,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.bearerFormat = bearerFormatVal
+		delete(proxy, `bearerFormat`)
 	}
 
 	if flowsBytes, ok := proxy["flows"]; ok {
@@ -2042,6 +2365,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.flows = &flowsVal
+		delete(proxy, `flows`)
 	}
 
 	if openIDConnectURLBytes, ok := proxy["openIdConnectUrl"]; ok {
@@ -2050,6 +2374,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.openIDConnectURL = openIDConnectURLVal
+		delete(proxy, `openIdConnectUrl`)
 	}
 
 	if v.openIDConnectURL != "" {
@@ -2067,6 +2392,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
@@ -2078,6 +2404,12 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.reference = referenceVal
+		delete(proxy, `$ref`)
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -2094,6 +2426,7 @@ func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.implicit = &implicitVal
+		delete(proxy, `implicit`)
 	}
 
 	if passwordBytes, ok := proxy["password"]; ok {
@@ -2102,6 +2435,7 @@ func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.password = &passwordVal
+		delete(proxy, `password`)
 	}
 
 	if clientCredentialsBytes, ok := proxy["clientCredentials"]; ok {
@@ -2110,6 +2444,7 @@ func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.clientCredentials = &clientCredentialsVal
+		delete(proxy, `clientCredentials`)
 	}
 
 	if authorizationCodeBytes, ok := proxy["authorizationCode"]; ok {
@@ -2118,6 +2453,7 @@ func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.authorizationCode = &authorizationCodeVal
+		delete(proxy, `authorizationCode`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -2129,9 +2465,15 @@ func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -2148,6 +2490,7 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.authorizationURL = authorizationURLVal
+		delete(proxy, `authorizationUrl`)
 	}
 
 	if v.authorizationURL != "" {
@@ -2162,6 +2505,7 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.tokenURL = tokenURLVal
+		delete(proxy, `tokenUrl`)
 	}
 
 	if v.tokenURL != "" {
@@ -2176,6 +2520,7 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.refreshURL = refreshURLVal
+		delete(proxy, `refreshUrl`)
 	}
 
 	if v.refreshURL != "" {
@@ -2190,6 +2535,7 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		v.scopes = scopesVal
+		delete(proxy, `scopes`)
 	}
 	extension := map[string]interface{}{}
 	for key, val := range proxy {
@@ -2201,9 +2547,15 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		extension[key] = extensionv
+		delete(proxy, key)
 	}
 	if len(extension) != 0 {
 		v.extension = extension
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }
@@ -2220,9 +2572,15 @@ func (v *SecurityRequirement) UnmarshalYAML(b []byte) error {
 			return err
 		}
 		securityRequirement[key] = securityRequirementv
+		delete(proxy, key)
 	}
 	if len(securityRequirement) != 0 {
 		v.securityRequirement = securityRequirement
+	}
+	if len(proxy) != 0 {
+		for k := range proxy {
+			return fmt.Errorf("unknown key: %s", k)
+		}
 	}
 	return nil
 }

@@ -25,6 +25,7 @@ func main() {
 	outf("\n\npackage openapi")
 	outf("\n\nimport (")
 	outf("\n\"errors\"")
+	outf("\n\"fmt\"")
 	outf("\n\"net/url\"")
 	outf("\n\"regexp\"")
 	outf("\n\"strings\"")
@@ -104,6 +105,7 @@ func main() {
 						outf("&")
 					}
 					outf("%sv", fn)
+					outf("\ndelete(proxy, key)")
 					outf("\n}")
 					outf("\nif len(%s) != 0 {", fn)
 					outf("\nv.%s = %s", fn, fn)
@@ -134,12 +136,17 @@ func main() {
 					outf("&")
 				}
 				outf("%sVal", fn)
-
+				outf("\ndelete(proxy, `%s`)", yn)
 				if !required {
 					outf("\n}")
 				}
 				formatValidation(outf, fn, yn, field, tag, required)
 			}
+			outf("\nif len(proxy) != 0 {")
+			outf("\nfor k := range proxy {")
+			outf("\nreturn fmt.Errorf(\"unknown key: %%s\", k)")
+			outf("\n}")
+			outf("\n}")
 
 			outf("\nreturn nil")
 			outf("\n}")
