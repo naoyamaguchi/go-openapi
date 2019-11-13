@@ -2277,6 +2277,891 @@ description: Pets operations`
 	}
 }
 
+func TestSchemaUnmarshalYAML(t *testing.T) {
+	t.Run("primitive", func(t *testing.T) {
+		yml := `type: string
+format: email`
+		var schema Schema
+		if err := yaml.Unmarshal([]byte(yml), &schema); err != nil {
+			t.Fatal(err)
+		}
+		if schema.type_ != "string" {
+			t.Errorf("unexpected schema.type: %s", schema.type_)
+			return
+		}
+		if schema.format != "email" {
+			t.Errorf("unexpected schema.format: %s", schema.format)
+			return
+		}
+	})
+	t.Run("simple model", func(t *testing.T) {
+		yml := `type: object
+required:
+- name
+properties:
+  name:
+    type: string
+  address:
+    $ref: '#/components/schemas/Address'
+  age:
+    type: integer
+    format: int32
+    minimum: 0`
+		var schema Schema
+		if err := yaml.Unmarshal([]byte(yml), &schema); err != nil {
+			t.Fatal(err)
+		}
+		if schema.type_ != "object" {
+			t.Errorf("unexpected schema.type: %s", schema.type_)
+			return
+		}
+		if !reflect.DeepEqual(schema.required, []string{"name"}) {
+			t.Errorf("unexpected schema.required: %q", schema.required)
+			return
+		}
+		name, ok := schema.properties["name"]
+		if !ok {
+			t.Error("schema.properties.name is not found")
+			return
+		}
+		if name.type_ != "string" {
+			t.Errorf("unexpected schema.properties.name.type: %s", name.type_)
+			return
+		}
+		address, ok := schema.properties["address"]
+		if !ok {
+			t.Error("schema.properties.address is not found")
+			return
+		}
+		if address.reference != "#/components/schemas/Address" {
+			t.Errorf("unexpected schema.properties.address.$ref: %s", address.reference)
+			return
+		}
+		age, ok := schema.properties["age"]
+		if !ok {
+			t.Error("schema.properties.age is not found")
+			return
+		}
+		if age.type_ != "integer" {
+			t.Errorf("unexpected schema.properties.age.type: %s", age.type_)
+			return
+		}
+		if age.format != "int32" {
+			t.Errorf("unexpected schema.properties.age.format: %s", age.format)
+			return
+		}
+		if age.minimum != 0 {
+			t.Errorf("unexpected schema.properties.age.minimum: %d", age.minimum)
+			return
+		}
+	})
+	t.Run("simple string to string map", func(t *testing.T) {
+		yml := `type: object
+additionalProperties:
+  type: string`
+		var schema Schema
+		if err := yaml.Unmarshal([]byte(yml), &schema); err != nil {
+			t.Fatal(err)
+		}
+		if schema.type_ != "object" {
+			t.Errorf("unexpected schema.type: %s", schema.type_)
+			return
+		}
+		if schema.additionalProperties.type_ != "string" {
+			t.Errorf("unexpected schema.additiionalProperties.type: %s", schema.additionalProperties.type_)
+			return
+		}
+	})
+	t.Run("string to model map", func(t *testing.T) {
+		yml := `type: object
+additionalProperties:
+  $ref: '#/components/schemas/ComplexModel'`
+		var schema Schema
+		if err := yaml.Unmarshal([]byte(yml), &schema); err != nil {
+			t.Fatal(err)
+		}
+		if schema.type_ != "object" {
+			t.Errorf("unexpected schema.type: %s", schema.type_)
+			return
+		}
+		if schema.additionalProperties.reference != "#/components/schemas/ComplexModel" {
+			t.Errorf("unexpected schema.additionalProperties.$ref: %s", schema.additionalProperties.reference)
+			return
+		}
+	})
+	t.Run("model with example", func(t *testing.T) {
+		yml := `type: object
+properties:
+  id:
+    type: integer
+    format: int64
+  name:
+    type: string
+required:
+- name
+example:
+  name: Puma
+  id: 1`
+		var schema Schema
+		if err := yaml.Unmarshal([]byte(yml), &schema); err != nil {
+			t.Fatal(err)
+		}
+		if schema.type_ != "object" {
+			t.Errorf("unexpected schema.type: %s", schema.type_)
+			return
+		}
+		id, ok := schema.properties["id"]
+		if !ok {
+			t.Error("schema.properties.id is not found")
+			return
+		}
+		if id.type_ != "integer" {
+			t.Errorf("unexpected schema.properties.id.type: %s", id.type_)
+			return
+		}
+		if id.format != "int64" {
+			t.Errorf("unexpected schema.properties.id.format: %s", id.format)
+			return
+		}
+		name, ok := schema.properties["name"]
+		if !ok {
+			if !ok {
+				t.Error("schema.properties.name is not found")
+				return
+			}
+			if name.type_ != "string" {
+				t.Errorf("unexpected schema.properties.name.type: %s", name.type_)
+				return
+			}
+		}
+		if !reflect.DeepEqual(schema.required, []string{"name"}) {
+			t.Errorf("unexpected schema.required: %q", schema.required)
+			return
+		}
+		if example, ok := schema.example.(map[string]interface{}); ok {
+			if name, ok := example["name"]; !ok {
+				t.Error("schema.example.name is not found")
+				return
+			} else if name != "Puma" {
+				t.Errorf("unexpected schema.example.name: %s", name)
+				return
+			}
+			if id, ok := example["id"]; !ok {
+				t.Error("schema.example.id is not found")
+				return
+			} else if id != uint64(1) {
+				t.Errorf("unexpected schema.example.id: %d", id)
+				return
+			}
+		}
+	})
+	t.Run("models with composition", func(t *testing.T) {
+		yml := `components:
+  schemas:
+    ErrorModel:
+      type: object
+      required:
+      - message
+      - code
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+          minimum: 100
+          maximum: 600
+    ExtendedErrorModel:
+      allOf:
+      - $ref: '#/components/schemas/ErrorModel'
+      - type: object
+        required:
+        - rootCause
+        properties:
+          rootCause:
+            type: string`
+		var target struct {
+			Components Components
+		}
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		t.Run("ErrorModel", func(t *testing.T) {
+			schema, ok := target.Components.schemas["ErrorModel"]
+			if !ok {
+				t.Error("components.schemas.ErrorModel is not found")
+				return
+			}
+			if schema.type_ != "object" {
+				t.Errorf("unexpected components.schemas.ErrorModel.type: %s", schema.type_)
+				return
+			}
+			if !reflect.DeepEqual(schema.required, []string{"message", "code"}) {
+				t.Errorf("unexpected components.schemas.ErrorModel.required: %q", schema.required)
+				return
+			}
+			message, ok := schema.properties["message"]
+			if !ok {
+				t.Error("components.schemas.ErrorModel.properties.message is not found")
+				return
+			}
+			if message.type_ != "string" {
+				t.Errorf("unexpected components.schemas.ErrorModel.properties.message.type: %s", message.type_)
+				return
+			}
+			code, ok := schema.properties["code"]
+			if !ok {
+				t.Error("components.schemas.ErrorModel.properties.code is not found")
+				return
+			}
+			if code.type_ != "integer" {
+				t.Errorf("unexpected components.schemas.ErrorModel.properties.code.type: %s", code.type_)
+				return
+			}
+			if code.minimum != 100 {
+				t.Errorf("unexpected components.schemas.ErrorModel.properties.code.minimum: %d", code.minimum)
+				return
+			}
+			if code.maximum != 600 {
+				t.Errorf("unexpected components.schemas.ErrorModel.properties.code.maximum: %d", code.maximum)
+				return
+			}
+		})
+		t.Run("ExtendedErrorModel", func(t *testing.T) {
+			schema, ok := target.Components.schemas["ExtendedErrorModel"]
+			if !ok {
+				t.Error("components.schemas.ExtendedErrorModel is not found")
+				return
+			}
+			ref := schema.allOf[0]
+			if ref.reference != "#/components/schemas/ErrorModel" {
+				t.Errorf("unexpected components.schemas.ExtendedErrorModel.allOf.0.$ref: %s", ref.reference)
+				return
+			}
+			ext := schema.allOf[1]
+			if ext.type_ != "object" {
+				t.Errorf("unexpected components.schemas.ExtendedErrorModel.allOf.1.type: %s", ext.type_)
+				return
+			}
+			if !reflect.DeepEqual(ext.required, []string{"rootCause"}) {
+				t.Errorf("unexpected components.schemas.ExtendedErrorModel.allOf.1.required: %q", ext.required)
+				return
+			}
+			rootCause, ok := ext.properties["rootCause"]
+			if !ok {
+				t.Error("components.schemas.ExtendedErrorModel.allOf.1.properties.rootCause is not found")
+				return
+			}
+			if rootCause.type_ != "string" {
+				t.Errorf("unexpected components.schemas.ExtendedErrorModel.allOf.1.properties.rootCause.type: %s", rootCause.type_)
+				return
+			}
+		})
+	})
+	t.Run("models with polymorphism support", func(t *testing.T) {
+		yml := `components:
+  schemas:
+    Pet:
+      type: object
+      discriminator:
+        propertyName: petType
+      properties:
+        name:
+          type: string
+        petType:
+          type: string
+      required:
+      - name
+      - petType
+    Cat:  ## "Cat" will be used as the discriminator value
+      description: A representation of a cat
+      allOf:
+      - $ref: '#/components/schemas/Pet'
+      - type: object
+        properties:
+          huntingSkill:
+            type: string
+            description: The measured skill for hunting
+            enum:
+            - clueless
+            - lazy
+            - adventurous
+            - aggressive
+        required:
+        - huntingSkill
+    Dog:  ## "Dog" will be used as the discriminator value
+      description: A representation of a dog
+      allOf:
+      - $ref: '#/components/schemas/Pet'
+      - type: object
+        properties:
+          packSize:
+            type: integer
+            format: int32
+            description: the size of the pack the dog is from
+            default: 0
+            minimum: 0
+        required:
+        - packSize`
+		var target struct {
+			Components Components
+		}
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		t.Run("Pet", func(t *testing.T) {
+			pet, ok := target.Components.schemas["Pet"]
+			if !ok {
+				t.Error("components.schemas.Pet is not found")
+				return
+			}
+			if pet.type_ != "object" {
+				t.Errorf("unexpected components.schemas.Pet.type: %s", pet.type_)
+				return
+			}
+			if pet.discriminator.propertyName != "petType" {
+				t.Errorf("unexpected components.schemas.discriminator.propertyName: %s", pet.discriminator.propertyName)
+				return
+			}
+			name, ok := pet.properties["name"]
+			if !ok {
+				t.Error("components.schemas.Pet.properties.name is not found")
+				return
+			}
+			if name.type_ != "string" {
+				t.Errorf("unexpected components.schemas.Pet.properties.name.type: %s", name.type_)
+				return
+			}
+			petType, ok := pet.properties["petType"]
+			if !ok {
+				t.Error("components.schemas.Pet.properties.petType is not found")
+				return
+			}
+			if petType.type_ != "string" {
+				t.Errorf("unexpected components.schemas.Pet.properties.petType.type: %s", petType.type_)
+				return
+			}
+			if !reflect.DeepEqual(pet.required, []string{"name", "petType"}) {
+				t.Errorf("unexpected componets.schemas.Pet.required: %q", pet.required)
+				return
+			}
+		})
+		t.Run("Cat", func(t *testing.T) {
+			cat, ok := target.Components.schemas["Cat"]
+			if !ok {
+				t.Error("components.schemas.Cat is not found")
+				return
+			}
+			if cat.description != "A representation of a cat" {
+				t.Errorf("unexpected components.schemas.Cat.description: %s", cat.description)
+				return
+			}
+			if cat.allOf[0].reference != "#/components/schemas/Pet" {
+				t.Errorf("unexpected components.schemas.Cat.allOf.0.$ref: %s", cat.allOf[0].reference)
+				return
+			}
+			schema := cat.allOf[1]
+			if schema.type_ != "object" {
+				t.Errorf("unexpected components.schemas.Cat.allOf.1.type: %s", schema.type_)
+				return
+			}
+			huntingSkill, ok := schema.properties["huntingSkill"]
+			if !ok {
+				t.Error("components.schemas.Cat.allOf.1.properties.huntingSkill is not found")
+				return
+			}
+			if huntingSkill.type_ != "string" {
+				t.Errorf("unexpected components.schemas.Cat.allOf.1.properties.huntingSkill.type: %s", huntingSkill.type_)
+				return
+			}
+			if huntingSkill.description != "The measured skill for hunting" {
+				t.Errorf("unexpected components.schemas.Cat.allOf.1.properties.huntingSkill.description: %s", huntingSkill.description)
+				return
+			}
+			if !reflect.DeepEqual(schema.required, []string{"huntingSkill"}) {
+				t.Errorf("unexpected components.schemas.Cat.allOf.1.required: %q", schema.required)
+				return
+			}
+		})
+		t.Run("Dog", func(t *testing.T) {
+			dog, ok := target.Components.schemas["Dog"]
+			if !ok {
+				t.Error("components.schemas.Dog is not found")
+				return
+			}
+			if dog.description != "A representation of a dog" {
+				t.Errorf("unexpected components.schemas.Dog.description: %s", dog.description)
+				return
+			}
+			if dog.allOf[0].reference != "#/components/schemas/Pet" {
+				t.Errorf("unexpected components.schemas.Dog.allOf.0.$ref: %s", dog.allOf[0].reference)
+				return
+			}
+			schema := dog.allOf[1]
+			if schema.type_ != "object" {
+				t.Errorf("unexpected components.schemas.Dog.allOf.1.type: %s", schema.type_)
+				return
+			}
+			packSize, ok := schema.properties["packSize"]
+			if !ok {
+				t.Error("components.schemas.Dog.allOf.1.properties.packSize is not found")
+				return
+			}
+			if packSize.type_ != "integer" {
+				t.Errorf("unexpected components.schemas.Dog.allOf.1.properties.packSize.type: %s", packSize.type_)
+				return
+			}
+			if packSize.format != "int32" {
+				t.Errorf("unexpected components.schemas.Dog.allOf.1.properties.packSize.format: %s", packSize.format)
+				return
+			}
+			if packSize.description != "the size of the pack the dog is from" {
+				t.Errorf("unexpected components.schemas.Dog.allOf.1.properties.packSize.description: %s", packSize.description)
+				return
+			}
+			if packSize.default_ != "0" {
+				t.Errorf("unexpected components.schemas.Dog.allOf.1.properties.packSize.default: %s", packSize.default_)
+				return
+			}
+			if packSize.minimum != 0 {
+				t.Errorf("unexpected components.schemas.Dog.allOf.1.properties.packSize.minimum: %d", packSize.minimum)
+				return
+			}
+			if !reflect.DeepEqual(schema.required, []string{"packSize"}) {
+				t.Errorf("unexpected components.schemas.Dog.allOf.1.required: %q", schema.required)
+				return
+			}
+		})
+	})
+}
+
+func TestDiscriminatorUnmarshalYAML(t *testing.T) {
+	t.Run("example", func(t *testing.T) {
+		yml := `MyResponseType:
+  oneOf:
+  - $ref: '#/components/schemas/Cat'
+  - $ref: '#/components/schemas/Dog'
+  - $ref: '#/components/schemas/Lizard'
+  discriminator:
+    propertyName: petType`
+		var target map[string]*Schema
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		schema, ok := target["MyResponseType"]
+		if !ok {
+			t.Error("MyResponseType is not found")
+			return
+		}
+		if schema.oneOf[0].reference != "#/components/schemas/Cat" {
+			t.Errorf("unexpected MyResponseType.oneOf.0.$ref: %s", schema.oneOf[0].reference)
+			return
+		}
+		if schema.oneOf[1].reference != "#/components/schemas/Dog" {
+			t.Errorf("unexpected MyResponseType.oneOf.1.$ref: %s", schema.oneOf[1].reference)
+			return
+		}
+		if schema.oneOf[2].reference != "#/components/schemas/Lizard" {
+			t.Errorf("unexpected MyResponseType.oneOf.2.$ref: %s", schema.oneOf[2].reference)
+			return
+		}
+		if schema.discriminator.propertyName != "petType" {
+			t.Errorf("unexpected MyResponseType.discriminator.propertyName: %s", schema.discriminator.propertyName)
+			return
+		}
+	})
+	t.Run("mapping", func(t *testing.T) {
+		yml := `MyResponseType:
+  oneOf:
+  - $ref: '#/components/schemas/Cat'
+  - $ref: '#/components/schemas/Dog'
+  - $ref: '#/components/schemas/Lizard'
+  - $ref: 'https://gigantic-server.com/schemas/Monster/schema.json'
+  discriminator:
+    propertyName: petType
+    mapping:
+      dog: '#/components/schemas/Dog'
+      monster: 'https://gigantic-server.com/schemas/Monster/schema.json'`
+		var target map[string]*Schema
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		schema, ok := target["MyResponseType"]
+		if !ok {
+			t.Error("MyResponseType is not found")
+			return
+		}
+		if schema.oneOf[0].reference != "#/components/schemas/Cat" {
+			t.Errorf("unexpected MyResponseType.oneOf.0.$ref: %s", schema.oneOf[0].reference)
+			return
+		}
+		if schema.oneOf[1].reference != "#/components/schemas/Dog" {
+			t.Errorf("unexpected MyResponseType.oneOf.1.$ref: %s", schema.oneOf[1].reference)
+			return
+		}
+		if schema.oneOf[2].reference != "#/components/schemas/Lizard" {
+			t.Errorf("unexpected MyResponseType.oneOf.2.$ref: %s", schema.oneOf[2].reference)
+			return
+		}
+		if schema.oneOf[3].reference != "https://gigantic-server.com/schemas/Monster/schema.json" {
+			t.Errorf("unexpected MyResponseType.oneOf.3.$ref: %s", schema.oneOf[3].reference)
+			return
+		}
+		if schema.discriminator.propertyName != "petType" {
+			t.Errorf("unexpected MyResponseType.discriminator.propertyName: %s", schema.discriminator.propertyName)
+			return
+		}
+		dog, ok := schema.discriminator.mapping["dog"]
+		if !ok {
+			t.Error("MyResponseType.discriminator.mapping.dog is not found")
+			return
+		}
+		if dog != "#/components/schemas/Dog" {
+			t.Errorf("unexpected MyResponseType.discriminator.mapping.dog: %s", dog)
+			return
+		}
+		monster, ok := schema.discriminator.mapping["monster"]
+		if !ok {
+			t.Error("MyResponseType.discriminator.mapping.monster is not found")
+			return
+		}
+		if monster != "https://gigantic-server.com/schemas/Monster/schema.json" {
+			t.Errorf("unexpected MyResponseType.discriminator.mapping.monster: %s", monster)
+			return
+		}
+	})
+}
+
+func TestXMLUnmarshalYAML(t *testing.T) {
+	t.Run("basic string", func(t *testing.T) {
+		yml := `animals:
+  type: string
+  xml:
+    name: animal`
+		var target map[string]*Schema
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		animals, ok := target["animals"]
+		if !ok {
+			t.Error("animals is not found")
+			return
+		}
+		if animals.type_ != "string" {
+			t.Errorf("unexpected animals.type: %s", animals.type_)
+			return
+		}
+		if animals.xml.name != "animal" {
+			t.Errorf("unexpected animals.xml.name: %s", animals.xml.name)
+			return
+		}
+	})
+	t.Run("attribute prefix namespace", func(t *testing.T) {
+		yml := `Person:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int32
+      xml:
+        attribute: true
+    name:
+      type: string
+      xml:
+        namespace: http://example.com/schema/sample
+        prefix: sample`
+		var target map[string]*Schema
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		person, ok := target["Person"]
+		if !ok {
+			t.Error("Person is not found")
+			return
+		}
+		if person.type_ != "object" {
+			t.Errorf("unexpected Person.type: %s", person.type_)
+			return
+		}
+		id, ok := person.properties["id"]
+		if !ok {
+			t.Error("Person.properties.id is not found")
+			return
+		}
+		if id.type_ != "integer" {
+			t.Errorf("unexpected Person.properties.id.type: %s", id.type_)
+			return
+		}
+		if id.format != "int32" {
+			t.Errorf("unexpected Person.properties.id.format: %s", id.format)
+			return
+		}
+		if id.xml.attribute != true {
+			t.Errorf("unexpected Person.properties.id.xml.attribute: %t", id.xml.attribute)
+			return
+		}
+		name, ok := person.properties["name"]
+		if !ok {
+			t.Error("Person.properties.name is not found")
+			return
+		}
+		if name.type_ != "string" {
+			t.Errorf("unexpected Person.properties.name.type: %s", name.type_)
+			return
+		}
+		if name.xml.namespace != "http://example.com/schema/sample" {
+			t.Errorf("unexpected Person.properties.name.xml.namespace: %s", name.xml.namespace)
+			return
+		}
+		if name.xml.prefix != "sample" {
+			t.Errorf("unexpected Person.properties.name.xml.prefix: %s", name.xml.prefix)
+			return
+		}
+	})
+	t.Run("wrapped array", func(t *testing.T) {
+		yml := `animals:
+  type: array
+  items:
+    type: string
+  xml:
+    wrapped: true`
+		var target map[string]*Schema
+		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+			t.Fatal(err)
+		}
+		animals, ok := target["animals"]
+		if !ok {
+			t.Error("animals is not found")
+			return
+		}
+		if animals.type_ != "array" {
+			t.Errorf("unexpected animals.type: %s", animals.type_)
+			return
+		}
+		if animals.items.type_ != "string" {
+			t.Errorf("unexpected animals.items.type: %s", animals.items.type_)
+			return
+		}
+		if animals.xml.wrapped != true {
+			t.Errorf("unexpected animals.xml.wrapped: %t", animals.xml.wrapped)
+			return
+		}
+	})
+}
+
+func TestSecuritySchemeUnmarshalYAML(t *testing.T) {
+	t.Run("basic auth", func(t *testing.T) {
+		yml := `type: http
+scheme: basic`
+		var securityScheme SecurityScheme
+		if err := yaml.Unmarshal([]byte(yml), &securityScheme); err != nil {
+			t.Fatal(err)
+		}
+		if securityScheme.type_ != "http" {
+			t.Errorf("unexpected securityScheme.type: %s", securityScheme.type_)
+			return
+		}
+		if securityScheme.scheme != "basic" {
+			t.Errorf("unexpected securityScheme.scheme: %s", securityScheme.scheme)
+			return
+		}
+	})
+	t.Run("api key", func(t *testing.T) {
+		yml := `type: apiKey
+name: api_key
+in: header`
+		var securityScheme SecurityScheme
+		if err := yaml.Unmarshal([]byte(yml), &securityScheme); err != nil {
+			t.Fatal(err)
+		}
+		if securityScheme.type_ != "apiKey" {
+			t.Errorf("unexpected securityScheme.type: %s", securityScheme.type_)
+			return
+		}
+		if securityScheme.name != "api_key" {
+			t.Errorf("unexpected securityScheme.name: %s", securityScheme.name)
+			return
+		}
+		if securityScheme.in != "header" {
+			t.Errorf("unexpected securityScheme.in: %s", securityScheme.in)
+			return
+		}
+	})
+	t.Run("JWT bearer", func(t *testing.T) {
+		yml := `type: http
+scheme: bearer
+bearerFormat: JWT`
+		var securityScheme SecurityScheme
+		if err := yaml.Unmarshal([]byte(yml), &securityScheme); err != nil {
+			t.Fatal(err)
+		}
+		if securityScheme.type_ != "http" {
+			t.Errorf("unexpected securityScheme.type: %s", securityScheme.type_)
+			return
+		}
+		if securityScheme.scheme != "bearer" {
+			t.Errorf("unexpected securityScheme.scheme: %s", securityScheme.scheme)
+			return
+		}
+		if securityScheme.bearerFormat != "JWT" {
+			t.Errorf("unexpected securityScheme.bearerFormat: %s", securityScheme.bearerFormat)
+			return
+		}
+	})
+	t.Run("implicit oauth2", func(t *testing.T) {
+		yml := `type: oauth2
+flows:
+  implicit:
+    authorizationUrl: https://example.com/api/oauth/dialog
+    scopes:
+      write:pets: modify pets in your account
+      read:pets: read your pets`
+		var securityScheme SecurityScheme
+		if err := yaml.Unmarshal([]byte(yml), &securityScheme); err != nil {
+			t.Fatal(err)
+		}
+		if securityScheme.type_ != "oauth2" {
+			t.Errorf("unexpected securityScheme.type: %s", securityScheme.type_)
+			return
+		}
+		if securityScheme.flows.implicit.authorizationURL != "https://example.com/api/oauth/dialog" {
+			t.Errorf("unexpected securityScheme.flows.implicit.authorizationURL: %s", securityScheme.flows.implicit.authorizationURL)
+			return
+		}
+		write, ok := securityScheme.flows.implicit.scopes["write:pets"]
+		if !ok {
+			t.Error("securityScheme.flows.implicit.scopes.write:pets is not found")
+			return
+		}
+		if write != "modify pets in your account" {
+			t.Errorf("unexpected securityScheme.flows.implicit.scopes.write:pets: %s", write)
+			return
+		}
+		read, ok := securityScheme.flows.implicit.scopes["read:pets"]
+		if !ok {
+			t.Error("securityScheme.flows.implicit.scopes.read:pets is not found")
+			return
+		}
+		if read != "read your pets" {
+			t.Errorf("unexpected securityScheme.flows.implicit.scopes.read:pets: %s", read)
+			return
+		}
+	})
+}
+
+func TestOAuthFlowUnmarshalYAML(t *testing.T) {
+	yml := `type: oauth2
+flows:
+  implicit:
+    authorizationUrl: https://example.com/api/oauth/dialog
+    scopes:
+      write:pets: modify pets in your account
+      read:pets: read your pets
+  authorizationCode:
+    authorizationUrl: https://example.com/api/oauth/dialog
+    tokenUrl: https://example.com/api/oauth/token
+    scopes:
+      write:pets: modify pets in your account
+      read:pets: read your pets `
+	var securityScheme SecurityScheme
+	if err := yaml.Unmarshal([]byte(yml), &securityScheme); err != nil {
+		t.Fatal(err)
+	}
+	if securityScheme.type_ != "oauth2" {
+		t.Errorf("unexpected securityScheme.type: %s", securityScheme.type_)
+		return
+	}
+	t.Run("implicit", func(t *testing.T) {
+		implicit := securityScheme.flows.implicit
+		if implicit.authorizationURL != "https://example.com/api/oauth/dialog" {
+			t.Errorf("unexpected securityScheme.flows.implicit.authorizationUrl: %s", implicit.authorizationURL)
+			return
+		}
+		write, ok := implicit.scopes["write:pets"]
+		if !ok {
+			t.Error("securityScheme.flows.implicit.scopes.write:pets is not found")
+			return
+		}
+		if write != "modify pets in your account" {
+			t.Errorf("unexpected securityScheme.flows.implicit.scopes.write:pets: %s", write)
+			return
+		}
+		read, ok := implicit.scopes["read:pets"]
+		if !ok {
+			t.Error("securityScheme.flows.implicit.scopes.read:pets is not found")
+			return
+		}
+		if read != "read your pets" {
+			t.Errorf("unexpected securityScheme.flows.implicit.scopes.read:pets: %s", read)
+			return
+		}
+	})
+	t.Run("authorizationCode", func(t *testing.T) {
+		authorizationCode := securityScheme.flows.authorizationCode
+		if authorizationCode.authorizationURL != "https://example.com/api/oauth/dialog" {
+			t.Errorf("unexpected securityScheme.flows.authorizationCode.authorizationUrl: %s", authorizationCode.authorizationURL)
+			return
+		}
+		if authorizationCode.tokenURL != "https://example.com/api/oauth/token" {
+			t.Errorf("unexpected securityScheme.flows.authorizationCode.tokenUrl: %s", authorizationCode.tokenURL)
+			return
+		}
+		write, ok := authorizationCode.scopes["write:pets"]
+		if !ok {
+			t.Error("securityScheme.flows.authorizationCode.scopes.write:pets is not found")
+			return
+		}
+		if write != "modify pets in your account" {
+			t.Errorf("unexpected securityScheme.flows.authorizationCode.scopes.write:pets: %s", write)
+			return
+		}
+		read, ok := authorizationCode.scopes["read:pets"]
+		if !ok {
+			t.Error("securityScheme.flows.authorizationCode.scopes.read:pets is not found")
+			return
+		}
+		if read != "read your pets" {
+			t.Errorf("unexpected securityScheme.flows.authorizationCode.scopes.read:pets: %s", read)
+			return
+		}
+	})
+}
+
+func TestSecurityRequirementUnmarshalYAML(t *testing.T) {
+	t.Run("non-oauth2", func(t *testing.T) {
+		yml := `api_key: []`
+		var securityRequirement SecurityRequirement
+		if err := yaml.Unmarshal([]byte(yml), &securityRequirement); err != nil {
+			t.Fatal(err)
+		}
+		if apiKey, ok := securityRequirement.securityRequirement["api_key"]; !ok {
+			t.Error("api_key is not found")
+			return
+		} else if !reflect.DeepEqual(apiKey, []string{}) {
+			t.Errorf("unexpected api_key: %q", apiKey)
+			return
+		}
+	})
+	t.Run("oauth2", func(t *testing.T) {
+		yml := `petstore_auth:
+- write:pets
+- read:pets`
+		var securityRequirement SecurityRequirement
+		if err := yaml.Unmarshal([]byte(yml), &securityRequirement); err != nil {
+			t.Fatal(err)
+		}
+		if auth, ok := securityRequirement.securityRequirement["petstore_auth"]; !ok {
+			t.Error("petstore_auth is not found")
+			return
+		} else if auth[0] != "write:pets" {
+			t.Errorf("unexpected petstore_auth.0: %s", auth[0])
+			return
+		} else if auth[1] != "read:pets" {
+			t.Errorf("unexpected petstore_auth.1: %s", auth[1])
+			return
+		}
+	})
+}
+
 func TestExtension(t *testing.T) {
 	tests := []struct {
 		proxy map[string]raw
