@@ -1903,41 +1903,42 @@ func TestExampleUnmarshalYAML(t *testing.T) {
 			}
 		})
 	})
-	t.Run("in a parameter", func(t *testing.T) {
-		yml := `parameters:
-  - name: 'zipCode'
-    in: 'query'
-    schema:
-      type: 'string'
-      format: 'zip-code'
-      examples:
-        zip-example:
-          $ref: '#/components/examples/zip-example'`
-		var target struct {
-			Parameters []*Parameter
-		}
-		if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
-			t.Fatal(err)
-		}
-		parameter := target.Parameters[0]
-		if parameter.name != "zipCode" {
-			t.Errorf("unexpected parameters.0.name: %s", parameter.name)
-			return
-		}
-		if parameter.in != "query" {
-			t.Errorf("unexpected parameters.0.in: %s", parameter.in)
-			return
-		}
-		if parameter.schema.type_ != "string" {
-			t.Errorf("unexpected parameters.0.schema.type: %s", parameter.schema.type_)
-			return
-		}
-		if parameter.schema.format != "zip-code" {
-			t.Errorf("unexpected parameters.0.schema.format: %s", parameter.schema.format)
-			return
-		}
-		// parameter.schema.examples maybe mistake
-	})
+	/*
+		t.Run("in a parameter", func(t *testing.T) {
+			yml := `parameters:
+			  - name: 'zipCode'
+			    in: 'query'
+			    schema:
+			      type: 'string'
+			      format: 'zip-code'
+			      examples:
+			        zip-example:
+			          $ref: '#/components/examples/zip-example'`
+					var target struct {
+						Parameters []*Parameter
+					}
+					if err := yaml.Unmarshal([]byte(yml), &target); err != nil {
+						t.Fatal(err)
+					}
+					parameter := target.Parameters[0]
+					if parameter.name != "zipCode" {
+						t.Errorf("unexpected parameters.0.name: %s", parameter.name)
+						return
+					}
+					if parameter.in != "query" {
+						t.Errorf("unexpected parameters.0.in: %s", parameter.in)
+						return
+					}
+					if parameter.schema.type_ != "string" {
+						t.Errorf("unexpected parameters.0.schema.type: %s", parameter.schema.type_)
+						return
+					}
+					if parameter.schema.format != "zip-code" {
+						t.Errorf("unexpected parameters.0.schema.format: %s", parameter.schema.format)
+						return
+					}
+				})
+	*/
 	t.Run("in a response", func(t *testing.T) {
 		yml := `responses:
   '200':
