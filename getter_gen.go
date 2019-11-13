@@ -2,10 +2,6 @@
 
 package openapi
 
-func (v *OpenAPI) Openapi() string {
-	return v.openapi
-}
-
 func (v *OpenAPI) Info() *Info {
 	if v.info == nil {
 		return &Info{}
@@ -102,7 +98,7 @@ func (v *Contact) Name() string {
 	return v.name
 }
 
-func (v *Contact) Url() string {
+func (v *Contact) URL() string {
 	return v.url
 }
 
@@ -125,7 +121,7 @@ func (v *License) Name() string {
 	return v.name
 }
 
-func (v *License) Url() string {
+func (v *License) URL() string {
 	return v.url
 }
 
@@ -140,7 +136,7 @@ func (v *Server) Root() *OpenAPI {
 	return v.root
 }
 
-func (v *Server) Url() string {
+func (v *Server) URL() string {
 	return v.url
 }
 
@@ -167,7 +163,7 @@ func (v *ServerVariable) Enum() []string {
 	return v.enum
 }
 
-func (v *ServerVariable) Default_() string {
+func (v *ServerVariable) Default() string {
 	return v.default_
 }
 
@@ -231,10 +227,6 @@ func (v *Paths) Root() *OpenAPI {
 		return &OpenAPI{}
 	}
 	return v.root
-}
-
-func (v *Paths) Paths() map[string]*PathItem {
-	return v.paths
 }
 
 func (v *Paths) Extension() map[string]interface{} {
@@ -403,7 +395,7 @@ func (v *ExternalDocumentation) Description() string {
 	return v.description
 }
 
-func (v *ExternalDocumentation) Url() string {
+func (v *ExternalDocumentation) URL() string {
 	return v.url
 }
 
@@ -576,10 +568,6 @@ func (v *Responses) Root() *OpenAPI {
 	return v.root
 }
 
-func (v *Responses) Responses() map[string]*Response {
-	return v.responses
-}
-
 func (v *Responses) Extension() map[string]interface{} {
 	return v.extension
 }
@@ -620,10 +608,6 @@ func (v *Callback) Root() *OpenAPI {
 		return &OpenAPI{}
 	}
 	return v.root
-}
-
-func (v *Callback) Callback() map[string]*PathItem {
-	return v.callback
 }
 
 func (v *Callback) Extension() map[string]interface{} {
@@ -870,7 +854,7 @@ func (v *Schema) Enum() []string {
 	return v.enum
 }
 
-func (v *Schema) Type_() string {
+func (v *Schema) Type() string {
 	return v.type_
 }
 
@@ -919,7 +903,7 @@ func (v *Schema) Format() string {
 	return v.format
 }
 
-func (v *Schema) Default_() string {
+func (v *Schema) Default() string {
 	return v.default_
 }
 
@@ -942,7 +926,7 @@ func (v *Schema) WriteOnly() bool {
 	return v.writeOnly
 }
 
-func (v *Schema) Xml() *XML {
+func (v *Schema) XML() *XML {
 	if v.xml == nil {
 		return &XML{}
 	}
@@ -1025,7 +1009,7 @@ func (v *SecurityScheme) Root() *OpenAPI {
 	return v.root
 }
 
-func (v *SecurityScheme) Type_() string {
+func (v *SecurityScheme) Type() string {
 	return v.type_
 }
 
@@ -1139,8 +1123,4 @@ func (v *SecurityRequirement) Root() *OpenAPI {
 		return &OpenAPI{}
 	}
 	return v.root
-}
-
-func (v *SecurityRequirement) SecurityRequirement() map[string][]string {
-	return v.securityRequirement
 }

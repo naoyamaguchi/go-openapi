@@ -75,6 +75,18 @@ func main() {
 }
 
 func expose(ident string) string {
+	if strings.HasSuffix(ident, "_") {
+		ident = ident[:len(ident)-1]
+	}
+	switch ident {
+	case "openapi":
+		return "OpenAPI"
+	case "url":
+		return "URL"
+	case "xml":
+		return "XML"
+	}
+
 	rident := []rune(ident)
 	return string(append([]rune{unicode.ToUpper(rident[0])}, rident[1:]...))
 }
