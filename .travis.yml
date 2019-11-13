@@ -4,8 +4,14 @@ go:
   - 1.12.x
   - 1.13.x
 
+install:
+  - mkdir -p ~/bin/ && export export PATH="~/bin/:$PATH"
+  - curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b ~/bin v1.21.0
+  - curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh| sh -s -- -b ~/bin
+
 script:
   - go test -v  -race -coverprofile=coverage.txt -covermode=atomic
+  - reviewdog -conf=.reviewdog.yml -reporter=github-pr-check
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
