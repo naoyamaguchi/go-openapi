@@ -43,10 +43,13 @@ func main() {
 			if !ok {
 				continue
 			}
+			log.Printf("generate getters for %s", typ.Name.Name)
 
 			for _, field := range st.Fields.List {
 				fn := field.Names[0].Name
 				ft := ast2type(field.Type)
+
+				log.Printf("  generate %s.%s()", typ.Name.Name, expose(fn))
 
 				outf("\n\nfunc (v *%s) %s() %s {", typ.Name.Name, expose(fn), ft)
 

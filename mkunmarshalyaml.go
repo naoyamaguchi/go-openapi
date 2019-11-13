@@ -58,7 +58,7 @@ func main() {
 				continue
 			}
 
-			log.Printf("generate %s.Unmarshal", typ.Name.Name)
+			log.Printf("generate %s.Unmarshal()", typ.Name.Name)
 			outf("\n\nfunc (v *%s) UnmarshalYAML(b []byte) error {", typ.Name.Name)
 			outf("\nvar proxy map[string]raw")
 			outf("\nif err := yaml.Unmarshal(b, &proxy); err != nil {")
