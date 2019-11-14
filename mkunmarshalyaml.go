@@ -172,11 +172,11 @@ func formatValidation(outf func(string, ...interface{}), fieldname, yamlname str
 		if !required {
 			outf("\nif v.%s != \"\" {", fieldname)
 		}
-		outf("\nif _, err := ")
+
 		if len(tag["format"]) > 1 && tag["format"][1] == "template" {
-			outf("url.Parse(urlTemplateVarRegexp.ReplaceAllLiteralString(v.%s, `1111`))", fieldname)
+			outf("\nif err := validateURLTemplate(v.%s)", fieldname)
 		} else {
-			outf("url.ParseRequestURI(v.%s)", fieldname)
+			outf("\nif _, err := url.ParseRequestURI(v.%s)", fieldname)
 		}
 		outf("; err != nil {")
 		outf("\nreturn err")

@@ -353,7 +353,7 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 	v.url = urlVal
 	delete(proxy, `url`)
 
-	if _, err := url.Parse(urlTemplateVarRegexp.ReplaceAllLiteralString(v.url, `1111`)); err != nil {
+	if err := validateURLTemplate(v.url); err != nil {
 		return err
 	}
 
