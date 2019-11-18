@@ -8,7 +8,7 @@ import (
 	yaml "github.com/goccy/go-yaml"
 )
 
-func TestCallbackExampleUnmarshalYAML(t *testing.T) {
+func TestCallbackExample(t *testing.T) {
 	b, err := ioutil.ReadFile("test/testdata/callback-example.yaml")
 	if err != nil {
 		t.Fatal(err)

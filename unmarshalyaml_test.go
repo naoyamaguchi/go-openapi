@@ -8,7 +8,7 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
-func TestInfoUnmarshalYAML(t *testing.T) {
+func TestInfoExampleUnmarshalYAML(t *testing.T) {
 	yml := `title: Sample Pet Store App
 description: This is a sample server for a pet store.
 termsOfService: http://example.com/terms/
@@ -64,7 +64,7 @@ version: 1.0.1`
 	}
 }
 
-func TestContactUnmarshalYAML(t *testing.T) {
+func TestContactExampleUnmarshalYAML(t *testing.T) {
 	yml := `name: API Support
 url: http://www.example.com/support
 email: support@example.com`
@@ -88,7 +88,7 @@ email: support@example.com`
 	}
 }
 
-func TestLicenseUnmarshalYAML(t *testing.T) {
+func TestLicenseExampleUnmarshalYAML(t *testing.T) {
 	yml := `name: Apache 2.0
 url: https://www.apache.org/licenses/LICENSE-2.0.html`
 
@@ -107,7 +107,7 @@ url: https://www.apache.org/licenses/LICENSE-2.0.html`
 	}
 }
 
-func TestServerUnmarshalYAML(t *testing.T) {
+func TestServerExampleUnmarshalYAML(t *testing.T) {
 	t.Run("single server", func(t *testing.T) {
 		yml := `url: https://development.gigantic-server.com/v1
 description: Development server`
@@ -237,7 +237,7 @@ description: Development server`
 	})
 }
 
-func TestComponentsUnmarshalYAML(t *testing.T) {
+func TestComponentsExampleUnmarshalYAML(t *testing.T) {
 	yml := `components:
   schemas:
     GeneralError:
@@ -541,7 +541,7 @@ func TestComponentsUnmarshalYAML(t *testing.T) {
 	})
 }
 
-func TestPathsUnmarshalYAML(t *testing.T) {
+func TestPathsExampleUnmarshalYAML(t *testing.T) {
 	yml := `/pets:
   get:
     description: Returns all pets from the system that the user has access to
@@ -587,7 +587,7 @@ func TestPathsUnmarshalYAML(t *testing.T) {
 	}
 }
 
-func TestPathItemUnmarshalYAML(t *testing.T) {
+func TestPathItemExampleUnmarshalYAML(t *testing.T) {
 	yml := `get:
   description: Returns pets based on ID
   summary: Find pets by ID
@@ -710,7 +710,7 @@ parameters:
 	})
 }
 
-func TestOperationUnmarshalYAML(t *testing.T) {
+func TestOperationExampleUnmarshalYAML(t *testing.T) {
 	yml := `tags:
 - pet
 summary: Updates a pet in the store with form data
@@ -867,7 +867,7 @@ security:
 	}
 }
 
-func TestExternalDocumentationUnmarshalYAML(t *testing.T) {
+func TestExternalDocumentationExampleUnmarshalYAML(t *testing.T) {
 	yml := `description: Find more info here
 url: https://example.com`
 	var externalDocumentation ExternalDocumentation
@@ -884,7 +884,7 @@ url: https://example.com`
 	}
 }
 
-func TestParameterUnmarshalYAML(t *testing.T) {
+func TestParameterExampleUnmarshalYAML(t *testing.T) {
 	t.Run("header parameter", func(t *testing.T) {
 		yml := `name: token
 in: header
@@ -1096,7 +1096,7 @@ content:
 	})
 }
 
-func TestRequestBodyUnmarshalYAML(t *testing.T) {
+func TestRequestBodyExampleUnmarshalYAML(t *testing.T) {
 	t.Run("with a referenced model", func(t *testing.T) {
 		yml := `description: user to add to the system
 content:
@@ -1258,7 +1258,7 @@ content:
 	})
 }
 
-func TestMediaTypeUnmarshalYAML(t *testing.T) {
+func TestMediaTypeExampleUnmarshalYAML(t *testing.T) {
 	yml := `application/json:
   schema:
     $ref: "#/components/schemas/Pet"
@@ -1393,7 +1393,7 @@ func TestMediaTypeUnmarshalYAML(t *testing.T) {
 	})
 }
 
-func TestEncodingUnmarshalYAML(t *testing.T) {
+func TestEncodingExampleUnmarshalYAML(t *testing.T) {
 	yml := `requestBody:
   content:
     multipart/mixed:
@@ -1521,7 +1521,7 @@ func TestEncodingUnmarshalYAML(t *testing.T) {
 	})
 }
 
-func TestResponsesUnmarshalYAML(t *testing.T) {
+func TestResponsesExampleUnmarshalYAML(t *testing.T) {
 	yml := `'200':
   description: a pet to be returned
   content:
@@ -1580,7 +1580,7 @@ default:
 	})
 }
 
-func TestResponseUnmarshalYAML(t *testing.T) {
+func TestResponseExampleUnmarshalYAML(t *testing.T) {
 	t.Run("array of complex type", func(t *testing.T) {
 		yml := `description: A complex object array response
 content:
@@ -1731,7 +1731,7 @@ headers:
 	})
 }
 
-func TestCallbackUnmarshalYAML(t *testing.T) {
+func TestCallbackExampleUnmarshalYAML(t *testing.T) {
 	yml := `myWebhook:
   'http://notificationServer.com?transactionId={$request.body#/id}&email={$request.body#/email}':
     post:
@@ -1780,7 +1780,7 @@ func TestCallbackUnmarshalYAML(t *testing.T) {
 	}
 }
 
-func TestExampleUnmarshalYAML(t *testing.T) {
+func TestExampleExampleUnmarshalYAML(t *testing.T) {
 	/* This is invalid example: https://github.com/OAI/OpenAPI-Specification/pull/2042
 	t.Run("in a model", func(t *testing.T) {
 		yml := `schemas:
@@ -1986,7 +1986,7 @@ func TestExampleUnmarshalYAML(t *testing.T) {
 	})
 }
 
-func TestLinkUnmarshalYAML(t *testing.T) {
+func TestLinkExampleUnmarshalYAML(t *testing.T) {
 	t.Run("$request.path.id", func(t *testing.T) {
 		yml := `paths:
   /users/{id}:
@@ -2243,7 +2243,7 @@ func TestLinkUnmarshalYAML(t *testing.T) {
 	})
 }
 
-func TestHeaderUnmarshalYAML(t *testing.T) {
+func TestHeaderExampleUnmarshalYAML(t *testing.T) {
 	yml := `description: The number of allowed requests in the current period
 schema:
   type: integer`
@@ -2261,7 +2261,7 @@ schema:
 	}
 }
 
-func TestTagUnmarshal(t *testing.T) {
+func TestTagExampleUnmarshal(t *testing.T) {
 	yml := `name: pet
 description: Pets operations`
 	var tag Tag
@@ -2278,7 +2278,7 @@ description: Pets operations`
 	}
 }
 
-func TestSchemaUnmarshalYAML(t *testing.T) {
+func TestSchemaExampleUnmarshalYAML(t *testing.T) {
 	t.Run("primitive", func(t *testing.T) {
 		yml := `type: string
 format: email`
@@ -2735,7 +2735,7 @@ example:
 	})
 }
 
-func TestDiscriminatorUnmarshalYAML(t *testing.T) {
+func TestDiscriminatorExampleUnmarshalYAML(t *testing.T) {
 	t.Run("example", func(t *testing.T) {
 		yml := `MyResponseType:
   oneOf:
@@ -2832,7 +2832,7 @@ func TestDiscriminatorUnmarshalYAML(t *testing.T) {
 	})
 }
 
-func TestXMLUnmarshalYAML(t *testing.T) {
+func TestXMLExampleUnmarshalYAML(t *testing.T) {
 	t.Run("basic string", func(t *testing.T) {
 		yml := `animals:
   type: string
@@ -2949,7 +2949,7 @@ func TestXMLUnmarshalYAML(t *testing.T) {
 	})
 }
 
-func TestSecuritySchemeUnmarshalYAML(t *testing.T) {
+func TestSecuritySchemeExampleUnmarshalYAML(t *testing.T) {
 	t.Run("basic auth", func(t *testing.T) {
 		yml := `type: http
 scheme: basic`
@@ -3049,7 +3049,7 @@ flows:
 	})
 }
 
-func TestOAuthFlowUnmarshalYAML(t *testing.T) {
+func TestOAuthFlowExampleUnmarshalYAML(t *testing.T) {
 	yml := `type: oauth2
 flows:
   implicit:
@@ -3127,7 +3127,7 @@ flows:
 	})
 }
 
-func TestSecurityRequirementUnmarshalYAML(t *testing.T) {
+func TestSecurityRequirementExampleUnmarshalYAML(t *testing.T) {
 	t.Run("non-oauth2", func(t *testing.T) {
 		yml := `api_key: []`
 		var securityRequirement SecurityRequirement
