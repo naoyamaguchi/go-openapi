@@ -113,12 +113,6 @@ func main() {
 					continue
 				}
 
-				unmarshalField := func() {
-					outf("\nif err := yaml.Unmarshal(%sBytes, &%[1]sVal); err != nil {", fn)
-					outf("\nreturn err")
-					outf("\n}")
-				}
-
 				outf("\n\n")
 				if required {
 					outf("%sBytes, ok := proxy[\"%s\"]", fn, yn)
@@ -130,7 +124,9 @@ func main() {
 				}
 
 				outf("\nvar %sVal %s", fn, strings.TrimPrefix(ast2type(field.Type), "*"))
-				unmarshalField()
+				outf("\nif err := yaml.Unmarshal(%sBytes, &%[1]sVal); err != nil {", fn)
+				outf("\nreturn err")
+				outf("\n}")
 				outf("\nv.%s = ", fn)
 				if _, ok := field.Type.(*ast.StarExpr); ok {
 					outf("&")
