@@ -18,19 +18,6 @@ func (v *raw) UnmarshalYAML(b []byte) error {
 	return nil
 }
 
-func extension(proxy map[string]raw) map[string]interface{} {
-	extension := map[string]interface{}{}
-	for k, v := range proxy {
-		if strings.HasPrefix(k, "x-") {
-			extension[k] = v
-		}
-	}
-	if len(extension) == 0 {
-		return nil
-	}
-	return extension
-}
-
 func isOneOf(s string, list []string) bool {
 	for _, t := range list {
 		if t == s {

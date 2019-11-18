@@ -3163,54 +3163,6 @@ func TestSecurityRequirementExampleUnmarshalYAML(t *testing.T) {
 	})
 }
 
-func TestExtension(t *testing.T) {
-	tests := []struct {
-		proxy map[string]raw
-		want  map[string]interface{}
-	}{
-		{
-			proxy: nil,
-			want:  nil,
-		},
-		{
-			proxy: map[string]raw{},
-			want:  nil,
-		},
-		{
-			proxy: map[string]raw{
-				"x-foo": raw("bar"),
-			},
-			want: map[string]interface{}{
-				"x-foo": raw("bar"),
-			},
-		},
-		{
-			proxy: map[string]raw{
-				"foo": raw("bar"),
-			},
-			want: nil,
-		},
-		{
-			proxy: map[string]raw{
-				"foo":   raw("bar"),
-				"x-foo": raw("baz"),
-			},
-			want: map[string]interface{}{
-				"x-foo": raw("baz"),
-			},
-		},
-	}
-	for i, tt := range tests {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			got := extension(tt.proxy)
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("unexpected: %q != %q", got, tt.want)
-				return
-			}
-		})
-	}
-}
-
 func TestIsOneOf(t *testing.T) {
 	tests := []struct {
 		s    string
