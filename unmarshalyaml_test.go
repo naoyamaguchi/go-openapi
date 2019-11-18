@@ -12,6 +12,149 @@ import (
 func TestOpenAPIUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
+		want OpenAPI
+	}{
+		{
+			yml: `openapi: 3.0.2
+info:
+  title: info.title
+  version: 1.0.0
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: getOpResp
+security:
+  - api_key: []
+`,
+			want: OpenAPI{
+				openapi: "3.0.2",
+				info: &Info{
+					title:   "info.title",
+					version: "1.0.0",
+				},
+				paths: &Paths{
+					paths: map[string]*PathItem{
+						"/": {
+							get: &Operation{
+								responses: &Responses{
+									responses: map[string]*Response{
+										"200": {
+											description: "getOpResp",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				security: []*SecurityRequirement{
+					{
+						securityRequirement: map[string][]string{"api_key": {}},
+					},
+				},
+			},
+		},
+		{
+			yml: `openapi: 3.0.2
+info:
+  title: info.title
+  version: 1.0.0
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: getOpResp
+tags:
+  - name: fooTag
+`,
+			want: OpenAPI{
+				openapi: "3.0.2",
+				info: &Info{
+					title:   "info.title",
+					version: "1.0.0",
+				},
+				paths: &Paths{
+					paths: map[string]*PathItem{
+						"/": {
+							get: &Operation{
+								responses: &Responses{
+									responses: map[string]*Response{
+										"200": {
+											description: "getOpResp",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				tags: []*Tag{
+					{
+						name: "fooTag",
+					},
+				},
+			},
+		},
+		{
+			yml: `openapi: 3.0.2
+info:
+  title: info.title
+  version: 1.0.0
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: getOpResp
+x-foo: bar
+`,
+			want: OpenAPI{
+				openapi: "3.0.2",
+				info: &Info{
+					title:   "info.title",
+					version: "1.0.0",
+				},
+				paths: &Paths{
+					paths: map[string]*PathItem{
+						"/": {
+							get: &Operation{
+								responses: &Responses{
+									responses: map[string]*Response{
+										"200": {
+											description: "getOpResp",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got OpenAPI
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected openapi:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestOpenAPIUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
 		want error
 	}{
 		{
@@ -38,6 +181,12 @@ info:
 		{
 			yml: `openapi: 3.0.2
 info:
+  version: 1.0.0`,
+			want: errors.New(`unmarshaling Info: "title" field is required`),
+		},
+		{
+			yml: `openapi: 3.0.2
+info:
   title: foobar
   version: 1.0.0
 paths:
@@ -50,13 +199,20 @@ foo: bar`,
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var target OpenAPI
 			got := yaml.Unmarshal([]byte(tt.yml), &target)
-			if got == nil {
-				t.Errorf("error `%s` is expected but not", tt.want.Error())
-				return
-			}
-			if got.Error() != tt.want.Error() {
-				t.Errorf("unexpected error:\n  got:  %s\n  want: %s", got.Error(), tt.want.Error())
-				return
+			if tt.want != nil {
+				if got == nil {
+					t.Errorf("error `%s` is expected but not", tt.want.Error())
+					return
+				}
+				if got.Error() != tt.want.Error() {
+					t.Errorf("unexpected error:\n  got:  %s\n  want: %s", got.Error(), tt.want.Error())
+					return
+				}
+			} else {
+				if got != nil {
+					t.Errorf("error: %s", got)
+					return
+				}
 			}
 		})
 	}
@@ -118,22 +274,75 @@ version: 1.0.1`
 	}
 }
 
+func TestInfoUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Info
+	}{
+		{
+			yml: `title: this is title
+version: 1.0.0`,
+			want: Info{
+				title:   "this is title",
+				version: "1.0.0",
+			},
+		},
+		{
+			yml: `title: this is title
+version: 1.0.0
+x-foo: bar`,
+			want: Info{
+				title:   "this is title",
+				version: "1.0.0",
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Info
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected info:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestInfoUnmarshalYAMLError(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want error
 	}{
 		{
-			`---
+			yml:  `version: 1.0.0`,
+			want: errors.New(`"title" field is required`),
+		},
+		{
+			yml:  `title: this is title`,
+			want: errors.New(`"version" field is required`),
+		},
+		{
+			yml: `title: this is title
 version: 1.0.0
-`,
-			errors.New(`"title" field is required`),
+foo: bar`,
+			want: errors.New(`unknown key: foo`),
 		},
 	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var info Info
-			if got := yaml.Unmarshal([]byte(tt.yml), &info); got.Error() != tt.want.Error() {
+			got := yaml.Unmarshal([]byte(tt.yml), &info)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
 				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
 				return
 			}
@@ -165,6 +374,70 @@ email: support@example.com`
 	}
 }
 
+func TestContactUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Contact
+	}{
+		{
+			yml: `email: foo@example.com`,
+			want: Contact{
+				email: "foo@example.com",
+			},
+		},
+		{
+			yml: `x-foo: bar`,
+			want: Contact{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Contact
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected contact:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestContactUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `email: invalidEmail`,
+			want: errors.New(`"email" field must be an email address`),
+		},
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var contact Contact
+			got := yaml.Unmarshal([]byte(tt.yml), &contact)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestLicenseExampleUnmarshalYAML(t *testing.T) {
 	yml := `name: Apache 2.0
 url: https://www.apache.org/licenses/LICENSE-2.0.html`
@@ -181,6 +454,73 @@ url: https://www.apache.org/licenses/LICENSE-2.0.html`
 	if license.url != "https://www.apache.org/licenses/LICENSE-2.0.html" {
 		t.Errorf("unexpected license.url: %s", license.url)
 		return
+	}
+}
+
+func TestLicenseUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want License
+	}{
+		{
+			yml: `name: licensename`,
+			want: License{
+				name: "licensename",
+			},
+		},
+		{
+			yml: `name: licensename
+x-foo: bar`,
+			want: License{
+				name: "licensename",
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got License
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected license:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestLicenseUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `url: example.com`,
+			want: errors.New(`"name" field is required`),
+		},
+		{
+			yml: `name: licensename
+foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var license License
+			got := yaml.Unmarshal([]byte(tt.yml), &license)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
 	}
 }
 
