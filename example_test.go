@@ -117,7 +117,7 @@ func TestCallbackExample(t *testing.T) {
 	}
 }
 
-func TestUsptoUnmarshalYAML(t *testing.T) {
+func TestUspto(t *testing.T) {
 	b, err := ioutil.ReadFile("test/testdata/uspto.yaml")
 	if err != nil {
 		t.Fatal(err)
