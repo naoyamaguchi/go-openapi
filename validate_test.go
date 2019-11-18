@@ -22,6 +22,10 @@ func TestValidateURLTemplate(t *testing.T) {
 			url:  "{scheme}://developer.uspto.gov/ds-api",
 			want: nil,
 		},
+		{
+			url:  "example.com/foo/bar",
+			want: nil,
+		},
 	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i)+"/"+tt.url, func(t *testing.T) {

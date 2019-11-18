@@ -1,12 +1,66 @@
 package openapi
 
 import (
+	"errors"
 	"reflect"
 	"strconv"
 	"testing"
 
 	"github.com/goccy/go-yaml"
 )
+
+func TestOpenAPIUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml: `info:
+  title: foobar
+  version: 1.0.0`,
+			want: errors.New(`"openapi" field is required`),
+		},
+		{
+			yml:  `openapi: version1`,
+			want: errors.New(`"openapi" field must be a valid semantic version but not`),
+		},
+		{
+			yml:  `openapi: 3.0.2`,
+			want: errors.New(`"info" field is required`),
+		},
+		{
+			yml: `openapi: 3.0.2
+info:
+  title: foobar
+  version: 1.0.0`,
+			want: errors.New(`"paths" field is required`),
+		},
+		{
+			yml: `openapi: 3.0.2
+info:
+  title: foobar
+  version: 1.0.0
+paths:
+  /: {}
+foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var target OpenAPI
+			got := yaml.Unmarshal([]byte(tt.yml), &target)
+			if got == nil {
+				t.Errorf("error `%s` is expected but not", tt.want.Error())
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected error:\n  got:  %s\n  want: %s", got.Error(), tt.want.Error())
+				return
+			}
+		})
+	}
+}
 
 func TestInfoExampleUnmarshalYAML(t *testing.T) {
 	yml := `title: Sample Pet Store App
@@ -61,6 +115,29 @@ version: 1.0.1`
 	if info.version != "1.0.1" {
 		t.Errorf("unexpected info.version: %s", info.version)
 		return
+	}
+}
+
+func TestInfoUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			`---
+version: 1.0.0
+`,
+			errors.New(`"title" field is required`),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var info Info
+			if got := yaml.Unmarshal([]byte(tt.yml), &info); got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
 	}
 }
 
