@@ -62,7 +62,7 @@ func main() {
 			outf("\n\nfunc (v *%s) UnmarshalYAML(b []byte) error {", typ.Name.Name)
 			outf("\nvar proxy map[string]raw")
 			outf("\nif err := yaml.Unmarshal(b, &proxy); err != nil {")
-			outf("\nreturn fmt.Errorf(`unmarshaling %s: %%w`, err)", typ.Name.Name)
+			outf("\nreturn err")
 			outf("\n}")
 
 			for _, field := range st.Fields.List {
@@ -98,7 +98,7 @@ func main() {
 					}
 					outf("\nvar %sv %s", fn, strings.TrimPrefix(ast2type(ft.Value), "*"))
 					outf("\nif err := yaml.Unmarshal(val, &%sv); err != nil {", fn)
-					outf("\nreturn fmt.Errorf(`unmarshaling %s: %%w`, err)", strings.TrimPrefix(ast2type(ft.Value), "*"))
+					outf("\nreturn err")
 					outf("\n}")
 					outf("\n%s[key] = ", fn)
 					if _, ok := ft.Value.(*ast.StarExpr); ok {
@@ -126,7 +126,7 @@ func main() {
 				typName := strings.TrimPrefix(ast2type(field.Type), "*")
 				outf("\nvar %sVal %s", fn, typName)
 				outf("\nif err := yaml.Unmarshal(%sBytes, &%[1]sVal); err != nil {", fn)
-				outf("\nreturn fmt.Errorf(`unmarshaling %s: %%w`, err)", typName)
+				outf("\nreturn err")
 				outf("\n}")
 				outf("\nv.%s = ", fn)
 				if _, ok := field.Type.(*ast.StarExpr); ok {
