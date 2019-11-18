@@ -8,6 +8,225 @@ import (
 	yaml "github.com/goccy/go-yaml"
 )
 
+func TestAPIWithExample(t *testing.T) {
+	b, err := ioutil.ReadFile("test/testdata/api-with-examples.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var got OpenAPI
+	if err := yaml.Unmarshal(b, &got); err != nil {
+		t.Fatal(err)
+	}
+
+	want := OpenAPI{
+		openapi: "3.0.0",
+		info: &Info{
+			title:   "Simple API overview",
+			version: "2.0.0",
+		},
+		paths: &Paths{
+			paths: map[string]*PathItem{
+				"/": {
+					get: &Operation{
+						operationID: "listVersionsv2",
+						summary:     "List API versions",
+						responses: &Responses{
+							responses: map[string]*Response{
+								"200": {
+									description: "200 response",
+									content: map[string]*MediaType{
+										"application/json": {
+											examples: map[string]*Example{
+												"foo": {
+													value: map[string]interface{}{
+														"versions": []interface{}{
+															map[string]interface{}{
+																"status":  "CURRENT",
+																"updated": "2011-01-21T11:33:21Z",
+																"id":      "v2.0",
+																"links": []interface{}{
+																	map[string]interface{}{
+																		"href": "http://127.0.0.1:8774/v2/",
+																		"rel":  "self",
+																	},
+																},
+															},
+															map[string]interface{}{
+																"status":  "EXPERIMENTAL",
+																"updated": "2013-07-23T11:33:21Z",
+																"id":      "v3.0",
+																"links": []interface{}{
+																	map[string]interface{}{
+																		"href": "http://127.0.0.1:8774/v3/",
+																		"rel":  "self",
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+								"300": {
+									description: "300 response",
+									content: map[string]*MediaType{
+										"application/json": {
+											examples: map[string]*Example{
+												"foo": {
+													value: `{
+ "versions": [
+       {
+         "status": "CURRENT",
+         "updated": "2011-01-21T11:33:21Z",
+         "id": "v2.0",
+         "links": [
+             {
+                 "href": "http://127.0.0.1:8774/v2/",
+                 "rel": "self"
+             }
+         ]
+     },
+     {
+         "status": "EXPERIMENTAL",
+         "updated": "2013-07-23T11:33:21Z",
+         "id": "v3.0",
+         "links": [
+             {
+                 "href": "http://127.0.0.1:8774/v3/",
+                 "rel": "self"
+             }
+         ]
+     }
+ ]
+}`,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				"/v2": {
+					get: &Operation{
+						operationID: "getVersionDetailsv2",
+						summary:     "Show API version details",
+						responses: &Responses{
+							responses: map[string]*Response{
+								"200": {
+									description: "200 response",
+									content: map[string]*MediaType{
+										"application/json": {
+											examples: map[string]*Example{
+												"foo": {
+													value: map[string]interface{}{
+														"version": map[string]interface{}{
+															"status":  "CURRENT",
+															"updated": "2011-01-21T11:33:21Z",
+															"media-types": []interface{}{
+																map[string]interface{}{
+																	"base": "application/xml",
+																	"type": "application/vnd.openstack.compute+xml;version=2",
+																},
+																map[string]interface{}{
+																	"base": "application/json",
+																	"type": "application/vnd.openstack.compute+json;version=2",
+																},
+															},
+															"id": "v2.0",
+															"links": []interface{}{
+																map[string]interface{}{
+																	"href": "http://127.0.0.1:8774/v2/",
+																	"rel":  "self",
+																},
+																map[string]interface{}{
+																	"href": "http://docs.openstack.org/api/openstack-compute/2/os-compute-devguide-2.pdf",
+																	"type": "application/pdf",
+																	"rel":  "describedby",
+																},
+																map[string]interface{}{
+																	"href": "http://docs.openstack.org/api/openstack-compute/2/wadl/os-compute-2.wadl",
+																	"type": "application/vnd.sun.wadl+xml",
+																	"rel":  "describedby",
+																},
+																map[string]interface{}{
+																	"href": "http://docs.openstack.org/api/openstack-compute/2/wadl/os-compute-2.wadl",
+																	"type": "application/vnd.sun.wadl+xml",
+																	"rel":  "describedby",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+								"203": {
+									description: "203 response",
+									content: map[string]*MediaType{
+										"application/json": {
+											examples: map[string]*Example{
+												"foo": {
+													value: map[string]interface{}{
+														"version": map[string]interface{}{
+															"status":  "CURRENT",
+															"updated": "2011-01-21T11:33:21Z",
+															"media-types": []interface{}{
+																map[string]interface{}{
+																	"base": "application/xml",
+																	"type": "application/vnd.openstack.compute+xml;version=2",
+																},
+																map[string]interface{}{
+																	"base": "application/json",
+																	"type": "application/vnd.openstack.compute+json;version=2",
+																},
+															},
+															"id": "v2.0",
+															"links": []interface{}{
+																map[string]interface{}{
+																	"href": "http://23.253.228.211:8774/v2/",
+																	"rel":  "self",
+																},
+																map[string]interface{}{
+																	"href": "http://docs.openstack.org/api/openstack-compute/2/os-compute-devguide-2.pdf",
+																	"type": "application/pdf",
+																	"rel":  "describedby",
+																},
+																map[string]interface{}{
+																	"href": "http://docs.openstack.org/api/openstack-compute/2/wadl/os-compute-2.wadl",
+																	"type": "application/vnd.sun.wadl+xml",
+																	"rel":  "describedby",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("unexpected:\n  got:  %#v\n  want: %#v", got, want)
+		t.Log(reflect.DeepEqual(got.paths.paths["/"].get.responses.responses["300"].content["application/json"].examples, want.paths.paths["/"].get.responses.responses["300"].content["application/json"].examples))
+		t.Logf("%s", got.paths.paths["/"].get.responses.responses["300"].content["application/json"].examples["foo"].value)
+		t.Logf("%s", want.paths.paths["/"].get.responses.responses["300"].content["application/json"].examples["foo"].value)
+		return
+	}
+}
+
 func TestCallbackExample(t *testing.T) {
 	b, err := ioutil.ReadFile("test/testdata/callback-example.yaml")
 	if err != nil {
