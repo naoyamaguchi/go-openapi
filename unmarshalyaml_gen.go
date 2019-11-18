@@ -15,7 +15,7 @@ import (
 func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling OpenAPI: %w`, err)
 	}
 
 	openapiBytes, ok := proxy["openapi"]
@@ -24,7 +24,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	}
 	var openapiVal string
 	if err := yaml.Unmarshal(openapiBytes, &openapiVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling string: %w`, err)
 	}
 	v.openapi = openapiVal
 	delete(proxy, `openapi`)
@@ -39,7 +39,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	}
 	var infoVal Info
 	if err := yaml.Unmarshal(infoBytes, &infoVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Info: %w`, err)
 	}
 	v.info = &infoVal
 	delete(proxy, `info`)
@@ -47,7 +47,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	if serversBytes, ok := proxy["servers"]; ok {
 		var serversVal []*Server
 		if err := yaml.Unmarshal(serversBytes, &serversVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []*Server: %w`, err)
 		}
 		v.servers = serversVal
 		delete(proxy, `servers`)
@@ -59,7 +59,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	}
 	var pathsVal Paths
 	if err := yaml.Unmarshal(pathsBytes, &pathsVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Paths: %w`, err)
 	}
 	v.paths = &pathsVal
 	delete(proxy, `paths`)
@@ -67,7 +67,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	if componentsBytes, ok := proxy["components"]; ok {
 		var componentsVal Components
 		if err := yaml.Unmarshal(componentsBytes, &componentsVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Components: %w`, err)
 		}
 		v.components = &componentsVal
 		delete(proxy, `components`)
@@ -76,7 +76,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	if securityBytes, ok := proxy["security"]; ok {
 		var securityVal []*SecurityRequirement
 		if err := yaml.Unmarshal(securityBytes, &securityVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []*SecurityRequirement: %w`, err)
 		}
 		v.security = securityVal
 		delete(proxy, `security`)
@@ -85,7 +85,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	if tagsBytes, ok := proxy["tags"]; ok {
 		var tagsVal []*Tag
 		if err := yaml.Unmarshal(tagsBytes, &tagsVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []*Tag: %w`, err)
 		}
 		v.tags = tagsVal
 		delete(proxy, `tags`)
@@ -94,7 +94,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
 		var externalDocsVal ExternalDocumentation
 		if err := yaml.Unmarshal(externalDocsBytes, &externalDocsVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling ExternalDocumentation: %w`, err)
 		}
 		v.externalDocs = &externalDocsVal
 		delete(proxy, `externalDocs`)
@@ -106,7 +106,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -125,7 +125,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 func (v *Info) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Info: %w`, err)
 	}
 
 	titleBytes, ok := proxy["title"]
@@ -134,7 +134,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 	}
 	var titleVal string
 	if err := yaml.Unmarshal(titleBytes, &titleVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling string: %w`, err)
 	}
 	v.title = titleVal
 	delete(proxy, `title`)
@@ -142,7 +142,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -151,7 +151,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 	if termsOfServiceBytes, ok := proxy["termsOfService"]; ok {
 		var termsOfServiceVal string
 		if err := yaml.Unmarshal(termsOfServiceBytes, &termsOfServiceVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.termsOfService = termsOfServiceVal
 		delete(proxy, `termsOfService`)
@@ -166,7 +166,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 	if contactBytes, ok := proxy["contact"]; ok {
 		var contactVal Contact
 		if err := yaml.Unmarshal(contactBytes, &contactVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Contact: %w`, err)
 		}
 		v.contact = &contactVal
 		delete(proxy, `contact`)
@@ -175,7 +175,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 	if licenseBytes, ok := proxy["license"]; ok {
 		var licenseVal License
 		if err := yaml.Unmarshal(licenseBytes, &licenseVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling License: %w`, err)
 		}
 		v.license = &licenseVal
 		delete(proxy, `license`)
@@ -187,7 +187,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 	}
 	var versionVal string
 	if err := yaml.Unmarshal(versionBytes, &versionVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling string: %w`, err)
 	}
 	v.version = versionVal
 	delete(proxy, `version`)
@@ -198,7 +198,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -217,13 +217,13 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 func (v *Contact) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Contact: %w`, err)
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
 		var nameVal string
 		if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.name = nameVal
 		delete(proxy, `name`)
@@ -232,7 +232,7 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 	if urlBytes, ok := proxy["url"]; ok {
 		var urlVal string
 		if err := yaml.Unmarshal(urlBytes, &urlVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.url = urlVal
 		delete(proxy, `url`)
@@ -247,7 +247,7 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 	if emailBytes, ok := proxy["email"]; ok {
 		var emailVal string
 		if err := yaml.Unmarshal(emailBytes, &emailVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.email = emailVal
 		delete(proxy, `email`)
@@ -266,7 +266,7 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -285,7 +285,7 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 func (v *License) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling License: %w`, err)
 	}
 
 	nameBytes, ok := proxy["name"]
@@ -294,7 +294,7 @@ func (v *License) UnmarshalYAML(b []byte) error {
 	}
 	var nameVal string
 	if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling string: %w`, err)
 	}
 	v.name = nameVal
 	delete(proxy, `name`)
@@ -302,7 +302,7 @@ func (v *License) UnmarshalYAML(b []byte) error {
 	if urlBytes, ok := proxy["url"]; ok {
 		var urlVal string
 		if err := yaml.Unmarshal(urlBytes, &urlVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.url = urlVal
 		delete(proxy, `url`)
@@ -320,7 +320,7 @@ func (v *License) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -339,7 +339,7 @@ func (v *License) UnmarshalYAML(b []byte) error {
 func (v *Server) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Server: %w`, err)
 	}
 
 	urlBytes, ok := proxy["url"]
@@ -348,7 +348,7 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 	}
 	var urlVal string
 	if err := yaml.Unmarshal(urlBytes, &urlVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling string: %w`, err)
 	}
 	v.url = urlVal
 	delete(proxy, `url`)
@@ -360,7 +360,7 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -369,7 +369,7 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 	if variablesBytes, ok := proxy["variables"]; ok {
 		var variablesVal map[string]*ServerVariable
 		if err := yaml.Unmarshal(variablesBytes, &variablesVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*ServerVariable: %w`, err)
 		}
 		v.variables = variablesVal
 		delete(proxy, `variables`)
@@ -381,7 +381,7 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -400,13 +400,13 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling ServerVariable: %w`, err)
 	}
 
 	if enumBytes, ok := proxy["enum"]; ok {
 		var enumVal []string
 		if err := yaml.Unmarshal(enumBytes, &enumVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []string: %w`, err)
 		}
 		v.enum = enumVal
 		delete(proxy, `enum`)
@@ -418,7 +418,7 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 	}
 	var default_Val string
 	if err := yaml.Unmarshal(default_Bytes, &default_Val); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling string: %w`, err)
 	}
 	v.default_ = default_Val
 	delete(proxy, `default`)
@@ -426,7 +426,7 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -438,7 +438,7 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -457,13 +457,13 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 func (v *Components) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Components: %w`, err)
 	}
 
 	if schemasBytes, ok := proxy["schemas"]; ok {
 		var schemasVal map[string]*Schema
 		if err := yaml.Unmarshal(schemasBytes, &schemasVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Schema: %w`, err)
 		}
 		v.schemas = schemasVal
 		delete(proxy, `schemas`)
@@ -472,7 +472,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 	if responsesBytes, ok := proxy["responses"]; ok {
 		var responsesVal map[string]*Response
 		if err := yaml.Unmarshal(responsesBytes, &responsesVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Response: %w`, err)
 		}
 		v.responses = responsesVal
 		delete(proxy, `responses`)
@@ -481,7 +481,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 	if parametersBytes, ok := proxy["parameters"]; ok {
 		var parametersVal map[string]*Parameter
 		if err := yaml.Unmarshal(parametersBytes, &parametersVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Parameter: %w`, err)
 		}
 		v.parameters = parametersVal
 		delete(proxy, `parameters`)
@@ -490,7 +490,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 	if examplesBytes, ok := proxy["examples"]; ok {
 		var examplesVal map[string]*Example
 		if err := yaml.Unmarshal(examplesBytes, &examplesVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Example: %w`, err)
 		}
 		v.examples = examplesVal
 		delete(proxy, `examples`)
@@ -499,7 +499,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 	if requestBodiesBytes, ok := proxy["requestBodies"]; ok {
 		var requestBodiesVal map[string]*RequestBody
 		if err := yaml.Unmarshal(requestBodiesBytes, &requestBodiesVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*RequestBody: %w`, err)
 		}
 		v.requestBodies = requestBodiesVal
 		delete(proxy, `requestBodies`)
@@ -508,7 +508,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 	if headersBytes, ok := proxy["headers"]; ok {
 		var headersVal map[string]*Header
 		if err := yaml.Unmarshal(headersBytes, &headersVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Header: %w`, err)
 		}
 		v.headers = headersVal
 		delete(proxy, `headers`)
@@ -517,7 +517,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 	if securitySchemesBytes, ok := proxy["securitySchemes"]; ok {
 		var securitySchemesVal map[string]*SecurityScheme
 		if err := yaml.Unmarshal(securitySchemesBytes, &securitySchemesVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*SecurityScheme: %w`, err)
 		}
 		v.securitySchemes = securitySchemesVal
 		delete(proxy, `securitySchemes`)
@@ -526,7 +526,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 	if linksBytes, ok := proxy["links"]; ok {
 		var linksVal map[string]*Link
 		if err := yaml.Unmarshal(linksBytes, &linksVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Link: %w`, err)
 		}
 		v.links = linksVal
 		delete(proxy, `links`)
@@ -535,7 +535,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 	if callbacksBytes, ok := proxy["callbacks"]; ok {
 		var callbacksVal map[string]*Callback
 		if err := yaml.Unmarshal(callbacksBytes, &callbacksVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Callback: %w`, err)
 		}
 		v.callbacks = callbacksVal
 		delete(proxy, `callbacks`)
@@ -547,7 +547,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -566,7 +566,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 func (v *Paths) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Paths: %w`, err)
 	}
 	paths := map[string]*PathItem{}
 	for key, val := range proxy {
@@ -575,7 +575,7 @@ func (v *Paths) UnmarshalYAML(b []byte) error {
 		}
 		var pathsv PathItem
 		if err := yaml.Unmarshal(val, &pathsv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling PathItem: %w`, err)
 		}
 		paths[key] = &pathsv
 		delete(proxy, key)
@@ -590,7 +590,7 @@ func (v *Paths) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -609,13 +609,13 @@ func (v *Paths) UnmarshalYAML(b []byte) error {
 func (v *PathItem) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling PathItem: %w`, err)
 	}
 
 	if summaryBytes, ok := proxy["summary"]; ok {
 		var summaryVal string
 		if err := yaml.Unmarshal(summaryBytes, &summaryVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.summary = summaryVal
 		delete(proxy, `summary`)
@@ -624,7 +624,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -633,7 +633,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	if getBytes, ok := proxy["get"]; ok {
 		var getVal Operation
 		if err := yaml.Unmarshal(getBytes, &getVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Operation: %w`, err)
 		}
 		v.get = &getVal
 		delete(proxy, `get`)
@@ -642,7 +642,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	if putBytes, ok := proxy["put"]; ok {
 		var putVal Operation
 		if err := yaml.Unmarshal(putBytes, &putVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Operation: %w`, err)
 		}
 		v.put = &putVal
 		delete(proxy, `put`)
@@ -651,7 +651,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	if postBytes, ok := proxy["post"]; ok {
 		var postVal Operation
 		if err := yaml.Unmarshal(postBytes, &postVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Operation: %w`, err)
 		}
 		v.post = &postVal
 		delete(proxy, `post`)
@@ -660,7 +660,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	if deleteBytes, ok := proxy["delete"]; ok {
 		var deleteVal Operation
 		if err := yaml.Unmarshal(deleteBytes, &deleteVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Operation: %w`, err)
 		}
 		v.delete = &deleteVal
 		delete(proxy, `delete`)
@@ -669,7 +669,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	if optionsBytes, ok := proxy["options"]; ok {
 		var optionsVal Operation
 		if err := yaml.Unmarshal(optionsBytes, &optionsVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Operation: %w`, err)
 		}
 		v.options = &optionsVal
 		delete(proxy, `options`)
@@ -678,7 +678,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	if headBytes, ok := proxy["head"]; ok {
 		var headVal Operation
 		if err := yaml.Unmarshal(headBytes, &headVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Operation: %w`, err)
 		}
 		v.head = &headVal
 		delete(proxy, `head`)
@@ -687,7 +687,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	if patchBytes, ok := proxy["patch"]; ok {
 		var patchVal Operation
 		if err := yaml.Unmarshal(patchBytes, &patchVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Operation: %w`, err)
 		}
 		v.patch = &patchVal
 		delete(proxy, `patch`)
@@ -696,7 +696,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	if traceBytes, ok := proxy["trace"]; ok {
 		var traceVal Operation
 		if err := yaml.Unmarshal(traceBytes, &traceVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Operation: %w`, err)
 		}
 		v.trace = &traceVal
 		delete(proxy, `trace`)
@@ -705,7 +705,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	if serversBytes, ok := proxy["servers"]; ok {
 		var serversVal []*Server
 		if err := yaml.Unmarshal(serversBytes, &serversVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []*Server: %w`, err)
 		}
 		v.servers = serversVal
 		delete(proxy, `servers`)
@@ -714,7 +714,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	if parametersBytes, ok := proxy["parameters"]; ok {
 		var parametersVal []*Parameter
 		if err := yaml.Unmarshal(parametersBytes, &parametersVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []*Parameter: %w`, err)
 		}
 		v.parameters = parametersVal
 		delete(proxy, `parameters`)
@@ -726,7 +726,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -745,13 +745,13 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 func (v *Operation) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Operation: %w`, err)
 	}
 
 	if tagsBytes, ok := proxy["tags"]; ok {
 		var tagsVal []string
 		if err := yaml.Unmarshal(tagsBytes, &tagsVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []string: %w`, err)
 		}
 		v.tags = tagsVal
 		delete(proxy, `tags`)
@@ -760,7 +760,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	if summaryBytes, ok := proxy["summary"]; ok {
 		var summaryVal string
 		if err := yaml.Unmarshal(summaryBytes, &summaryVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.summary = summaryVal
 		delete(proxy, `summary`)
@@ -769,7 +769,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -778,7 +778,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
 		var externalDocsVal ExternalDocumentation
 		if err := yaml.Unmarshal(externalDocsBytes, &externalDocsVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling ExternalDocumentation: %w`, err)
 		}
 		v.externalDocs = &externalDocsVal
 		delete(proxy, `externalDocs`)
@@ -787,7 +787,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	if operationIDBytes, ok := proxy["operationId"]; ok {
 		var operationIDVal string
 		if err := yaml.Unmarshal(operationIDBytes, &operationIDVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.operationID = operationIDVal
 		delete(proxy, `operationId`)
@@ -796,7 +796,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	if parametersBytes, ok := proxy["parameters"]; ok {
 		var parametersVal []*Parameter
 		if err := yaml.Unmarshal(parametersBytes, &parametersVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []*Parameter: %w`, err)
 		}
 		v.parameters = parametersVal
 		delete(proxy, `parameters`)
@@ -805,7 +805,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	if requestBodyBytes, ok := proxy["requestBody"]; ok {
 		var requestBodyVal RequestBody
 		if err := yaml.Unmarshal(requestBodyBytes, &requestBodyVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling RequestBody: %w`, err)
 		}
 		v.requestBody = &requestBodyVal
 		delete(proxy, `requestBody`)
@@ -817,7 +817,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	}
 	var responsesVal Responses
 	if err := yaml.Unmarshal(responsesBytes, &responsesVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Responses: %w`, err)
 	}
 	v.responses = &responsesVal
 	delete(proxy, `responses`)
@@ -825,7 +825,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	if callbacksBytes, ok := proxy["callbacks"]; ok {
 		var callbacksVal map[string]*Callback
 		if err := yaml.Unmarshal(callbacksBytes, &callbacksVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Callback: %w`, err)
 		}
 		v.callbacks = callbacksVal
 		delete(proxy, `callbacks`)
@@ -834,7 +834,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	if deprecatedBytes, ok := proxy["deprecated"]; ok {
 		var deprecatedVal bool
 		if err := yaml.Unmarshal(deprecatedBytes, &deprecatedVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.deprecated = deprecatedVal
 		delete(proxy, `deprecated`)
@@ -843,7 +843,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	if securityBytes, ok := proxy["security"]; ok {
 		var securityVal []*SecurityRequirement
 		if err := yaml.Unmarshal(securityBytes, &securityVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []*SecurityRequirement: %w`, err)
 		}
 		v.security = securityVal
 		delete(proxy, `security`)
@@ -852,7 +852,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	if serversBytes, ok := proxy["servers"]; ok {
 		var serversVal []*Server
 		if err := yaml.Unmarshal(serversBytes, &serversVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []*Server: %w`, err)
 		}
 		v.servers = serversVal
 		delete(proxy, `servers`)
@@ -864,7 +864,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -883,13 +883,13 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 func (v *ExternalDocumentation) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling ExternalDocumentation: %w`, err)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -901,7 +901,7 @@ func (v *ExternalDocumentation) UnmarshalYAML(b []byte) error {
 	}
 	var urlVal string
 	if err := yaml.Unmarshal(urlBytes, &urlVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling string: %w`, err)
 	}
 	v.url = urlVal
 	delete(proxy, `url`)
@@ -916,7 +916,7 @@ func (v *ExternalDocumentation) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -935,7 +935,7 @@ func (v *ExternalDocumentation) UnmarshalYAML(b []byte) error {
 func (v *Parameter) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Parameter: %w`, err)
 	}
 
 	nameBytes, ok := proxy["name"]
@@ -944,7 +944,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	}
 	var nameVal string
 	if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling string: %w`, err)
 	}
 	v.name = nameVal
 	delete(proxy, `name`)
@@ -955,7 +955,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	}
 	var inVal string
 	if err := yaml.Unmarshal(inBytes, &inVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling string: %w`, err)
 	}
 	v.in = inVal
 	delete(proxy, `in`)
@@ -967,7 +967,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -976,7 +976,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if requiredBytes, ok := proxy["required"]; ok {
 		var requiredVal bool
 		if err := yaml.Unmarshal(requiredBytes, &requiredVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.required = requiredVal
 		delete(proxy, `required`)
@@ -985,7 +985,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if deprecatedBytes, ok := proxy["deprecated"]; ok {
 		var deprecatedVal bool
 		if err := yaml.Unmarshal(deprecatedBytes, &deprecatedVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.deprecated = deprecatedVal
 		delete(proxy, `deprecated`)
@@ -994,7 +994,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if allowEmptyValueBytes, ok := proxy["allowEmptyValue"]; ok {
 		var allowEmptyValueVal bool
 		if err := yaml.Unmarshal(allowEmptyValueBytes, &allowEmptyValueVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.allowEmptyValue = allowEmptyValueVal
 		delete(proxy, `allowEmptyValue`)
@@ -1003,7 +1003,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if styleBytes, ok := proxy["style"]; ok {
 		var styleVal string
 		if err := yaml.Unmarshal(styleBytes, &styleVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.style = styleVal
 		delete(proxy, `style`)
@@ -1012,7 +1012,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if explodeBytes, ok := proxy["explode"]; ok {
 		var explodeVal bool
 		if err := yaml.Unmarshal(explodeBytes, &explodeVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.explode = explodeVal
 		delete(proxy, `explode`)
@@ -1021,7 +1021,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if allowReservedBytes, ok := proxy["allowReserved"]; ok {
 		var allowReservedVal bool
 		if err := yaml.Unmarshal(allowReservedBytes, &allowReservedVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.allowReserved = allowReservedVal
 		delete(proxy, `allowReserved`)
@@ -1030,7 +1030,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if schemaBytes, ok := proxy["schema"]; ok {
 		var schemaVal Schema
 		if err := yaml.Unmarshal(schemaBytes, &schemaVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Schema: %w`, err)
 		}
 		v.schema = &schemaVal
 		delete(proxy, `schema`)
@@ -1039,7 +1039,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if exampleBytes, ok := proxy["example"]; ok {
 		var exampleVal interface{}
 		if err := yaml.Unmarshal(exampleBytes, &exampleVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		v.example = exampleVal
 		delete(proxy, `example`)
@@ -1048,7 +1048,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if examplesBytes, ok := proxy["examples"]; ok {
 		var examplesVal map[string]*Example
 		if err := yaml.Unmarshal(examplesBytes, &examplesVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Example: %w`, err)
 		}
 		v.examples = examplesVal
 		delete(proxy, `examples`)
@@ -1057,7 +1057,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if contentBytes, ok := proxy["content"]; ok {
 		var contentVal map[string]*MediaType
 		if err := yaml.Unmarshal(contentBytes, &contentVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*MediaType: %w`, err)
 		}
 		v.content = contentVal
 		delete(proxy, `content`)
@@ -1069,7 +1069,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -1081,7 +1081,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if referenceBytes, ok := proxy["$ref"]; ok {
 		var referenceVal string
 		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.reference = referenceVal
 		delete(proxy, `$ref`)
@@ -1097,13 +1097,13 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 func (v *RequestBody) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling RequestBody: %w`, err)
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -1115,7 +1115,7 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 	}
 	var contentVal map[string]*MediaType
 	if err := yaml.Unmarshal(contentBytes, &contentVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling map[string]*MediaType: %w`, err)
 	}
 	v.content = contentVal
 	delete(proxy, `content`)
@@ -1123,7 +1123,7 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 	if requiredBytes, ok := proxy["required"]; ok {
 		var requiredVal bool
 		if err := yaml.Unmarshal(requiredBytes, &requiredVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.required = requiredVal
 		delete(proxy, `required`)
@@ -1135,7 +1135,7 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -1147,7 +1147,7 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 	if referenceBytes, ok := proxy["$ref"]; ok {
 		var referenceVal string
 		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.reference = referenceVal
 		delete(proxy, `$ref`)
@@ -1163,13 +1163,13 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 func (v *MediaType) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling MediaType: %w`, err)
 	}
 
 	if schemaBytes, ok := proxy["schema"]; ok {
 		var schemaVal Schema
 		if err := yaml.Unmarshal(schemaBytes, &schemaVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Schema: %w`, err)
 		}
 		v.schema = &schemaVal
 		delete(proxy, `schema`)
@@ -1178,7 +1178,7 @@ func (v *MediaType) UnmarshalYAML(b []byte) error {
 	if exampleBytes, ok := proxy["example"]; ok {
 		var exampleVal interface{}
 		if err := yaml.Unmarshal(exampleBytes, &exampleVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		v.example = exampleVal
 		delete(proxy, `example`)
@@ -1187,7 +1187,7 @@ func (v *MediaType) UnmarshalYAML(b []byte) error {
 	if examplesBytes, ok := proxy["examples"]; ok {
 		var examplesVal map[string]*Example
 		if err := yaml.Unmarshal(examplesBytes, &examplesVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Example: %w`, err)
 		}
 		v.examples = examplesVal
 		delete(proxy, `examples`)
@@ -1196,7 +1196,7 @@ func (v *MediaType) UnmarshalYAML(b []byte) error {
 	if encodingBytes, ok := proxy["encoding"]; ok {
 		var encodingVal map[string]*Encoding
 		if err := yaml.Unmarshal(encodingBytes, &encodingVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Encoding: %w`, err)
 		}
 		v.encoding = encodingVal
 		delete(proxy, `encoding`)
@@ -1208,7 +1208,7 @@ func (v *MediaType) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -1227,13 +1227,13 @@ func (v *MediaType) UnmarshalYAML(b []byte) error {
 func (v *Encoding) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Encoding: %w`, err)
 	}
 
 	if contentTypeBytes, ok := proxy["contentType"]; ok {
 		var contentTypeVal string
 		if err := yaml.Unmarshal(contentTypeBytes, &contentTypeVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.contentType = contentTypeVal
 		delete(proxy, `contentType`)
@@ -1242,7 +1242,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 	if headersBytes, ok := proxy["headers"]; ok {
 		var headersVal map[string]*Header
 		if err := yaml.Unmarshal(headersBytes, &headersVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Header: %w`, err)
 		}
 		v.headers = headersVal
 		delete(proxy, `headers`)
@@ -1251,7 +1251,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 	if styleBytes, ok := proxy["style"]; ok {
 		var styleVal string
 		if err := yaml.Unmarshal(styleBytes, &styleVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.style = styleVal
 		delete(proxy, `style`)
@@ -1260,7 +1260,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 	if explodeBytes, ok := proxy["explode"]; ok {
 		var explodeVal string
 		if err := yaml.Unmarshal(explodeBytes, &explodeVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.explode = explodeVal
 		delete(proxy, `explode`)
@@ -1269,7 +1269,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 	if allowReservedBytes, ok := proxy["allowReserved"]; ok {
 		var allowReservedVal bool
 		if err := yaml.Unmarshal(allowReservedBytes, &allowReservedVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.allowReserved = allowReservedVal
 		delete(proxy, `allowReserved`)
@@ -1281,7 +1281,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -1300,7 +1300,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 func (v *Responses) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Responses: %w`, err)
 	}
 	responses := map[string]*Response{}
 	for key, val := range proxy {
@@ -1310,7 +1310,7 @@ func (v *Responses) UnmarshalYAML(b []byte) error {
 		}
 		var responsesv Response
 		if err := yaml.Unmarshal(val, &responsesv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Response: %w`, err)
 		}
 		responses[key] = &responsesv
 		delete(proxy, key)
@@ -1325,7 +1325,7 @@ func (v *Responses) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -1344,7 +1344,7 @@ func (v *Responses) UnmarshalYAML(b []byte) error {
 func (v *Response) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Response: %w`, err)
 	}
 
 	descriptionBytes, ok := proxy["description"]
@@ -1353,7 +1353,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	}
 	var descriptionVal string
 	if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling string: %w`, err)
 	}
 	v.description = descriptionVal
 	delete(proxy, `description`)
@@ -1361,7 +1361,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	if headersBytes, ok := proxy["headers"]; ok {
 		var headersVal map[string]*Header
 		if err := yaml.Unmarshal(headersBytes, &headersVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Header: %w`, err)
 		}
 		v.headers = headersVal
 		delete(proxy, `headers`)
@@ -1370,7 +1370,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	if contentBytes, ok := proxy["content"]; ok {
 		var contentVal map[string]*MediaType
 		if err := yaml.Unmarshal(contentBytes, &contentVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*MediaType: %w`, err)
 		}
 		v.content = contentVal
 		delete(proxy, `content`)
@@ -1379,7 +1379,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	if linksBytes, ok := proxy["links"]; ok {
 		var linksVal map[string]*Link
 		if err := yaml.Unmarshal(linksBytes, &linksVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Link: %w`, err)
 		}
 		v.links = linksVal
 		delete(proxy, `links`)
@@ -1391,7 +1391,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -1403,7 +1403,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	if referenceBytes, ok := proxy["$ref"]; ok {
 		var referenceVal string
 		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.reference = referenceVal
 		delete(proxy, `$ref`)
@@ -1419,13 +1419,13 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 func (v *Callback) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Callback: %w`, err)
 	}
 	callback := map[string]*PathItem{}
 	for key, val := range proxy {
 		var callbackv PathItem
 		if err := yaml.Unmarshal(val, &callbackv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling PathItem: %w`, err)
 		}
 		callback[key] = &callbackv
 		delete(proxy, key)
@@ -1440,7 +1440,7 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -1452,7 +1452,7 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 	if referenceBytes, ok := proxy["$ref"]; ok {
 		var referenceVal string
 		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.reference = referenceVal
 		delete(proxy, `$ref`)
@@ -1468,13 +1468,13 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 func (v *Example) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Example: %w`, err)
 	}
 
 	if summaryBytes, ok := proxy["summary"]; ok {
 		var summaryVal string
 		if err := yaml.Unmarshal(summaryBytes, &summaryVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.summary = summaryVal
 		delete(proxy, `summary`)
@@ -1483,7 +1483,7 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -1492,7 +1492,7 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	if valueBytes, ok := proxy["value"]; ok {
 		var valueVal interface{}
 		if err := yaml.Unmarshal(valueBytes, &valueVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		v.value = valueVal
 		delete(proxy, `value`)
@@ -1501,7 +1501,7 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	if externalValueBytes, ok := proxy["externalValue"]; ok {
 		var externalValueVal string
 		if err := yaml.Unmarshal(externalValueBytes, &externalValueVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.externalValue = externalValueVal
 		delete(proxy, `externalValue`)
@@ -1513,7 +1513,7 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -1525,7 +1525,7 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	if referenceBytes, ok := proxy["$ref"]; ok {
 		var referenceVal string
 		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.reference = referenceVal
 		delete(proxy, `$ref`)
@@ -1541,13 +1541,13 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 func (v *Link) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Link: %w`, err)
 	}
 
 	if operationRefBytes, ok := proxy["operationRef"]; ok {
 		var operationRefVal string
 		if err := yaml.Unmarshal(operationRefBytes, &operationRefVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.operationRef = operationRefVal
 		delete(proxy, `operationRef`)
@@ -1556,7 +1556,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	if operationIDBytes, ok := proxy["operationId"]; ok {
 		var operationIDVal string
 		if err := yaml.Unmarshal(operationIDBytes, &operationIDVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.operationID = operationIDVal
 		delete(proxy, `operationId`)
@@ -1565,7 +1565,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	if parametersBytes, ok := proxy["parameters"]; ok {
 		var parametersVal map[string]interface{}
 		if err := yaml.Unmarshal(parametersBytes, &parametersVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]interface{}: %w`, err)
 		}
 		v.parameters = parametersVal
 		delete(proxy, `parameters`)
@@ -1574,7 +1574,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	if requestBodyBytes, ok := proxy["requestBody"]; ok {
 		var requestBodyVal interface{}
 		if err := yaml.Unmarshal(requestBodyBytes, &requestBodyVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		v.requestBody = requestBodyVal
 		delete(proxy, `requestBody`)
@@ -1583,7 +1583,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -1592,7 +1592,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	if serverBytes, ok := proxy["server"]; ok {
 		var serverVal Server
 		if err := yaml.Unmarshal(serverBytes, &serverVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Server: %w`, err)
 		}
 		v.server = &serverVal
 		delete(proxy, `server`)
@@ -1604,7 +1604,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -1616,7 +1616,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	if referenceBytes, ok := proxy["$ref"]; ok {
 		var referenceVal string
 		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.reference = referenceVal
 		delete(proxy, `$ref`)
@@ -1632,13 +1632,13 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 func (v *Header) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Header: %w`, err)
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
 		var nameVal string
 		if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.name = nameVal
 		delete(proxy, `name`)
@@ -1647,7 +1647,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if inBytes, ok := proxy["in"]; ok {
 		var inVal string
 		if err := yaml.Unmarshal(inBytes, &inVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.in = inVal
 		delete(proxy, `in`)
@@ -1656,7 +1656,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -1665,7 +1665,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if requiredBytes, ok := proxy["required"]; ok {
 		var requiredVal bool
 		if err := yaml.Unmarshal(requiredBytes, &requiredVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.required = requiredVal
 		delete(proxy, `required`)
@@ -1674,7 +1674,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if deprecatedBytes, ok := proxy["deprecated"]; ok {
 		var deprecatedVal bool
 		if err := yaml.Unmarshal(deprecatedBytes, &deprecatedVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.deprecated = deprecatedVal
 		delete(proxy, `deprecated`)
@@ -1683,7 +1683,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if allowEmptyValueBytes, ok := proxy["allowEmptyValue"]; ok {
 		var allowEmptyValueVal bool
 		if err := yaml.Unmarshal(allowEmptyValueBytes, &allowEmptyValueVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.allowEmptyValue = allowEmptyValueVal
 		delete(proxy, `allowEmptyValue`)
@@ -1692,7 +1692,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if styleBytes, ok := proxy["style"]; ok {
 		var styleVal string
 		if err := yaml.Unmarshal(styleBytes, &styleVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.style = styleVal
 		delete(proxy, `style`)
@@ -1701,7 +1701,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if explodeBytes, ok := proxy["explode"]; ok {
 		var explodeVal bool
 		if err := yaml.Unmarshal(explodeBytes, &explodeVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.explode = explodeVal
 		delete(proxy, `explode`)
@@ -1710,7 +1710,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if allowReservedBytes, ok := proxy["allowReserved"]; ok {
 		var allowReservedVal bool
 		if err := yaml.Unmarshal(allowReservedBytes, &allowReservedVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.allowReserved = allowReservedVal
 		delete(proxy, `allowReserved`)
@@ -1719,7 +1719,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if schemaBytes, ok := proxy["schema"]; ok {
 		var schemaVal Schema
 		if err := yaml.Unmarshal(schemaBytes, &schemaVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Schema: %w`, err)
 		}
 		v.schema = &schemaVal
 		delete(proxy, `schema`)
@@ -1728,7 +1728,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if exampleBytes, ok := proxy["example"]; ok {
 		var exampleVal interface{}
 		if err := yaml.Unmarshal(exampleBytes, &exampleVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		v.example = exampleVal
 		delete(proxy, `example`)
@@ -1737,7 +1737,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if examplesBytes, ok := proxy["examples"]; ok {
 		var examplesVal map[string]*Example
 		if err := yaml.Unmarshal(examplesBytes, &examplesVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Example: %w`, err)
 		}
 		v.examples = examplesVal
 		delete(proxy, `examples`)
@@ -1746,7 +1746,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if contentBytes, ok := proxy["content"]; ok {
 		var contentVal map[string]*MediaType
 		if err := yaml.Unmarshal(contentBytes, &contentVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*MediaType: %w`, err)
 		}
 		v.content = contentVal
 		delete(proxy, `content`)
@@ -1758,7 +1758,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -1770,7 +1770,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if referenceBytes, ok := proxy["$ref"]; ok {
 		var referenceVal string
 		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.reference = referenceVal
 		delete(proxy, `$ref`)
@@ -1786,7 +1786,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 func (v *Tag) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Tag: %w`, err)
 	}
 
 	nameBytes, ok := proxy["name"]
@@ -1795,7 +1795,7 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 	}
 	var nameVal string
 	if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling string: %w`, err)
 	}
 	v.name = nameVal
 	delete(proxy, `name`)
@@ -1803,7 +1803,7 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -1812,7 +1812,7 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
 		var externalDocsVal ExternalDocumentation
 		if err := yaml.Unmarshal(externalDocsBytes, &externalDocsVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling ExternalDocumentation: %w`, err)
 		}
 		v.externalDocs = &externalDocsVal
 		delete(proxy, `externalDocs`)
@@ -1824,7 +1824,7 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -1843,13 +1843,13 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 func (v *Schema) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Schema: %w`, err)
 	}
 
 	if titleBytes, ok := proxy["title"]; ok {
 		var titleVal string
 		if err := yaml.Unmarshal(titleBytes, &titleVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.title = titleVal
 		delete(proxy, `title`)
@@ -1858,7 +1858,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if multipleOfBytes, ok := proxy["multipleOf"]; ok {
 		var multipleOfVal int
 		if err := yaml.Unmarshal(multipleOfBytes, &multipleOfVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling int: %w`, err)
 		}
 		v.multipleOf = multipleOfVal
 		delete(proxy, `multipleOf`)
@@ -1867,7 +1867,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if maximumBytes, ok := proxy["maximum"]; ok {
 		var maximumVal int
 		if err := yaml.Unmarshal(maximumBytes, &maximumVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling int: %w`, err)
 		}
 		v.maximum = maximumVal
 		delete(proxy, `maximum`)
@@ -1876,7 +1876,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if exclusiveMaximumBytes, ok := proxy["exclusiveMaximum"]; ok {
 		var exclusiveMaximumVal bool
 		if err := yaml.Unmarshal(exclusiveMaximumBytes, &exclusiveMaximumVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.exclusiveMaximum = exclusiveMaximumVal
 		delete(proxy, `exclusiveMaximum`)
@@ -1885,7 +1885,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if minimumBytes, ok := proxy["minimum"]; ok {
 		var minimumVal int
 		if err := yaml.Unmarshal(minimumBytes, &minimumVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling int: %w`, err)
 		}
 		v.minimum = minimumVal
 		delete(proxy, `minimum`)
@@ -1894,7 +1894,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if exclusiveMinimumBytes, ok := proxy["exclusiveMinimum"]; ok {
 		var exclusiveMinimumVal bool
 		if err := yaml.Unmarshal(exclusiveMinimumBytes, &exclusiveMinimumVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.exclusiveMinimum = exclusiveMinimumVal
 		delete(proxy, `exclusiveMinimum`)
@@ -1903,7 +1903,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if maxLengthBytes, ok := proxy["maxLength"]; ok {
 		var maxLengthVal int
 		if err := yaml.Unmarshal(maxLengthBytes, &maxLengthVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling int: %w`, err)
 		}
 		v.maxLength = maxLengthVal
 		delete(proxy, `maxLength`)
@@ -1912,7 +1912,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if minLengthBytes, ok := proxy["minLength"]; ok {
 		var minLengthVal int
 		if err := yaml.Unmarshal(minLengthBytes, &minLengthVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling int: %w`, err)
 		}
 		v.minLength = minLengthVal
 		delete(proxy, `minLength`)
@@ -1921,7 +1921,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if patternBytes, ok := proxy["pattern"]; ok {
 		var patternVal string
 		if err := yaml.Unmarshal(patternBytes, &patternVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.pattern = patternVal
 		delete(proxy, `pattern`)
@@ -1930,7 +1930,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if maxItemsBytes, ok := proxy["maxItems"]; ok {
 		var maxItemsVal int
 		if err := yaml.Unmarshal(maxItemsBytes, &maxItemsVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling int: %w`, err)
 		}
 		v.maxItems = maxItemsVal
 		delete(proxy, `maxItems`)
@@ -1939,7 +1939,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if minItemsBytes, ok := proxy["minItems"]; ok {
 		var minItemsVal int
 		if err := yaml.Unmarshal(minItemsBytes, &minItemsVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling int: %w`, err)
 		}
 		v.minItems = minItemsVal
 		delete(proxy, `minItems`)
@@ -1948,7 +1948,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if maxPropertiesBytes, ok := proxy["maxProperties"]; ok {
 		var maxPropertiesVal int
 		if err := yaml.Unmarshal(maxPropertiesBytes, &maxPropertiesVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling int: %w`, err)
 		}
 		v.maxProperties = maxPropertiesVal
 		delete(proxy, `maxProperties`)
@@ -1957,7 +1957,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if minPropertiesBytes, ok := proxy["minProperties"]; ok {
 		var minPropertiesVal int
 		if err := yaml.Unmarshal(minPropertiesBytes, &minPropertiesVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling int: %w`, err)
 		}
 		v.minProperties = minPropertiesVal
 		delete(proxy, `minProperties`)
@@ -1966,7 +1966,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if requiredBytes, ok := proxy["required"]; ok {
 		var requiredVal []string
 		if err := yaml.Unmarshal(requiredBytes, &requiredVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []string: %w`, err)
 		}
 		v.required = requiredVal
 		delete(proxy, `required`)
@@ -1975,7 +1975,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if enumBytes, ok := proxy["enum"]; ok {
 		var enumVal []string
 		if err := yaml.Unmarshal(enumBytes, &enumVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []string: %w`, err)
 		}
 		v.enum = enumVal
 		delete(proxy, `enum`)
@@ -1984,7 +1984,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if type_Bytes, ok := proxy["type"]; ok {
 		var type_Val string
 		if err := yaml.Unmarshal(type_Bytes, &type_Val); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.type_ = type_Val
 		delete(proxy, `type`)
@@ -1993,7 +1993,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if allOfBytes, ok := proxy["allOf"]; ok {
 		var allOfVal []*Schema
 		if err := yaml.Unmarshal(allOfBytes, &allOfVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []*Schema: %w`, err)
 		}
 		v.allOf = allOfVal
 		delete(proxy, `allOf`)
@@ -2002,7 +2002,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if oneOfBytes, ok := proxy["oneOf"]; ok {
 		var oneOfVal []*Schema
 		if err := yaml.Unmarshal(oneOfBytes, &oneOfVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []*Schema: %w`, err)
 		}
 		v.oneOf = oneOfVal
 		delete(proxy, `oneOf`)
@@ -2011,7 +2011,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if anyOfBytes, ok := proxy["anyOf"]; ok {
 		var anyOfVal []*Schema
 		if err := yaml.Unmarshal(anyOfBytes, &anyOfVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []*Schema: %w`, err)
 		}
 		v.anyOf = anyOfVal
 		delete(proxy, `anyOf`)
@@ -2020,7 +2020,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if notBytes, ok := proxy["not"]; ok {
 		var notVal Schema
 		if err := yaml.Unmarshal(notBytes, &notVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Schema: %w`, err)
 		}
 		v.not = &notVal
 		delete(proxy, `not`)
@@ -2029,7 +2029,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if itemsBytes, ok := proxy["items"]; ok {
 		var itemsVal Schema
 		if err := yaml.Unmarshal(itemsBytes, &itemsVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Schema: %w`, err)
 		}
 		v.items = &itemsVal
 		delete(proxy, `items`)
@@ -2038,7 +2038,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if propertiesBytes, ok := proxy["properties"]; ok {
 		var propertiesVal map[string]*Schema
 		if err := yaml.Unmarshal(propertiesBytes, &propertiesVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]*Schema: %w`, err)
 		}
 		v.properties = propertiesVal
 		delete(proxy, `properties`)
@@ -2047,7 +2047,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if additionalPropertiesBytes, ok := proxy["additionalProperties"]; ok {
 		var additionalPropertiesVal Schema
 		if err := yaml.Unmarshal(additionalPropertiesBytes, &additionalPropertiesVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Schema: %w`, err)
 		}
 		v.additionalProperties = &additionalPropertiesVal
 		delete(proxy, `additionalProperties`)
@@ -2056,7 +2056,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -2065,7 +2065,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if formatBytes, ok := proxy["format"]; ok {
 		var formatVal string
 		if err := yaml.Unmarshal(formatBytes, &formatVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.format = formatVal
 		delete(proxy, `format`)
@@ -2074,7 +2074,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if default_Bytes, ok := proxy["default"]; ok {
 		var default_Val string
 		if err := yaml.Unmarshal(default_Bytes, &default_Val); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.default_ = default_Val
 		delete(proxy, `default`)
@@ -2083,7 +2083,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if nullableBytes, ok := proxy["nullable"]; ok {
 		var nullableVal bool
 		if err := yaml.Unmarshal(nullableBytes, &nullableVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.nullable = nullableVal
 		delete(proxy, `nullable`)
@@ -2092,7 +2092,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if discriminatorBytes, ok := proxy["discriminator"]; ok {
 		var discriminatorVal Discriminator
 		if err := yaml.Unmarshal(discriminatorBytes, &discriminatorVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling Discriminator: %w`, err)
 		}
 		v.discriminator = &discriminatorVal
 		delete(proxy, `discriminator`)
@@ -2101,7 +2101,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if readOnlyBytes, ok := proxy["readOnly"]; ok {
 		var readOnlyVal bool
 		if err := yaml.Unmarshal(readOnlyBytes, &readOnlyVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.readOnly = readOnlyVal
 		delete(proxy, `readOnly`)
@@ -2110,7 +2110,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if writeOnlyBytes, ok := proxy["writeOnly"]; ok {
 		var writeOnlyVal bool
 		if err := yaml.Unmarshal(writeOnlyBytes, &writeOnlyVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.writeOnly = writeOnlyVal
 		delete(proxy, `writeOnly`)
@@ -2119,7 +2119,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if xmlBytes, ok := proxy["xml"]; ok {
 		var xmlVal XML
 		if err := yaml.Unmarshal(xmlBytes, &xmlVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling XML: %w`, err)
 		}
 		v.xml = &xmlVal
 		delete(proxy, `xml`)
@@ -2128,7 +2128,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if externalDocsBytes, ok := proxy["externalDocs"]; ok {
 		var externalDocsVal ExternalDocumentation
 		if err := yaml.Unmarshal(externalDocsBytes, &externalDocsVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling ExternalDocumentation: %w`, err)
 		}
 		v.externalDocs = &externalDocsVal
 		delete(proxy, `externalDocs`)
@@ -2137,7 +2137,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if exampleBytes, ok := proxy["example"]; ok {
 		var exampleVal interface{}
 		if err := yaml.Unmarshal(exampleBytes, &exampleVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		v.example = exampleVal
 		delete(proxy, `example`)
@@ -2146,7 +2146,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if deprecatedBytes, ok := proxy["deprecated"]; ok {
 		var deprecatedVal bool
 		if err := yaml.Unmarshal(deprecatedBytes, &deprecatedVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.deprecated = deprecatedVal
 		delete(proxy, `deprecated`)
@@ -2158,7 +2158,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -2170,7 +2170,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if referenceBytes, ok := proxy["$ref"]; ok {
 		var referenceVal string
 		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.reference = referenceVal
 		delete(proxy, `$ref`)
@@ -2186,13 +2186,13 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 func (v *Discriminator) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling Discriminator: %w`, err)
 	}
 
 	if propertyNameBytes, ok := proxy["propertyName"]; ok {
 		var propertyNameVal string
 		if err := yaml.Unmarshal(propertyNameBytes, &propertyNameVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.propertyName = propertyNameVal
 		delete(proxy, `propertyName`)
@@ -2201,7 +2201,7 @@ func (v *Discriminator) UnmarshalYAML(b []byte) error {
 	if mappingBytes, ok := proxy["mapping"]; ok {
 		var mappingVal map[string]string
 		if err := yaml.Unmarshal(mappingBytes, &mappingVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]string: %w`, err)
 		}
 		v.mapping = mappingVal
 		delete(proxy, `mapping`)
@@ -2217,13 +2217,13 @@ func (v *Discriminator) UnmarshalYAML(b []byte) error {
 func (v *XML) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling XML: %w`, err)
 	}
 
 	if nameBytes, ok := proxy["name"]; ok {
 		var nameVal string
 		if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.name = nameVal
 		delete(proxy, `name`)
@@ -2232,7 +2232,7 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 	if namespaceBytes, ok := proxy["namespace"]; ok {
 		var namespaceVal string
 		if err := yaml.Unmarshal(namespaceBytes, &namespaceVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.namespace = namespaceVal
 		delete(proxy, `namespace`)
@@ -2241,7 +2241,7 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 	if prefixBytes, ok := proxy["prefix"]; ok {
 		var prefixVal string
 		if err := yaml.Unmarshal(prefixBytes, &prefixVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.prefix = prefixVal
 		delete(proxy, `prefix`)
@@ -2250,7 +2250,7 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 	if attributeBytes, ok := proxy["attribute"]; ok {
 		var attributeVal bool
 		if err := yaml.Unmarshal(attributeBytes, &attributeVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.attribute = attributeVal
 		delete(proxy, `attribute`)
@@ -2259,7 +2259,7 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 	if wrappedBytes, ok := proxy["wrapped"]; ok {
 		var wrappedVal bool
 		if err := yaml.Unmarshal(wrappedBytes, &wrappedVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling bool: %w`, err)
 		}
 		v.wrapped = wrappedVal
 		delete(proxy, `wrapped`)
@@ -2271,7 +2271,7 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -2290,13 +2290,13 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling SecurityScheme: %w`, err)
 	}
 
 	if type_Bytes, ok := proxy["type"]; ok {
 		var type_Val string
 		if err := yaml.Unmarshal(type_Bytes, &type_Val); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.type_ = type_Val
 		delete(proxy, `type`)
@@ -2311,7 +2311,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.description = descriptionVal
 		delete(proxy, `description`)
@@ -2320,7 +2320,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	if nameBytes, ok := proxy["name"]; ok {
 		var nameVal string
 		if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.name = nameVal
 		delete(proxy, `name`)
@@ -2329,7 +2329,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	if inBytes, ok := proxy["in"]; ok {
 		var inVal string
 		if err := yaml.Unmarshal(inBytes, &inVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.in = inVal
 		delete(proxy, `in`)
@@ -2344,7 +2344,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	if schemeBytes, ok := proxy["scheme"]; ok {
 		var schemeVal string
 		if err := yaml.Unmarshal(schemeBytes, &schemeVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.scheme = schemeVal
 		delete(proxy, `scheme`)
@@ -2353,7 +2353,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	if bearerFormatBytes, ok := proxy["bearerFormat"]; ok {
 		var bearerFormatVal string
 		if err := yaml.Unmarshal(bearerFormatBytes, &bearerFormatVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.bearerFormat = bearerFormatVal
 		delete(proxy, `bearerFormat`)
@@ -2362,7 +2362,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	if flowsBytes, ok := proxy["flows"]; ok {
 		var flowsVal OAuthFlows
 		if err := yaml.Unmarshal(flowsBytes, &flowsVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling OAuthFlows: %w`, err)
 		}
 		v.flows = &flowsVal
 		delete(proxy, `flows`)
@@ -2371,7 +2371,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	if openIDConnectURLBytes, ok := proxy["openIdConnectUrl"]; ok {
 		var openIDConnectURLVal string
 		if err := yaml.Unmarshal(openIDConnectURLBytes, &openIDConnectURLVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.openIDConnectURL = openIDConnectURLVal
 		delete(proxy, `openIdConnectUrl`)
@@ -2389,7 +2389,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -2401,7 +2401,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	if referenceBytes, ok := proxy["$ref"]; ok {
 		var referenceVal string
 		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.reference = referenceVal
 		delete(proxy, `$ref`)
@@ -2417,13 +2417,13 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling OAuthFlows: %w`, err)
 	}
 
 	if implicitBytes, ok := proxy["implicit"]; ok {
 		var implicitVal OAuthFlow
 		if err := yaml.Unmarshal(implicitBytes, &implicitVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling OAuthFlow: %w`, err)
 		}
 		v.implicit = &implicitVal
 		delete(proxy, `implicit`)
@@ -2432,7 +2432,7 @@ func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 	if passwordBytes, ok := proxy["password"]; ok {
 		var passwordVal OAuthFlow
 		if err := yaml.Unmarshal(passwordBytes, &passwordVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling OAuthFlow: %w`, err)
 		}
 		v.password = &passwordVal
 		delete(proxy, `password`)
@@ -2441,7 +2441,7 @@ func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 	if clientCredentialsBytes, ok := proxy["clientCredentials"]; ok {
 		var clientCredentialsVal OAuthFlow
 		if err := yaml.Unmarshal(clientCredentialsBytes, &clientCredentialsVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling OAuthFlow: %w`, err)
 		}
 		v.clientCredentials = &clientCredentialsVal
 		delete(proxy, `clientCredentials`)
@@ -2450,7 +2450,7 @@ func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 	if authorizationCodeBytes, ok := proxy["authorizationCode"]; ok {
 		var authorizationCodeVal OAuthFlow
 		if err := yaml.Unmarshal(authorizationCodeBytes, &authorizationCodeVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling OAuthFlow: %w`, err)
 		}
 		v.authorizationCode = &authorizationCodeVal
 		delete(proxy, `authorizationCode`)
@@ -2462,7 +2462,7 @@ func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -2481,13 +2481,13 @@ func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling OAuthFlow: %w`, err)
 	}
 
 	if authorizationURLBytes, ok := proxy["authorizationUrl"]; ok {
 		var authorizationURLVal string
 		if err := yaml.Unmarshal(authorizationURLBytes, &authorizationURLVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.authorizationURL = authorizationURLVal
 		delete(proxy, `authorizationUrl`)
@@ -2502,7 +2502,7 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	if tokenURLBytes, ok := proxy["tokenUrl"]; ok {
 		var tokenURLVal string
 		if err := yaml.Unmarshal(tokenURLBytes, &tokenURLVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.tokenURL = tokenURLVal
 		delete(proxy, `tokenUrl`)
@@ -2517,7 +2517,7 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	if refreshURLBytes, ok := proxy["refreshUrl"]; ok {
 		var refreshURLVal string
 		if err := yaml.Unmarshal(refreshURLBytes, &refreshURLVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling string: %w`, err)
 		}
 		v.refreshURL = refreshURLVal
 		delete(proxy, `refreshUrl`)
@@ -2532,7 +2532,7 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	if scopesBytes, ok := proxy["scopes"]; ok {
 		var scopesVal map[string]string
 		if err := yaml.Unmarshal(scopesBytes, &scopesVal); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling map[string]string: %w`, err)
 		}
 		v.scopes = scopesVal
 		delete(proxy, `scopes`)
@@ -2544,7 +2544,7 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 		}
 		var extensionv interface{}
 		if err := yaml.Unmarshal(val, &extensionv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling interface{}: %w`, err)
 		}
 		extension[key] = extensionv
 		delete(proxy, key)
@@ -2563,13 +2563,13 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 func (v *SecurityRequirement) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
-		return err
+		return fmt.Errorf(`unmarshaling SecurityRequirement: %w`, err)
 	}
 	securityRequirement := map[string][]string{}
 	for key, val := range proxy {
 		var securityRequirementv []string
 		if err := yaml.Unmarshal(val, &securityRequirementv); err != nil {
-			return err
+			return fmt.Errorf(`unmarshaling []string: %w`, err)
 		}
 		securityRequirement[key] = securityRequirementv
 		delete(proxy, key)
