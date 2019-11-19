@@ -3418,7 +3418,22 @@ func TestHeaderUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want Header
-	}{}
+	}{
+		{
+			yml: `x-foo: bar`,
+			want: Header{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+		{
+			yml: `$ref: '#/components/headers/foo'`,
+			want: Header{
+				reference: "#/components/headers/foo",
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got Header
@@ -3480,7 +3495,18 @@ func TestTagUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want Tag
-	}{}
+	}{
+		{
+			yml: `name: theName
+x-foo: bar`,
+			want: Tag{
+				name: "theName",
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got Tag
@@ -3500,6 +3526,10 @@ func TestTagUnmarshalYAMLError(t *testing.T) {
 		yml  string
 		want error
 	}{
+		{
+			yml:  `description: foobar`,
+			want: errors.New(`"name" field is required`),
+		},
 		{
 			yml: `name: tagName
 foo: bar`,
@@ -3983,7 +4013,119 @@ func TestSchemaUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want Schema
-	}{}
+	}{
+		{
+			yml: `title: Foo API`,
+			want: Schema{
+				title: "Foo API",
+			},
+		},
+		{
+			yml: `multipleOf: 3`,
+			want: Schema{
+				multipleOf: 3,
+			},
+		},
+		{
+			yml: `exclusiveMaximum: true`,
+			want: Schema{
+				exclusiveMaximum: true,
+			},
+		},
+		{
+			yml: `exclusiveMinimum: true`,
+			want: Schema{
+				exclusiveMinimum: true,
+			},
+		},
+		{
+			yml: `minLength: 3
+maxLength: 6`,
+			want: Schema{
+				minLength: 3,
+				maxLength: 6,
+			},
+		},
+		{
+			yml: `pattern: ^foo.+$`,
+			want: Schema{
+				pattern: "^foo.+$",
+			},
+		},
+		{
+			yml: `minItems: 3
+maxItems: 6`,
+			want: Schema{
+				minItems: 3,
+				maxItems: 6,
+			},
+		},
+		{
+			yml: `minProperties: 3
+maxProperties: 6`,
+			want: Schema{
+				minProperties: 3,
+				maxProperties: 6,
+			},
+		},
+		{
+			yml: `anyOf:
+- description: foo`,
+			want: Schema{
+				anyOf: []*Schema{
+					{
+						description: "foo",
+					},
+				},
+			},
+		},
+		{
+			yml: `not:
+  description: foo`,
+			want: Schema{
+				not: &Schema{
+					description: "foo",
+				},
+			},
+		},
+		{
+			yml: `nullable: true`,
+			want: Schema{
+				nullable: true,
+			},
+		},
+		{
+			yml: `writeOnly: true
+readOnly: true`,
+			want: Schema{
+				writeOnly: true,
+				readOnly:  true,
+			},
+		},
+		{
+			yml: `externalDocs:
+url: https://example.com`,
+			want: Schema{
+				externalDocs: &ExternalDocumentation{
+					url: "https://example.com",
+				},
+			},
+		},
+		{
+			yml: `deprecated: true`,
+			want: Schema{
+				deprecated: true,
+			},
+		},
+		{
+			yml: `x-foo: bar`,
+			want: Schema{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got Schema
@@ -4287,7 +4429,16 @@ func TestXMLUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want XML
-	}{}
+	}{
+		{
+			yml: `x-foo: bar`,
+			want: XML{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got XML
@@ -4434,6 +4585,66 @@ func TestSecuritySchemeUnmarshalYAML(t *testing.T) {
 		want SecurityScheme
 	}{
 		{
+			yml: `type: apiKey`,
+			want: SecurityScheme{
+				type_: "apiKey",
+			},
+		},
+		{
+			yml: `type: http`,
+			want: SecurityScheme{
+				type_: "http",
+			},
+		},
+		{
+			yml: `type: oauth2`,
+			want: SecurityScheme{
+				type_: "oauth2",
+			},
+		},
+		{
+			yml: `type: openIdConnect`,
+			want: SecurityScheme{
+				type_: "openIdConnect",
+			},
+		},
+		{
+			yml: `description: foobar`,
+			want: SecurityScheme{
+				description: "foobar",
+			},
+		},
+		{
+			yml: `in: query`,
+			want: SecurityScheme{
+				in: "query",
+			},
+		},
+		{
+			yml: `in: header`,
+			want: SecurityScheme{
+				in: "header",
+			},
+		},
+		{
+			yml: `in: cookie`,
+			want: SecurityScheme{
+				in: "cookie",
+			},
+		},
+		{
+			yml: `openIdConnectUrl: https://example.com`,
+			want: SecurityScheme{
+				openIDConnectURL: "https://example.com",
+			},
+		},
+		{
+			yml: `$ref: '#/components/securitySchemes/Foo'`,
+			want: SecurityScheme{
+				reference: "#/components/securitySchemes/Foo",
+			},
+		},
+		{
 			yml: `x-foo: bar`,
 			want: SecurityScheme{
 				extension: map[string]interface{}{
@@ -4461,6 +4672,14 @@ func TestSecuritySchemeUnmarshalYAMLError(t *testing.T) {
 		yml  string
 		want error
 	}{
+		{
+			yml:  `type: foo`,
+			want: errors.New(`"type" field must be one of ["apiKey", "http", "oauth2", "openIdConnect"]`),
+		},
+		{
+			yml:  `in: "foo"`,
+			want: errors.New(`"in" field must be one of ["query", "header", "cookie"]`),
+		},
 		{
 			yml:  `foo: bar`,
 			want: errors.New("unknown key: foo"),
