@@ -654,6 +654,73 @@ description: Development server`
 	})
 }
 
+func TestServerUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Server
+	}{
+		{
+			yml: `url: https://example.com`,
+			want: Server{
+				url: "https://example.com",
+			},
+		},
+		{
+			yml: `url: https://example.com
+x-foo: bar`,
+			want: Server{
+				url: "https://example.com",
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Server
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected server:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestServerUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `description: foobar`,
+			want: errors.New(`"url" field is required`),
+		},
+		{
+			yml: `url: example.com
+foo: bar`,
+			want: errors.New(`unknown key: foo`),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var server Server
+			got := yaml.Unmarshal([]byte(tt.yml), &server)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestComponentsExampleUnmarshalYAML(t *testing.T) {
 	yml := `components:
   schemas:
