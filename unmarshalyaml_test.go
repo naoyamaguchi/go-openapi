@@ -4432,7 +4432,16 @@ func TestSecuritySchemeUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want SecurityScheme
-	}{}
+	}{
+		{
+			yml: `x-foo: bar`,
+			want: SecurityScheme{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got SecurityScheme
@@ -4461,6 +4470,72 @@ func TestSecuritySchemeUnmarshalYAMLError(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var securityScheme SecurityScheme
 			got := yaml.Unmarshal([]byte(tt.yml), &securityScheme)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestOAuthFlowsUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want OAuthFlows
+	}{
+		{
+			yml: `password: {}`,
+			want: OAuthFlows{
+				password: &OAuthFlow{},
+			},
+		},
+		{
+			yml: `clientCredentials: {}`,
+			want: OAuthFlows{
+				clientCredentials: &OAuthFlow{},
+			},
+		},
+		{
+			yml: `x-foo: bar`,
+			want: OAuthFlows{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got OAuthFlows
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected oAuthFlows:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestoAuthFlowsUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var oAuthFlows OAuthFlows
+			got := yaml.Unmarshal([]byte(tt.yml), &oAuthFlows)
 			if got == nil {
 				t.Error("error is expected but not")
 				return
@@ -4555,7 +4630,22 @@ func TestOAuthFlowUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want OAuthFlow
-	}{}
+	}{
+		{
+			yml: `refreshUrl: https://example.com`,
+			want: OAuthFlow{
+				refreshURL: "https://example.com",
+			},
+		},
+		{
+			yml: `x-foo: bar`,
+			want: OAuthFlow{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got OAuthFlow
