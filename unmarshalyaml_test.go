@@ -1025,6 +1025,60 @@ func TestComponentsExampleUnmarshalYAML(t *testing.T) {
 	})
 }
 
+func TestComponentsUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Components
+	}{
+		{
+			yml: `x-foo: bar`,
+			want: Components{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Components
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected components:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestComponentsUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var components Components
+			got := yaml.Unmarshal([]byte(tt.yml), &components)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestPathsExampleUnmarshalYAML(t *testing.T) {
 	yml := `/pets:
   get:
@@ -1068,6 +1122,60 @@ func TestPathsExampleUnmarshalYAML(t *testing.T) {
 	if schema.items.reference != "#/components/schemas/pet" {
 		t.Errorf("unexpected paths./pets.get.responses.200.content.application/json.schema.items.$ref: %s", schema.reference)
 		return
+	}
+}
+
+func TestPathsUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Paths
+	}{
+		{
+			yml: `x-foo: bar`,
+			want: Paths{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Paths
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected paths:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestPathsUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var paths Paths
+			got := yaml.Unmarshal([]byte(tt.yml), &paths)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
 	}
 }
 
