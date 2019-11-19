@@ -182,7 +182,7 @@ info:
 			yml: `openapi: 3.0.2
 info:
   version: 1.0.0`,
-			want: errors.New(`unmarshaling Info: "title" field is required`),
+			want: errors.New(`"title" field is required`),
 		},
 		{
 			yml: `openapi: 3.0.2
