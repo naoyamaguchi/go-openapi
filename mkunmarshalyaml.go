@@ -65,6 +65,7 @@ func main() {
 			outf("\nreturn err")
 			outf("\n}")
 
+			var noUnknown bool
 			for _, field := range st.Fields.List {
 				fn := field.Names[0].Name
 				tag := parseTags(field)
@@ -95,6 +96,8 @@ func main() {
 							outf("\ncontinue")
 							outf("\n}")
 						}
+					} else {
+						noUnknown = true
 					}
 					outf("\nvar %sv %s", fn, strings.TrimPrefix(ast2type(ft.Value), "*"))
 					outf("\nif err := yaml.Unmarshal(val, &%sv); err != nil {", fn)
@@ -139,11 +142,13 @@ func main() {
 				}
 				formatValidation(outf, fn, yn, field, tag, required)
 			}
-			outf("\nif len(proxy) != 0 {")
-			outf("\nfor k := range proxy {")
-			outf("\nreturn fmt.Errorf(\"unknown key: %%s\", k)")
-			outf("\n}")
-			outf("\n}")
+			if !noUnknown {
+				outf("\nif len(proxy) != 0 {")
+				outf("\nfor k := range proxy {")
+				outf("\nreturn fmt.Errorf(\"unknown key: %%s\", k)")
+				outf("\n}")
+				outf("\n}")
+			}
 
 			outf("\nreturn nil")
 			outf("\n}")

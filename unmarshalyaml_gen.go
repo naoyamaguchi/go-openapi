@@ -2577,10 +2577,5 @@ func (v *SecurityRequirement) UnmarshalYAML(b []byte) error {
 	if len(securityRequirement) != 0 {
 		v.securityRequirement = securityRequirement
 	}
-	if len(proxy) != 0 {
-		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
-		}
-	}
 	return nil
 }
