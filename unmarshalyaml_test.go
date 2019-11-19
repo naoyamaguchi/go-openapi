@@ -1302,6 +1302,68 @@ parameters:
 	})
 }
 
+func TestPathItemUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want PathItem
+	}{
+		{
+			yml: `summary: this is summary text
+description: this is description`,
+			want: PathItem{
+				summary:     "this is summary text",
+				description: "this is description",
+			},
+		},
+		{
+			yml: `x-foo: bar`,
+			want: PathItem{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got PathItem
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected pathItem:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestPathItemUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var pathItem PathItem
+			got := yaml.Unmarshal([]byte(tt.yml), &pathItem)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestOperationExampleUnmarshalYAML(t *testing.T) {
 	yml := `tags:
 - pet
@@ -1459,6 +1521,54 @@ security:
 	}
 }
 
+func TestOperationUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Operation
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Operation
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected operation:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestOperationUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml: `responses:
+  "200":
+    description: foobar
+foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var operation Operation
+			got := yaml.Unmarshal([]byte(tt.yml), &operation)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestExternalDocumentationExampleUnmarshalYAML(t *testing.T) {
 	yml := `description: Find more info here
 url: https://example.com`
@@ -1473,6 +1583,52 @@ url: https://example.com`
 	if externalDocumentation.url != "https://example.com" {
 		t.Errorf("unexpected externalDocumentation.url: %s", externalDocumentation.url)
 		return
+	}
+}
+
+func TestExternalDocumentationUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want ExternalDocumentation
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got ExternalDocumentation
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected externalDocumentation:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestExternalDocumentationUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml: `url: https://example.com
+foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var externalDocumentation ExternalDocumentation
+			got := yaml.Unmarshal([]byte(tt.yml), &externalDocumentation)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
 	}
 }
 
@@ -1688,6 +1844,53 @@ content:
 	})
 }
 
+func TestParameterUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Parameter
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Parameter
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected parameter:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestParameterUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml: `name: namename
+in: query
+foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var parameter Parameter
+			got := yaml.Unmarshal([]byte(tt.yml), &parameter)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestRequestBodyExampleUnmarshalYAML(t *testing.T) {
 	t.Run("with a referenced model", func(t *testing.T) {
 		yml := `description: user to add to the system
@@ -1850,6 +2053,53 @@ content:
 	})
 }
 
+func TestRequestBodyUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want RequestBody
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got RequestBody
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected requestBody:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestRequestBodyUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml: `content:
+  application/json: {}
+foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var requestBody RequestBody
+			got := yaml.Unmarshal([]byte(tt.yml), &requestBody)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestMediaTypeExampleUnmarshalYAML(t *testing.T) {
 	yml := `application/json:
   schema:
@@ -1985,6 +2235,51 @@ func TestMediaTypeExampleUnmarshalYAML(t *testing.T) {
 	})
 }
 
+func TestMediaTypeUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want MediaType
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got MediaType
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected mediaType:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestMediaTypeUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var mediaType MediaType
+			got := yaml.Unmarshal([]byte(tt.yml), &mediaType)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestEncodingExampleUnmarshalYAML(t *testing.T) {
 	yml := `requestBody:
   content:
@@ -2113,6 +2408,51 @@ func TestEncodingExampleUnmarshalYAML(t *testing.T) {
 	})
 }
 
+func TestEncodingUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Encoding
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Encoding
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected encoding:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestEncodingUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var encoding Encoding
+			got := yaml.Unmarshal([]byte(tt.yml), &encoding)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestResponsesExampleUnmarshalYAML(t *testing.T) {
 	yml := `'200':
   description: a pet to be returned
@@ -2170,6 +2510,51 @@ default:
 			return
 		}
 	})
+}
+
+func TestResponsesUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Responses
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Responses
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected responses:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestResponsesUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var responses Responses
+			got := yaml.Unmarshal([]byte(tt.yml), &responses)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
 }
 
 func TestResponseExampleUnmarshalYAML(t *testing.T) {
@@ -2323,6 +2708,52 @@ headers:
 	})
 }
 
+func TestResponseUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Response
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Response
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected response:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestResponseUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml: `description: foo
+foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var response Response
+			got := yaml.Unmarshal([]byte(tt.yml), &response)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestCallbackExampleUnmarshalYAML(t *testing.T) {
 	yml := `myWebhook:
   'http://notificationServer.com?transactionId={$request.body#/id}&email={$request.body#/email}':
@@ -2369,6 +2800,46 @@ func TestCallbackExampleUnmarshalYAML(t *testing.T) {
 	if response.description != "webhook successfully processed and no retries will be performed" {
 		t.Errorf("unexpected myWebhook.http://notificationServer.com?transactionId={$request.body#/id}&email={$request.body#/email}.post.responses.200.description: %s", response.description)
 		return
+	}
+}
+
+func TestCallbackUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Callback
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Callback
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected callback:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestCallbackUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var callback Callback
+			got := yaml.Unmarshal([]byte(tt.yml), &callback)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
 	}
 }
 
@@ -2576,6 +3047,51 @@ func TestExampleExampleUnmarshalYAML(t *testing.T) {
 			return
 		}
 	})
+}
+
+func TestExampleUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Example
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Example
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected example:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestExampleUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var example Example
+			got := yaml.Unmarshal([]byte(tt.yml), &example)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
 }
 
 func TestLinkExampleUnmarshalYAML(t *testing.T) {
@@ -2835,6 +3351,51 @@ func TestLinkExampleUnmarshalYAML(t *testing.T) {
 	})
 }
 
+func TestLinkUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Link
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Link
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected link:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestLinkUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var link Link
+			got := yaml.Unmarshal([]byte(tt.yml), &link)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestHeaderExampleUnmarshalYAML(t *testing.T) {
 	yml := `description: The number of allowed requests in the current period
 schema:
@@ -2853,6 +3414,51 @@ schema:
 	}
 }
 
+func TestHeaderUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Header
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Header
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected header:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestHeaderUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var header Header
+			got := yaml.Unmarshal([]byte(tt.yml), &header)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestTagExampleUnmarshal(t *testing.T) {
 	yml := `name: pet
 description: Pets operations`
@@ -2867,6 +3473,52 @@ description: Pets operations`
 	if tag.description != "Pets operations" {
 		t.Errorf("unexpected tag.description: %s", tag.description)
 		return
+	}
+}
+
+func TestTagUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Tag
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Tag
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected tag:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestTagUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml: `name: tagName
+foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var tag Tag
+			got := yaml.Unmarshal([]byte(tt.yml), &tag)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
 	}
 }
 
@@ -3327,6 +3979,51 @@ example:
 	})
 }
 
+func TestSchemaUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Schema
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Schema
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected schema:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestSchemaUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var schema Schema
+			got := yaml.Unmarshal([]byte(tt.yml), &schema)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestDiscriminatorExampleUnmarshalYAML(t *testing.T) {
 	t.Run("example", func(t *testing.T) {
 		yml := `MyResponseType:
@@ -3422,6 +4119,51 @@ func TestDiscriminatorExampleUnmarshalYAML(t *testing.T) {
 			return
 		}
 	})
+}
+
+func TestDiscriminatorUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want Discriminator
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got Discriminator
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected discriminator:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestDiscriminatorUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var discriminator Discriminator
+			got := yaml.Unmarshal([]byte(tt.yml), &discriminator)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
 }
 
 func TestXMLExampleUnmarshalYAML(t *testing.T) {
@@ -3541,6 +4283,51 @@ func TestXMLExampleUnmarshalYAML(t *testing.T) {
 	})
 }
 
+func TestXMLUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want XML
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got XML
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected xml:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestXMLUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var xml XML
+			got := yaml.Unmarshal([]byte(tt.yml), &xml)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestSecuritySchemeExampleUnmarshalYAML(t *testing.T) {
 	t.Run("basic auth", func(t *testing.T) {
 		yml := `type: http
@@ -3641,6 +4428,51 @@ flows:
 	})
 }
 
+func TestSecuritySchemeUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want SecurityScheme
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got SecurityScheme
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected securityScheme:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestSecuritySchemeUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var securityScheme SecurityScheme
+			got := yaml.Unmarshal([]byte(tt.yml), &securityScheme)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestOAuthFlowExampleUnmarshalYAML(t *testing.T) {
 	yml := `type: oauth2
 flows:
@@ -3719,6 +4551,51 @@ flows:
 	})
 }
 
+func TestOAuthFlowUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want OAuthFlow
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got OAuthFlow
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected oAuthFlow:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestOAuthFlowUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var oAuthFlow OAuthFlow
+			got := yaml.Unmarshal([]byte(tt.yml), &oAuthFlow)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
 func TestSecurityRequirementExampleUnmarshalYAML(t *testing.T) {
 	t.Run("non-oauth2", func(t *testing.T) {
 		yml := `api_key: []`
@@ -3753,6 +4630,46 @@ func TestSecurityRequirementExampleUnmarshalYAML(t *testing.T) {
 			return
 		}
 	})
+}
+
+func TestSecurityRequirementUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want SecurityRequirement
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got SecurityRequirement
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected securityRequirement:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestSecurityRequirementUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var securityRequirement SecurityRequirement
+			got := yaml.Unmarshal([]byte(tt.yml), &securityRequirement)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
 }
 
 func TestIsOneOf(t *testing.T) {
