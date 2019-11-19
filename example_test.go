@@ -336,6 +336,551 @@ func TestCallbackExample(t *testing.T) {
 	}
 }
 
+func TestLinkExample(t *testing.T) {
+	b, err := ioutil.ReadFile("test/testdata/link-example.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var got OpenAPI
+	if err := yaml.Unmarshal(b, &got); err != nil {
+		t.Fatal(err)
+	}
+
+	want := OpenAPI{
+		openapi: "3.0.0",
+		info: &Info{
+			title:   "Link Example",
+			version: "1.0.0",
+		},
+		paths: &Paths{
+			paths: map[string]*PathItem{
+				"/2.0/users/{username}": {
+					get: &Operation{
+						operationID: "getUserByName",
+						parameters: []*Parameter{
+							{
+								name:     "username",
+								in:       "path",
+								required: true,
+								schema: &Schema{
+									type_: "string",
+								},
+							},
+						},
+						responses: &Responses{
+							responses: map[string]*Response{
+								"200": {
+									description: "The User",
+									content: map[string]*MediaType{
+										"application/json": {
+											schema: &Schema{
+												reference: "#/components/schemas/user",
+											},
+										},
+									},
+									links: map[string]*Link{
+										"userRepositories": {
+											reference: "#/components/links/UserRepositories",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				"/2.0/repositories/{username}": {
+					get: &Operation{
+						operationID: "getRepositoriesByOwner",
+						parameters: []*Parameter{
+							{
+								name:     "username",
+								in:       "path",
+								required: true,
+								schema: &Schema{
+									type_: "string",
+								},
+							},
+						},
+						responses: &Responses{
+							responses: map[string]*Response{
+								"200": {
+									description: "repositories owned by the supplied user",
+									content: map[string]*MediaType{
+										"application/json": {
+											schema: &Schema{
+												type_: "array",
+												items: &Schema{
+													reference: "#/components/schemas/repository",
+												},
+											},
+										},
+									},
+									links: map[string]*Link{
+										"userRepository": {
+											reference: "#/components/links/UserRepository",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				"/2.0/repositories/{username}/{slug}": {
+					get: &Operation{
+						operationID: "getRepository",
+						parameters: []*Parameter{
+							{
+								name:     "username",
+								in:       "path",
+								required: true,
+								schema: &Schema{
+									type_: "string",
+								},
+							},
+							{
+								name:     "slug",
+								in:       "path",
+								required: true,
+								schema: &Schema{
+									type_: "string",
+								},
+							},
+						},
+						responses: &Responses{
+							responses: map[string]*Response{
+								"200": {
+									description: "The repository",
+									content: map[string]*MediaType{
+										"application/json": {
+											schema: &Schema{
+												reference: "#/components/schemas/repository",
+											},
+										},
+									},
+									links: map[string]*Link{
+										"repositoryPullRequests": {
+											reference: "#/components/links/RepositoryPullRequests",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				"/2.0/repositories/{username}/{slug}/pullrequests": {
+					get: &Operation{
+						operationID: "getPullRequestsByRepository",
+						parameters: []*Parameter{
+							{
+								name:     "username",
+								in:       "path",
+								required: true,
+								schema: &Schema{
+									type_: "string",
+								},
+							},
+							{
+								name:     "slug",
+								in:       "path",
+								required: true,
+								schema: &Schema{
+									type_: "string",
+								},
+							},
+							{
+								name: "state",
+								in:   "query",
+								schema: &Schema{
+									type_: "string",
+									enum: []string{
+										"open",
+										"merged",
+										"declined",
+									},
+								},
+							},
+						},
+						responses: &Responses{
+							responses: map[string]*Response{
+								"200": {
+									description: "an array of pull request objects",
+									content: map[string]*MediaType{
+										"application/json": {
+											schema: &Schema{
+												type_: "array",
+												items: &Schema{
+													reference: "#/components/schemas/pullrequest",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				"/2.0/repositories/{username}/{slug}/pullrequests/{pid}": {
+					get: &Operation{
+						operationID: "getPullRequestsById",
+						parameters: []*Parameter{
+							{
+								name:     "username",
+								in:       "path",
+								required: true,
+								schema: &Schema{
+									type_: "string",
+								},
+							},
+							{
+								name:     "slug",
+								in:       "path",
+								required: true,
+								schema: &Schema{
+									type_: "string",
+								},
+							},
+							{
+								name:     "pid",
+								in:       "path",
+								required: true,
+								schema: &Schema{
+									type_: "string",
+								},
+							},
+						},
+						responses: &Responses{
+							responses: map[string]*Response{
+								"200": {
+									description: "a pull request object",
+									content: map[string]*MediaType{
+										"application/json": {
+											schema: &Schema{
+												reference: "#/components/schemas/pullrequest",
+											},
+										},
+									},
+									links: map[string]*Link{
+										"pullRequestMerge": {
+											reference: "#/components/links/PullRequestMerge",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				"/2.0/repositories/{username}/{slug}/pullrequests/{pid}/merge": {
+					post: &Operation{
+						operationID: "mergePullRequest",
+						parameters: []*Parameter{
+							{
+								name:     "username",
+								in:       "path",
+								required: true,
+								schema: &Schema{
+									type_: "string",
+								},
+							},
+							{
+								name:     "slug",
+								in:       "path",
+								required: true,
+								schema: &Schema{
+									type_: "string",
+								},
+							},
+							{
+								name:     "pid",
+								in:       "path",
+								required: true,
+								schema: &Schema{
+									type_: "string",
+								},
+							},
+						},
+						responses: &Responses{
+							responses: map[string]*Response{
+								"204": {
+									description: "the PR was successfully merged",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		components: &Components{
+			links: map[string]*Link{
+				"UserRepositories": {
+					operationID: "getRepositoriesByOwner",
+					parameters: map[string]interface{}{
+						"username": "$response.body#/username",
+					},
+				},
+				"UserRepository": {
+					operationID: "getRepository",
+					parameters: map[string]interface{}{
+						"username": "$response.body#/owner/username",
+						"slug":     "$response.body#/slug",
+					},
+				},
+				"RepositoryPullRequests": {
+					operationID: "getPullRequestsByRepository",
+					parameters: map[string]interface{}{
+						"username": "$response.body#/owner/username",
+						"slug":     "$response.body#/slug",
+					},
+				},
+				"PullRequestMerge": {
+					operationID: "mergePullRequest",
+					parameters: map[string]interface{}{
+						"username": "$response.body#/author/username",
+						"slug":     "$response.body#/repository/slug",
+						"pid":      "$response.body#/id",
+					},
+				},
+			},
+			schemas: map[string]*Schema{
+				"user": {
+					type_: "object",
+					properties: map[string]*Schema{
+						"username": {
+							type_: "string",
+						},
+						"uuid": {
+							type_: "string",
+						},
+					},
+				},
+				"repository": {
+					type_: "object",
+					properties: map[string]*Schema{
+						"slug": {
+							type_: "string",
+						},
+						"owner": {
+							reference: "#/components/schemas/user",
+						},
+					},
+				},
+				"pullrequest": {
+					type_: "object",
+					properties: map[string]*Schema{
+						"id": {
+							type_: "integer",
+						},
+						"title": {
+							type_: "string",
+						},
+						"repository": {
+							reference: "#/components/schemas/repository",
+						},
+						"author": {
+							reference: "#/components/schemas/user",
+						},
+					},
+				},
+			},
+		},
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("unexpected:\n  got: %#v\n  want: %#v", got, want)
+		return
+	}
+}
+
+func TestPetstore(t *testing.T) {
+	b, err := ioutil.ReadFile("test/testdata/petstore.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var got OpenAPI
+	if err := yaml.Unmarshal(b, &got); err != nil {
+		t.Fatal(err)
+	}
+
+	want := OpenAPI{
+		openapi: "3.0.0",
+		info: &Info{
+			version: "1.0.0",
+			title:   "Swagger Petstore",
+			license: &License{
+				name: "MIT",
+			},
+		},
+		servers: []*Server{
+			{
+				url: "http://petstore.swagger.io/v1",
+			},
+		},
+		paths: &Paths{
+			paths: map[string]*PathItem{
+				"/pets": {
+					get: &Operation{
+						summary:     "List all pets",
+						operationID: "listPets",
+						tags:        []string{"pets"},
+						parameters: []*Parameter{
+							{
+								name:        "limit",
+								in:          "query",
+								description: "How many items to return at one time (max 100)",
+								required:    false,
+								schema: &Schema{
+									type_:  "integer",
+									format: "int32",
+								},
+							},
+						},
+						responses: &Responses{
+							responses: map[string]*Response{
+								"200": {
+									description: "A paged array of pets",
+									headers: map[string]*Header{
+										"x-next": {
+											description: "A link to the next page of responses",
+											schema: &Schema{
+												type_: "string",
+											},
+										},
+									},
+									content: map[string]*MediaType{
+										"application/json": {
+											schema: &Schema{
+												reference: "#/components/schemas/Pets",
+											},
+										},
+									},
+								},
+								"default": {
+									description: "unexpected error",
+									content: map[string]*MediaType{
+										"application/json": {
+											schema: &Schema{
+												reference: "#/components/schemas/Error",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					post: &Operation{
+						summary:     "Create a pet",
+						operationID: "createPets",
+						tags:        []string{"pets"},
+						responses: &Responses{
+							responses: map[string]*Response{
+								"201": {
+									description: "Null response",
+								},
+								"default": {
+									description: "unexpected error",
+									content: map[string]*MediaType{
+										"application/json": {
+											schema: &Schema{
+												reference: "#/components/schemas/Error",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				"/pets/{petId}": {
+					get: &Operation{
+						summary:     "Info for a specific pet",
+						operationID: "showPetById",
+						tags:        []string{"pets"},
+						parameters: []*Parameter{
+							{
+								name:        "petId",
+								in:          "path",
+								required:    true,
+								description: "The id of the pet to retrieve",
+								schema: &Schema{
+									type_: "string",
+								},
+							},
+						},
+						responses: &Responses{
+							responses: map[string]*Response{
+								"200": {
+									description: "Expected response to a valid request",
+									content: map[string]*MediaType{
+										"application/json": {
+											schema: &Schema{
+												reference: "#/components/schemas/Pet",
+											},
+										},
+									},
+								},
+								"default": {
+									description: "unexpected error",
+									content: map[string]*MediaType{
+										"application/json": {
+											schema: &Schema{
+												reference: "#/components/schemas/Error",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		components: &Components{
+			schemas: map[string]*Schema{
+				"Pet": {
+					type_:    "object",
+					required: []string{"id", "name"},
+					properties: map[string]*Schema{
+						"id": {
+							type_:  "integer",
+							format: "int64",
+						},
+						"name": {
+							type_: "string",
+						},
+						"tag": {
+							type_: "string",
+						},
+					},
+				},
+				"Pets": {
+					type_: "array",
+					items: &Schema{
+						reference: "#/components/schemas/Pet",
+					},
+				},
+				"Error": {
+					type_:    "object",
+					required: []string{"code", "message"},
+					properties: map[string]*Schema{
+						"code": {
+							type_:  "integer",
+							format: "int32",
+						},
+						"message": {
+							type_: "string",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("unexpected:\n  got: %#v\n  want: %#v", got, want)
+		return
+	}
+}
+
 func TestUspto(t *testing.T) {
 	b, err := ioutil.ReadFile("test/testdata/uspto.yaml")
 	if err != nil {

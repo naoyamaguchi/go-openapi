@@ -137,6 +137,26 @@ x-foo: bar
 				},
 			},
 		},
+		{
+			yml: `openapi: 3.0.2
+info:
+  title: title
+  version: 1.0.0
+paths: {}
+externalDocs:
+  url: https://example.com`,
+			want: OpenAPI{
+				openapi: "3.0.2",
+				info: &Info{
+					title:   "title",
+					version: "1.0.0",
+				},
+				paths: &Paths{},
+				externalDocs: &ExternalDocumentation{
+					url: "https://example.com",
+				},
+			},
+		},
 	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
@@ -709,6 +729,73 @@ foo: bar`,
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var server Server
 			got := yaml.Unmarshal([]byte(tt.yml), &server)
+			if got == nil {
+				t.Error("error is expected but not")
+				return
+			}
+			if got.Error() != tt.want.Error() {
+				t.Errorf("unexpected:\n  got:  %v\n  want: %v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestServerVariableUnmarshalYAML(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want ServerVariable
+	}{
+		{
+			yml: `default: defaultValue`,
+			want: ServerVariable{
+				default_: "defaultValue",
+			},
+		},
+		{
+			yml: `default: defaultValue
+x-foo: bar`,
+			want: ServerVariable{
+				default_: "defaultValue",
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var got ServerVariable
+			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected serverVariable:\n  got:  %#v\n  want: %#v", got, tt.want)
+				return
+			}
+		})
+	}
+}
+
+func TestServerVariableUnmarshalYAMLError(t *testing.T) {
+	tests := []struct {
+		yml  string
+		want error
+	}{
+		{
+			yml:  `description: foobar`,
+			want: errors.New(`"default" field is required`),
+		},
+		{
+			yml: `default: defaultValue
+foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+	}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var serverVariable ServerVariable
+			got := yaml.Unmarshal([]byte(tt.yml), &serverVariable)
 			if got == nil {
 				t.Error("error is expected but not")
 				return
