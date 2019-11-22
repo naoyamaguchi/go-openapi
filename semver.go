@@ -52,14 +52,11 @@ func isValidSemVer(version string) bool {
 	} else if major < 0 {
 		return false
 	}
-	if minor, err := strconv.Atoi(minor); err != nil {
-		return false
-	} else if minor < 0 {
+	// minor and patch never be negative: if there's "-", it is parsed as prerelease
+	if _, err := strconv.Atoi(minor); err != nil {
 		return false
 	}
-	if patch, err := strconv.Atoi(patch); err != nil {
-		return false
-	} else if patch < 0 {
+	if _, err := strconv.Atoi(patch); err != nil {
 		return false
 	}
 	// prerelease version is identifiers splitted by dot.
