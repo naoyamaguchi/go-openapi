@@ -5139,6 +5139,34 @@ func TestMatchRuntimerExpr(t *testing.T) {
 			expr: "$response.header.Server",
 			want: true,
 		},
+		{
+			expr: "invalid.expr",
+			want: false,
+		},
+		{
+			expr: "$neither.request.response",
+			want: false,
+		},
+		{
+			expr: "$request",
+			want: false,
+		},
+		{
+			expr: "$request.header.",
+			want: false,
+		},
+		{
+			expr: "$request.body.foo#/fuga",
+			want: false,
+		},
+		{
+			expr: "$request.query.value",
+			want: true,
+		},
+		{
+			expr: "$request.",
+			want: false,
+		},
 	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i)+"/"+tt.expr, func(t *testing.T) {
