@@ -1125,6 +1125,65 @@ func TestComponentsUnmarshalYAML(t *testing.T) {
 				},
 			},
 		},
+		{
+			yml: `examples:
+  fooExample:
+    value: foo`,
+			want: Components{
+				examples: map[string]*Example{
+					"fooExample": {
+						value: "foo",
+					},
+				},
+			},
+		},
+		{
+			yml: `requestBodies:
+  FooRequest:
+    content:
+      application/json: {}`,
+			want: Components{
+				requestBodies: map[string]*RequestBody{
+					"FooRequest": {
+						content: map[string]*MediaType{
+							"application/json": {},
+						},
+					},
+				},
+			},
+		},
+		{
+			yml: `headers:
+  FooHeader:
+    schema:
+      type: string`,
+			want: Components{
+				headers: map[string]*Header{
+					"FooHeader": {
+						schema: &Schema{
+							type_: "string",
+						},
+					},
+				},
+			},
+		},
+		{
+			yml: `callbacks:
+  CallBack:
+    $request.body#/url:
+      summary: foobar`,
+			want: Components{
+				callbacks: map[string]*Callback{
+					"CallBack": {
+						callback: map[string]*PathItem{
+							"$request.body#/url": {
+								summary: "foobar",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
@@ -1148,6 +1207,17 @@ func TestComponentsUnmarshalYAMLError(t *testing.T) {
 		{
 			yml:  `foo: bar`,
 			want: errors.New("unknown key: foo"),
+		},
+		{
+			yml: `examples:
+  fooExample:
+    foo: bar`,
+			want: errors.New("unknown key: foo"),
+		},
+		{
+			yml: `requestBodies:
+  FooRequest: {}`,
+			want: errors.New(`"content" field is required`),
 		},
 	}
 	for i, tt := range tests {
@@ -1407,6 +1477,91 @@ description: this is description`,
 			want: PathItem{
 				extension: map[string]interface{}{
 					"x-foo": "bar",
+				},
+			},
+		},
+		{
+			yml: `put:
+  responses:
+    "200":
+      description: foobar`,
+			want: PathItem{
+				put: &Operation{
+					responses: &Responses{
+						responses: map[string]*Response{
+							"200": {
+								description: "foobar",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			yml: `options:
+  responses:
+    "200":
+      description: foobar`,
+			want: PathItem{
+				options: &Operation{
+					responses: &Responses{
+						responses: map[string]*Response{
+							"200": {
+								description: "foobar",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			yml: `head:
+  responses:
+    "200":
+      description: foobar`,
+			want: PathItem{
+				head: &Operation{
+					responses: &Responses{
+						responses: map[string]*Response{
+							"200": {
+								description: "foobar",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			yml: `patch:
+  responses:
+    "200":
+      description: foobar`,
+			want: PathItem{
+				patch: &Operation{
+					responses: &Responses{
+						responses: map[string]*Response{
+							"200": {
+								description: "foobar",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			yml: `trace:
+  responses:
+    "200":
+      description: foobar`,
+			want: PathItem{
+				trace: &Operation{
+					responses: &Responses{
+						responses: map[string]*Response{
+							"200": {
+								description: "foobar",
+							},
+						},
+					},
 				},
 			},
 		},
