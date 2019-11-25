@@ -3597,7 +3597,37 @@ func TestLinkUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want Link
-	}{}
+	}{
+		{
+			yml: `requestBody: {}`,
+			want: Link{
+				requestBody: map[string]interface{}{},
+			},
+		},
+		{
+			yml: `description: foo`,
+			want: Link{
+				description: "foo",
+			},
+		},
+		{
+			yml: `server:
+  url: example.com`,
+			want: Link{
+				server: &Server{
+					url: "example.com",
+				},
+			},
+		},
+		{
+			yml: `x-foo: bar`,
+			want: Link{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got Link
@@ -3662,10 +3692,73 @@ func TestHeaderUnmarshalYAML(t *testing.T) {
 		want Header
 	}{
 		{
+			yml: `required: true`,
+			want: Header{
+				required: true,
+			},
+		},
+		{
+			yml: `deprecated: true`,
+			want: Header{
+				deprecated: true,
+			},
+		},
+		{
+			yml: `allowEmptyValue: true`,
+			want: Header{
+				allowEmptyValue: true,
+			},
+		},
+		{
+			yml: `style: foo`,
+			want: Header{
+				style: "foo",
+			},
+		},
+		{
+			yml: `explode: true`,
+			want: Header{
+				explode: true,
+			},
+		},
+		{
+			yml: `allowReserved: true`,
+			want: Header{
+				allowReserved: true,
+			},
+		},
+		{
 			yml: `x-foo: bar`,
 			want: Header{
 				extension: map[string]interface{}{
 					"x-foo": "bar",
+				},
+			},
+		},
+		{
+			yml: `example: foo`,
+			want: Header{
+				example: "foo",
+			},
+		},
+		{
+			yml: `examples:
+  foo:
+    value: bar`,
+			want: Header{
+				examples: map[string]*Example{
+					"foo": {
+						value: "bar",
+					},
+				},
+			},
+		},
+		{
+			yml: `content:
+  application/json: {}`,
+			want: Header{
+				content: map[string]*MediaType{
+					"application/json": {},
 				},
 			},
 		},
