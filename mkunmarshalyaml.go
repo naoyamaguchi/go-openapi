@@ -25,7 +25,6 @@ func main() {
 	outf("\n\npackage openapi")
 	outf("\n\nimport (")
 	outf("\n\"errors\"")
-	outf("\n\"fmt\"")
 	outf("\n\"net/url\"")
 	outf("\n\"regexp\"")
 	outf("\n\"strings\"")
@@ -120,7 +119,7 @@ func main() {
 				if required {
 					outf("%sBytes, ok := proxy[\"%s\"]", fn, yn)
 					outf("\nif !ok {")
-					outf("\nreturn errors.New(`\"%s\" field is required`)", yn)
+					outf("\nreturn ErrRequired(%s)", strconv.Quote(yn))
 					outf("\n}")
 				} else {
 					outf("if %sBytes, ok := proxy[\"%s\"]; ok {", fn, yn)
@@ -145,7 +144,7 @@ func main() {
 			if !noUnknown {
 				outf("\nif len(proxy) != 0 {")
 				outf("\nfor k := range proxy {")
-				outf("\nreturn fmt.Errorf(\"unknown key: %%s\", k)")
+				outf("\nreturn ErrUnknownKey(k)")
 				outf("\n}")
 				outf("\n}")
 			}

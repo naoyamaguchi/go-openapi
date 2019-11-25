@@ -4,7 +4,6 @@ package openapi
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"regexp"
 	"strings"
@@ -20,7 +19,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 
 	openapiBytes, ok := proxy["openapi"]
 	if !ok {
-		return errors.New(`"openapi" field is required`)
+		return ErrRequired("openapi")
 	}
 	var openapiVal string
 	if err := yaml.Unmarshal(openapiBytes, &openapiVal); err != nil {
@@ -35,7 +34,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 
 	infoBytes, ok := proxy["info"]
 	if !ok {
-		return errors.New(`"info" field is required`)
+		return ErrRequired("info")
 	}
 	var infoVal Info
 	if err := yaml.Unmarshal(infoBytes, &infoVal); err != nil {
@@ -55,7 +54,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 
 	pathsBytes, ok := proxy["paths"]
 	if !ok {
-		return errors.New(`"paths" field is required`)
+		return ErrRequired("paths")
 	}
 	var pathsVal Paths
 	if err := yaml.Unmarshal(pathsBytes, &pathsVal); err != nil {
@@ -116,7 +115,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -130,7 +129,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 
 	titleBytes, ok := proxy["title"]
 	if !ok {
-		return errors.New(`"title" field is required`)
+		return ErrRequired("title")
 	}
 	var titleVal string
 	if err := yaml.Unmarshal(titleBytes, &titleVal); err != nil {
@@ -183,7 +182,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 
 	versionBytes, ok := proxy["version"]
 	if !ok {
-		return errors.New(`"version" field is required`)
+		return ErrRequired("version")
 	}
 	var versionVal string
 	if err := yaml.Unmarshal(versionBytes, &versionVal); err != nil {
@@ -208,7 +207,7 @@ func (v *Info) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -276,7 +275,7 @@ func (v *Contact) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -290,7 +289,7 @@ func (v *License) UnmarshalYAML(b []byte) error {
 
 	nameBytes, ok := proxy["name"]
 	if !ok {
-		return errors.New(`"name" field is required`)
+		return ErrRequired("name")
 	}
 	var nameVal string
 	if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
@@ -330,7 +329,7 @@ func (v *License) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -344,7 +343,7 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 
 	urlBytes, ok := proxy["url"]
 	if !ok {
-		return errors.New(`"url" field is required`)
+		return ErrRequired("url")
 	}
 	var urlVal string
 	if err := yaml.Unmarshal(urlBytes, &urlVal); err != nil {
@@ -391,7 +390,7 @@ func (v *Server) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -414,7 +413,7 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 
 	default_Bytes, ok := proxy["default"]
 	if !ok {
-		return errors.New(`"default" field is required`)
+		return ErrRequired("default")
 	}
 	var default_Val string
 	if err := yaml.Unmarshal(default_Bytes, &default_Val); err != nil {
@@ -448,7 +447,7 @@ func (v *ServerVariable) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -557,7 +556,7 @@ func (v *Components) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -600,7 +599,7 @@ func (v *Paths) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -736,7 +735,7 @@ func (v *PathItem) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -813,7 +812,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 
 	responsesBytes, ok := proxy["responses"]
 	if !ok {
-		return errors.New(`"responses" field is required`)
+		return ErrRequired("responses")
 	}
 	var responsesVal Responses
 	if err := yaml.Unmarshal(responsesBytes, &responsesVal); err != nil {
@@ -874,7 +873,7 @@ func (v *Operation) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -897,7 +896,7 @@ func (v *ExternalDocumentation) UnmarshalYAML(b []byte) error {
 
 	urlBytes, ok := proxy["url"]
 	if !ok {
-		return errors.New(`"url" field is required`)
+		return ErrRequired("url")
 	}
 	var urlVal string
 	if err := yaml.Unmarshal(urlBytes, &urlVal); err != nil {
@@ -926,7 +925,7 @@ func (v *ExternalDocumentation) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -940,7 +939,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 
 	nameBytes, ok := proxy["name"]
 	if !ok {
-		return errors.New(`"name" field is required`)
+		return ErrRequired("name")
 	}
 	var nameVal string
 	if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
@@ -951,7 +950,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 
 	inBytes, ok := proxy["in"]
 	if !ok {
-		return errors.New(`"in" field is required`)
+		return ErrRequired("in")
 	}
 	var inVal string
 	if err := yaml.Unmarshal(inBytes, &inVal); err != nil {
@@ -1088,7 +1087,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -1111,7 +1110,7 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 
 	contentBytes, ok := proxy["content"]
 	if !ok {
-		return errors.New(`"content" field is required`)
+		return ErrRequired("content")
 	}
 	var contentVal map[string]*MediaType
 	if err := yaml.Unmarshal(contentBytes, &contentVal); err != nil {
@@ -1154,7 +1153,7 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -1218,7 +1217,7 @@ func (v *MediaType) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -1291,7 +1290,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -1335,7 +1334,7 @@ func (v *Responses) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -1349,7 +1348,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 
 	descriptionBytes, ok := proxy["description"]
 	if !ok {
-		return errors.New(`"description" field is required`)
+		return ErrRequired("description")
 	}
 	var descriptionVal string
 	if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
@@ -1410,7 +1409,7 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -1459,7 +1458,7 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -1532,7 +1531,7 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -1623,7 +1622,7 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -1759,7 +1758,7 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -1773,7 +1772,7 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 
 	nameBytes, ok := proxy["name"]
 	if !ok {
-		return errors.New(`"name" field is required`)
+		return ErrRequired("name")
 	}
 	var nameVal string
 	if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
@@ -1816,7 +1815,7 @@ func (v *Tag) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -2159,7 +2158,7 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -2190,7 +2189,7 @@ func (v *Discriminator) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -2263,7 +2262,7 @@ func (v *XML) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -2390,7 +2389,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -2454,7 +2453,7 @@ func (v *OAuthFlows) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
@@ -2536,7 +2535,7 @@ func (v *OAuthFlow) UnmarshalYAML(b []byte) error {
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
-			return fmt.Errorf("unknown key: %s", k)
+			return ErrUnknownKey(k)
 		}
 	}
 	return nil
