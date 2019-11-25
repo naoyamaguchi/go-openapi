@@ -4,6 +4,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"go/ast"
 	"go/format"
@@ -16,6 +17,8 @@ import (
 )
 
 func main() {
+	only := flag.String("only", "", "")
+	flag.Parse()
 	var buf bytes.Buffer
 	outf := func(format string, args ...interface{}) {
 		fmt.Fprintf(&buf, format, args...)
@@ -57,6 +60,10 @@ func main() {
 				continue
 			}
 
+			if *only != "" && typ.Name.Name != *only {
+				continue
+			}
+
 			log.Printf("generate %s.Unmarshal()", typ.Name.Name)
 			outf("\n\nfunc (v *%s) UnmarshalYAML(b []byte) error {", typ.Name.Name)
 			outf("\nvar proxy map[string]raw")
@@ -65,6 +72,16 @@ func main() {
 			outf("\n}")
 
 			var noUnknown bool
+
+			var referencable bool
+			var gotReference bool
+
+			for _, field := range st.Fields.List {
+				if yamlName(field, parseTags(field)) == "$ref" {
+					referencable = true
+				}
+			}
+
 			for _, field := range st.Fields.List {
 				fn := field.Names[0].Name
 				tag := parseTags(field)
@@ -117,8 +134,16 @@ func main() {
 
 				outf("\n\n")
 				if required {
+					if referencable && !gotReference {
+						outf("_, isReference := proxy[\"$ref\"]\n")
+						gotReference = true
+					}
 					outf("%sBytes, ok := proxy[\"%s\"]", fn, yn)
-					outf("\nif !ok {")
+					if !referencable {
+						outf("\nif !ok {")
+					} else {
+						outf("\nif !isReference && !ok {")
+					}
 					outf("\nreturn ErrRequired(%s)", strconv.Quote(yn))
 					outf("\n}")
 				} else {
@@ -139,7 +164,75 @@ func main() {
 				if !required {
 					outf("\n}")
 				}
-				formatValidation(outf, fn, yn, field, tag, required)
+				switch tag.get("format") {
+				case "semver":
+					outf("\n\nif !isValidSemVer(v.%s) {", fn)
+					outf("\nreturn errors.New(`\"%s\" field must be a valid semantic version but not`)", yn)
+					outf("\n}")
+				case "url":
+					outf("\n")
+					if !required {
+						outf("\nif v.%s != \"\" {", fn)
+					}
+
+					if len(tag["format"]) > 1 && tag["format"][1] == "template" {
+						outf("\nif err := validateURLTemplate(v.%s)", fn)
+					} else {
+						outf("\nif _, err := url.ParseRequestURI(v.%s)", fn)
+					}
+					outf("; err != nil {")
+					outf("\nreturn err")
+					outf("\n}")
+					if !required {
+						outf("\n}")
+					}
+				case "email":
+					outf("\n")
+					if !required {
+						outf("\nif v.%s != \"\" {", fn)
+					}
+					outf("\n\nif v.%s != \"\" && !emailRegexp.MatchString(v.%[1]s) {", fn)
+					outf("\nreturn errors.New(`\"%s\" field must be an email address`)", yn)
+					outf("\n}")
+					if !required {
+						outf("\n}")
+					}
+				case "runtime":
+					if _, ok := field.Type.(*ast.MapType); ok {
+						outf("\n\nfor key := range v.%s {", fn)
+						outf("\nif !matchRuntimeExpr(key) {")
+						outf("\nreturn errors.New(`the keys of \"%s\" must be a runtime expression`)", yn)
+						outf("\n}")
+						outf("\n}")
+					}
+				case "regexp":
+					if _, ok := field.Type.(*ast.MapType); ok {
+						outf("\n\n%sRegexp := regexp.MustCompile(`%s`)", fn, tag["format"][1])
+						outf("\nfor key := range v.%s {", fn)
+						outf("\nif !%sRegexp.MatchString(v.%s) {", fn, fn)
+						outf("\nreturn errors.New(`the keys of \"%s\" must be match \"%s\"`)", yn, tag["format"][1])
+						outf("\n}")
+					}
+				}
+				if list, ok := tag["oneof"]; ok {
+					outf("\n")
+					if !required {
+						outf("\nif v.%s != \"\" {", fn)
+					}
+					if referencable {
+						if !gotReference {
+							outf("\n_, isReference := proxy[\"$ref\"]")
+						}
+						outf("\nif !isReference && !isOneOf(v.%s, %#v) {", fn, list)
+					} else {
+						outf("\nif !isOneOf(v.%s, %#v) {", fn, list)
+					}
+					outf("\nreturn errors.New(`\"%s\" field must be one of [%s]`)", yn, strings.Join(quoteEachString(list), ", "))
+					outf("\n}")
+					if !required {
+						outf("\n}")
+					}
+				}
 			}
 			if !noUnknown {
 				outf("\nif len(proxy) != 0 {")
@@ -155,6 +248,8 @@ func main() {
 	}
 	src, err := format.Source(buf.Bytes())
 	if err != nil {
+		fmt.Printf("%s\n", buf.Bytes())
+
 		log.Fatalf("error on formatting: %+v", err)
 	}
 	if err := ioutil.WriteFile("unmarshalyaml_gen.go", src, 0644); err != nil {
@@ -163,68 +258,7 @@ func main() {
 }
 
 func formatValidation(outf func(string, ...interface{}), fieldname, yamlname string, field *ast.Field, tag tags, required bool) {
-	switch tag.get("format") {
-	case "semver":
-		outf("\n\nif !isValidSemVer(v.%s) {", fieldname)
-		outf("\nreturn errors.New(`\"%s\" field must be a valid semantic version but not`)", yamlname)
-		outf("\n}")
-	case "url":
-		outf("\n")
-		if !required {
-			outf("\nif v.%s != \"\" {", fieldname)
-		}
 
-		if len(tag["format"]) > 1 && tag["format"][1] == "template" {
-			outf("\nif err := validateURLTemplate(v.%s)", fieldname)
-		} else {
-			outf("\nif _, err := url.ParseRequestURI(v.%s)", fieldname)
-		}
-		outf("; err != nil {")
-		outf("\nreturn err")
-		outf("\n}")
-		if !required {
-			outf("\n}")
-		}
-	case "email":
-		outf("\n")
-		if !required {
-			outf("\nif v.%s != \"\" {", fieldname)
-		}
-		outf("\n\nif v.%s != \"\" && !emailRegexp.MatchString(v.%[1]s) {", fieldname)
-		outf("\nreturn errors.New(`\"%s\" field must be an email address`)", yamlname)
-		outf("\n}")
-		if !required {
-			outf("\n}")
-		}
-	case "runtime":
-		if _, ok := field.Type.(*ast.MapType); ok {
-			outf("\n\nfor key := range v.%s {", fieldname)
-			outf("\nif !matchRuntimeExpr(key) {")
-			outf("\nreturn errors.New(`the keys of \"%s\" must be a runtime expression`)", yamlname)
-			outf("\n}")
-			outf("\n}")
-		}
-	case "regexp":
-		if _, ok := field.Type.(*ast.MapType); ok {
-			outf("\n\n%sRegexp := regexp.MustCompile(`%s`)", fieldname, tag["format"][1])
-			outf("\nfor key := range v.%s {", fieldname)
-			outf("\nif !%sRegexp.MatchString(v.%s) {", fieldname, fieldname)
-			outf("\nreturn errors.New(`the keys of \"%s\" must be match \"%s\"`)", yamlname, tag["format"][1])
-			outf("\n}")
-		}
-	}
-	if list, ok := tag["oneof"]; ok {
-		outf("\n")
-		if !required {
-			outf("\nif v.%s != \"\" {", fieldname)
-		}
-		outf("\nif !isOneOf(v.%s, %#v) {", fieldname, list)
-		outf("\nreturn errors.New(`\"%s\" field must be one of [%s]`)", yamlname, strings.Join(quoteEachString(list), ", "))
-		outf("\n}")
-		if !required {
-			outf("\n}")
-		}
-	}
 }
 
 func isInline(t tags) bool {

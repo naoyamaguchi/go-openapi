@@ -937,8 +937,9 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 		return err
 	}
 
+	_, isReference := proxy["$ref"]
 	nameBytes, ok := proxy["name"]
-	if !ok {
+	if !isReference && !ok {
 		return ErrRequired("name")
 	}
 	var nameVal string
@@ -949,7 +950,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	delete(proxy, `name`)
 
 	inBytes, ok := proxy["in"]
-	if !ok {
+	if !isReference && !ok {
 		return ErrRequired("in")
 	}
 	var inVal string
@@ -959,7 +960,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	v.in = inVal
 	delete(proxy, `in`)
 
-	if !isOneOf(v.in, []string{"query", "header", "path", "cookie"}) {
+	if !isReference && !isOneOf(v.in, []string{"query", "header", "path", "cookie"}) {
 		return errors.New(`"in" field must be one of ["query", "header", "path", "cookie"]`)
 	}
 
@@ -1108,8 +1109,9 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 		delete(proxy, `description`)
 	}
 
+	_, isReference := proxy["$ref"]
 	contentBytes, ok := proxy["content"]
-	if !ok {
+	if !isReference && !ok {
 		return ErrRequired("content")
 	}
 	var contentVal map[string]*MediaType
@@ -1346,8 +1348,9 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 		return err
 	}
 
+	_, isReference := proxy["$ref"]
 	descriptionBytes, ok := proxy["description"]
-	if !ok {
+	if !isReference && !ok {
 		return ErrRequired("description")
 	}
 	var descriptionVal string
@@ -2284,7 +2287,8 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if v.type_ != "" {
-		if !isOneOf(v.type_, []string{"apiKey", "http", "oauth2", "openIdConnect"}) {
+		_, isReference := proxy["$ref"]
+		if !isReference && !isOneOf(v.type_, []string{"apiKey", "http", "oauth2", "openIdConnect"}) {
 			return errors.New(`"type" field must be one of ["apiKey", "http", "oauth2", "openIdConnect"]`)
 		}
 	}
@@ -2317,7 +2321,8 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if v.in != "" {
-		if !isOneOf(v.in, []string{"query", "header", "cookie"}) {
+		_, isReference := proxy["$ref"]
+		if !isReference && !isOneOf(v.in, []string{"query", "header", "cookie"}) {
 			return errors.New(`"in" field must be one of ["query", "header", "cookie"]`)
 		}
 	}

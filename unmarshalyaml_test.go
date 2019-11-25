@@ -1214,11 +1214,6 @@ func TestComponentsUnmarshalYAMLError(t *testing.T) {
     foo: bar`,
 			want: errors.New("unknown key: foo"),
 		},
-		{
-			yml: `requestBodies:
-  FooRequest: {}`,
-			want: errors.New(`"content" field is required`),
-		},
 	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
@@ -2210,6 +2205,12 @@ x-foo: bar`,
 				},
 			},
 		},
+		{
+			yml: `$ref: "#/components/parameters/Foo"`,
+			want: Parameter{
+				reference: "#/components/parameters/Foo",
+			},
+		},
 	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
@@ -2439,6 +2440,10 @@ func TestRequestBodyUnmarshalYAMLError(t *testing.T) {
 		yml  string
 		want error
 	}{
+		{
+			yml:  `description: foo`,
+			want: ErrRequired("content"),
+		},
 		{
 			yml: `content:
   application/json: {}
