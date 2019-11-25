@@ -1565,6 +1565,17 @@ description: this is description`,
 				},
 			},
 		},
+		{
+			yml: `servers:
+- url: example.com`,
+			want: PathItem{
+				servers: []*Server{
+					{
+						url: "example.com",
+					},
+				},
+			},
+		},
 	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
@@ -1767,7 +1778,48 @@ func TestOperationUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want Operation
-	}{}
+	}{
+		{
+			yml: `responses: {}
+externalDocs:
+  url: https://example.com`,
+			want: Operation{
+				responses: &Responses{},
+				externalDocs: &ExternalDocumentation{
+					url: "https://example.com",
+				},
+			},
+		},
+		{
+			yml: `responses: {}
+deprecated: true`,
+			want: Operation{
+				responses:  &Responses{},
+				deprecated: true,
+			},
+		},
+		{
+			yml: `responses: {}
+servers:
+- url: example.com`,
+			want: Operation{
+				responses: &Responses{},
+				servers: []*Server{
+					{url: "example.com"},
+				},
+			},
+		},
+		{
+			yml: `responses: {}
+x-foo: bar`,
+			want: Operation{
+				responses: &Responses{},
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got Operation
@@ -1787,6 +1839,10 @@ func TestOperationUnmarshalYAMLError(t *testing.T) {
 		yml  string
 		want error
 	}{
+		{
+			yml:  `tags: ["foo"]`,
+			want: ErrRequired("responses"),
+		},
 		{
 			yml: `responses:
   "200":
@@ -1832,7 +1888,14 @@ func TestExternalDocumentationUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want ExternalDocumentation
-	}{}
+	}{
+		{
+			yml: `url: https://example.com`,
+			want: ExternalDocumentation{
+				url: "https://example.com",
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got ExternalDocumentation
