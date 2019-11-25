@@ -2153,7 +2153,64 @@ func TestParameterUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want Parameter
-	}{}
+	}{
+		{
+			yml: `name: foo
+in: path`,
+			want: Parameter{
+				name: "foo",
+				in:   "path",
+			},
+		},
+		{
+			yml: `name: foo
+in: path
+deprecated: true`,
+			want: Parameter{
+				name:       "foo",
+				in:         "path",
+				deprecated: true,
+			},
+		},
+		{
+			yml: `name: foo
+in: path
+allowReserved: true`,
+			want: Parameter{
+				name:          "foo",
+				in:            "path",
+				allowReserved: true,
+			},
+		},
+		{
+			yml: `name: foo
+in: path
+examples:
+  foo:
+    value: bar`,
+			want: Parameter{
+				name: "foo",
+				in:   "path",
+				examples: map[string]*Example{
+					"foo": {
+						value: "bar",
+					},
+				},
+			},
+		},
+		{
+			yml: `name: foo
+in: path
+x-foo: bar`,
+			want: Parameter{
+				name: "foo",
+				in:   "path",
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got Parameter
