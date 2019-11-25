@@ -302,8 +302,6 @@ type Link struct {
 type Header struct {
 	root *OpenAPI `yaml:"-"`
 
-	name            string                `yaml:",omitempty"`
-	in              string                `yaml:",omitempty"`
 	description     string                `yaml:",omitempty"`
 	required        bool                  `yaml:",omitempty"`
 	deprecated      bool                  `yaml:",omitempty"`

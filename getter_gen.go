@@ -698,14 +698,6 @@ func (v *Header) Root() *OpenAPI {
 	return v.root
 }
 
-func (v *Header) Name() string {
-	return v.name
-}
-
-func (v *Header) In() string {
-	return v.in
-}
-
 func (v *Header) Description() string {
 	return v.description
 }

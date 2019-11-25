@@ -1635,24 +1635,6 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 		return err
 	}
 
-	if nameBytes, ok := proxy["name"]; ok {
-		var nameVal string
-		if err := yaml.Unmarshal(nameBytes, &nameVal); err != nil {
-			return err
-		}
-		v.name = nameVal
-		delete(proxy, `name`)
-	}
-
-	if inBytes, ok := proxy["in"]; ok {
-		var inVal string
-		if err := yaml.Unmarshal(inBytes, &inVal); err != nil {
-			return err
-		}
-		v.in = inVal
-		delete(proxy, `in`)
-	}
-
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
 		if err := yaml.Unmarshal(descriptionBytes, &descriptionVal); err != nil {
