@@ -73,12 +73,18 @@ func main() {
 
 			var noUnknown bool
 
-			var referencable bool
-			var gotReference bool
-
 			for _, field := range st.Fields.List {
 				if yamlName(field, parseTags(field)) == "$ref" {
-					referencable = true
+					outf("\nif referenceBytes, ok := proxy[\"$ref\"]; ok {")
+					outf("\nvar referenceVal string")
+					outf("\nif err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {")
+					outf("\nreturn err")
+					outf("\n}")
+					outf("\nv.reference = referenceVal")
+					outf("\ndelete(proxy, \"$ref\")")
+					outf("\nreturn nil")
+					outf("\n}")
+					continue
 				}
 			}
 
@@ -88,7 +94,7 @@ func main() {
 				yn := yamlName(field, tag)
 				required := isRequired(tag)
 
-				if yn == "-" {
+				if yn == "-" || yn == "$ref" {
 					continue
 				}
 
@@ -134,16 +140,8 @@ func main() {
 
 				outf("\n\n")
 				if required {
-					if referencable && !gotReference {
-						outf("_, isReference := proxy[\"$ref\"]\n")
-						gotReference = true
-					}
 					outf("%sBytes, ok := proxy[\"%s\"]", fn, yn)
-					if !referencable {
-						outf("\nif !ok {")
-					} else {
-						outf("\nif !isReference && !ok {")
-					}
+					outf("\nif !ok {")
 					outf("\nreturn ErrRequired(%s)", strconv.Quote(yn))
 					outf("\n}")
 				} else {
@@ -219,14 +217,7 @@ func main() {
 					if !required {
 						outf("\nif v.%s != \"\" {", fn)
 					}
-					if referencable {
-						if !gotReference {
-							outf("\n_, isReference := proxy[\"$ref\"]")
-						}
-						outf("\nif !isReference && !isOneOf(v.%s, %#v) {", fn, list)
-					} else {
-						outf("\nif !isOneOf(v.%s, %#v) {", fn, list)
-					}
+					outf("\nif !isOneOf(v.%s, %#v) {", fn, list)
 					outf("\nreturn errors.New(`\"%s\" field must be one of [%s]`)", yn, strings.Join(quoteEachString(list), ", "))
 					outf("\n}")
 					if !required {

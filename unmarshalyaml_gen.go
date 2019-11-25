@@ -936,10 +936,18 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
 		return err
 	}
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
+		}
+		v.reference = referenceVal
+		delete(proxy, "$ref")
+		return nil
+	}
 
-	_, isReference := proxy["$ref"]
 	nameBytes, ok := proxy["name"]
-	if !isReference && !ok {
+	if !ok {
 		return ErrRequired("name")
 	}
 	var nameVal string
@@ -950,7 +958,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	delete(proxy, `name`)
 
 	inBytes, ok := proxy["in"]
-	if !isReference && !ok {
+	if !ok {
 		return ErrRequired("in")
 	}
 	var inVal string
@@ -960,7 +968,7 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	v.in = inVal
 	delete(proxy, `in`)
 
-	if !isReference && !isOneOf(v.in, []string{"query", "header", "path", "cookie"}) {
+	if !isOneOf(v.in, []string{"query", "header", "path", "cookie"}) {
 		return errors.New(`"in" field must be one of ["query", "header", "path", "cookie"]`)
 	}
 
@@ -1077,15 +1085,6 @@ func (v *Parameter) UnmarshalYAML(b []byte) error {
 	if len(extension) != 0 {
 		v.extension = extension
 	}
-
-	if referenceBytes, ok := proxy["$ref"]; ok {
-		var referenceVal string
-		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
-		}
-		v.reference = referenceVal
-		delete(proxy, `$ref`)
-	}
 	if len(proxy) != 0 {
 		for k := range proxy {
 			return ErrUnknownKey(k)
@@ -1099,6 +1098,15 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
 		return err
 	}
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
+		}
+		v.reference = referenceVal
+		delete(proxy, "$ref")
+		return nil
+	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
 		var descriptionVal string
@@ -1109,9 +1117,8 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 		delete(proxy, `description`)
 	}
 
-	_, isReference := proxy["$ref"]
 	contentBytes, ok := proxy["content"]
-	if !isReference && !ok {
+	if !ok {
 		return ErrRequired("content")
 	}
 	var contentVal map[string]*MediaType
@@ -1143,15 +1150,6 @@ func (v *RequestBody) UnmarshalYAML(b []byte) error {
 	}
 	if len(extension) != 0 {
 		v.extension = extension
-	}
-
-	if referenceBytes, ok := proxy["$ref"]; ok {
-		var referenceVal string
-		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
-		}
-		v.reference = referenceVal
-		delete(proxy, `$ref`)
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
@@ -1347,10 +1345,18 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
 		return err
 	}
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
+		}
+		v.reference = referenceVal
+		delete(proxy, "$ref")
+		return nil
+	}
 
-	_, isReference := proxy["$ref"]
 	descriptionBytes, ok := proxy["description"]
-	if !isReference && !ok {
+	if !ok {
 		return ErrRequired("description")
 	}
 	var descriptionVal string
@@ -1401,15 +1407,6 @@ func (v *Response) UnmarshalYAML(b []byte) error {
 	if len(extension) != 0 {
 		v.extension = extension
 	}
-
-	if referenceBytes, ok := proxy["$ref"]; ok {
-		var referenceVal string
-		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
-		}
-		v.reference = referenceVal
-		delete(proxy, `$ref`)
-	}
 	if len(proxy) != 0 {
 		for k := range proxy {
 			return ErrUnknownKey(k)
@@ -1422,6 +1419,15 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
 		return err
+	}
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
+		}
+		v.reference = referenceVal
+		delete(proxy, "$ref")
+		return nil
 	}
 	callback := map[string]*PathItem{}
 	for key, val := range proxy {
@@ -1450,15 +1456,6 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 	if len(extension) != 0 {
 		v.extension = extension
 	}
-
-	if referenceBytes, ok := proxy["$ref"]; ok {
-		var referenceVal string
-		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
-		}
-		v.reference = referenceVal
-		delete(proxy, `$ref`)
-	}
 	if len(proxy) != 0 {
 		for k := range proxy {
 			return ErrUnknownKey(k)
@@ -1471,6 +1468,15 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
 		return err
+	}
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
+		}
+		v.reference = referenceVal
+		delete(proxy, "$ref")
+		return nil
 	}
 
 	if summaryBytes, ok := proxy["summary"]; ok {
@@ -1523,15 +1529,6 @@ func (v *Example) UnmarshalYAML(b []byte) error {
 	if len(extension) != 0 {
 		v.extension = extension
 	}
-
-	if referenceBytes, ok := proxy["$ref"]; ok {
-		var referenceVal string
-		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
-		}
-		v.reference = referenceVal
-		delete(proxy, `$ref`)
-	}
 	if len(proxy) != 0 {
 		for k := range proxy {
 			return ErrUnknownKey(k)
@@ -1544,6 +1541,15 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
 		return err
+	}
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
+		}
+		v.reference = referenceVal
+		delete(proxy, "$ref")
+		return nil
 	}
 
 	if operationRefBytes, ok := proxy["operationRef"]; ok {
@@ -1614,15 +1620,6 @@ func (v *Link) UnmarshalYAML(b []byte) error {
 	if len(extension) != 0 {
 		v.extension = extension
 	}
-
-	if referenceBytes, ok := proxy["$ref"]; ok {
-		var referenceVal string
-		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
-		}
-		v.reference = referenceVal
-		delete(proxy, `$ref`)
-	}
 	if len(proxy) != 0 {
 		for k := range proxy {
 			return ErrUnknownKey(k)
@@ -1635,6 +1632,15 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
 		return err
+	}
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
+		}
+		v.reference = referenceVal
+		delete(proxy, "$ref")
+		return nil
 	}
 
 	if descriptionBytes, ok := proxy["description"]; ok {
@@ -1750,15 +1756,6 @@ func (v *Header) UnmarshalYAML(b []byte) error {
 	if len(extension) != 0 {
 		v.extension = extension
 	}
-
-	if referenceBytes, ok := proxy["$ref"]; ok {
-		var referenceVal string
-		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
-		}
-		v.reference = referenceVal
-		delete(proxy, `$ref`)
-	}
 	if len(proxy) != 0 {
 		for k := range proxy {
 			return ErrUnknownKey(k)
@@ -1828,6 +1825,15 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	var proxy map[string]raw
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
 		return err
+	}
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
+		}
+		v.reference = referenceVal
+		delete(proxy, "$ref")
+		return nil
 	}
 
 	if titleBytes, ok := proxy["title"]; ok {
@@ -2150,15 +2156,6 @@ func (v *Schema) UnmarshalYAML(b []byte) error {
 	if len(extension) != 0 {
 		v.extension = extension
 	}
-
-	if referenceBytes, ok := proxy["$ref"]; ok {
-		var referenceVal string
-		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
-		}
-		v.reference = referenceVal
-		delete(proxy, `$ref`)
-	}
 	if len(proxy) != 0 {
 		for k := range proxy {
 			return ErrUnknownKey(k)
@@ -2276,6 +2273,15 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	if err := yaml.Unmarshal(b, &proxy); err != nil {
 		return err
 	}
+	if referenceBytes, ok := proxy["$ref"]; ok {
+		var referenceVal string
+		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
+			return err
+		}
+		v.reference = referenceVal
+		delete(proxy, "$ref")
+		return nil
+	}
 
 	if type_Bytes, ok := proxy["type"]; ok {
 		var type_Val string
@@ -2287,8 +2293,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if v.type_ != "" {
-		_, isReference := proxy["$ref"]
-		if !isReference && !isOneOf(v.type_, []string{"apiKey", "http", "oauth2", "openIdConnect"}) {
+		if !isOneOf(v.type_, []string{"apiKey", "http", "oauth2", "openIdConnect"}) {
 			return errors.New(`"type" field must be one of ["apiKey", "http", "oauth2", "openIdConnect"]`)
 		}
 	}
@@ -2321,8 +2326,7 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 
 	if v.in != "" {
-		_, isReference := proxy["$ref"]
-		if !isReference && !isOneOf(v.in, []string{"query", "header", "cookie"}) {
+		if !isOneOf(v.in, []string{"query", "header", "cookie"}) {
 			return errors.New(`"in" field must be one of ["query", "header", "cookie"]`)
 		}
 	}
@@ -2382,15 +2386,6 @@ func (v *SecurityScheme) UnmarshalYAML(b []byte) error {
 	}
 	if len(extension) != 0 {
 		v.extension = extension
-	}
-
-	if referenceBytes, ok := proxy["$ref"]; ok {
-		var referenceVal string
-		if err := yaml.Unmarshal(referenceBytes, &referenceVal); err != nil {
-			return err
-		}
-		v.reference = referenceVal
-		delete(proxy, `$ref`)
 	}
 	if len(proxy) != 0 {
 		for k := range proxy {
