@@ -36,7 +36,27 @@ const (
 
 func matchRuntimeExpr(expr string) bool {
 	if !strings.HasPrefix(expr, "$") {
-		return false
+		var isMatch []bool
+		for i := 0; i < len(expr); i++ {
+			if expr[i] != '{' {
+				continue
+			}
+			for j := i + 1; j < len(expr); j++ {
+				if expr[j] != '}' {
+					continue
+				}
+				isMatch = append(isMatch, matchRuntimeExpr(expr[i+1:j]))
+			}
+		}
+		if len(isMatch) == 0 {
+			return false
+		}
+		for _, b := range isMatch {
+			if !b {
+				return false
+			}
+		}
+		return true
 	}
 	if expr == "$url" || expr == "$method" || expr == "$statusCode" {
 		return true
