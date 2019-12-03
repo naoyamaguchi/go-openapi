@@ -118,7 +118,7 @@ func main() {
 							outf("\ncontinue")
 							outf("\n}")
 						case "runtime":
-							outf("\nif !matchRuntimeExpr(key) {")
+							outf("\nif !IsRuntimeExpr(key) {")
 							outf("\ncontinue")
 							outf("\n}")
 						}

@@ -1431,7 +1431,7 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 	}
 	callback := map[string]*PathItem{}
 	for key, val := range proxy {
-		if !matchRuntimeExpr(key) {
+		if !IsRuntimeExpr(key) {
 			continue
 		}
 		var callbackv PathItem
