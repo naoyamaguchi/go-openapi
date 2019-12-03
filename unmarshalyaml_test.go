@@ -1890,6 +1890,16 @@ func TestExternalDocumentationUnmarshalYAML(t *testing.T) {
 				url: "https://example.com",
 			},
 		},
+		{
+			yml: `url: https://example.com
+x-foo: bar`,
+			want: ExternalDocumentation{
+				url: "https://example.com",
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
 	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
