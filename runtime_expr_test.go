@@ -66,6 +66,14 @@ func TestIsRuntimerExpr(t *testing.T) {
 			expr: "$request.",
 			want: false,
 		},
+		{
+			expr: "https://example.com/{$request.body#foo}",
+			want: false,
+		},
+		{
+			expr: "$response.header.ほげ",
+			want: false,
+		},
 	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i)+"/"+tt.expr, func(t *testing.T) {
