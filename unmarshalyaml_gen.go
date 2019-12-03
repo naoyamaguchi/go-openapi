@@ -1431,6 +1431,9 @@ func (v *Callback) UnmarshalYAML(b []byte) error {
 	}
 	callback := map[string]*PathItem{}
 	for key, val := range proxy {
+		if !matchRuntimeExpr(key) {
+			continue
+		}
 		var callbackv PathItem
 		if err := yaml.Unmarshal(val, &callbackv); err != nil {
 			return err

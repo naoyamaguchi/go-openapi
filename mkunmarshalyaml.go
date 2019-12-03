@@ -117,6 +117,10 @@ func main() {
 							outf("\nif !%sRegexp.MatchString(key) {", fn)
 							outf("\ncontinue")
 							outf("\n}")
+						case "runtime":
+							outf("\nif !matchRuntimeExpr(key) {")
+							outf("\ncontinue")
+							outf("\n}")
 						}
 					} else {
 						noUnknown = true
