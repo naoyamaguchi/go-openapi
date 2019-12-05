@@ -1921,6 +1921,10 @@ func TestExternalDocumentationUnmarshalYAMLError(t *testing.T) {
 		want error
 	}{
 		{
+			yml:  `description: foo`,
+			want: ErrRequired("url"),
+		},
+		{
 			yml: `url: https://example.com
 foo: bar`,
 			want: errors.New("unknown key: foo"),
@@ -2206,6 +2210,16 @@ examples:
 		{
 			yml: `name: foo
 in: path
+allowEmptyValue: true`,
+			want: Parameter{
+				name:            "foo",
+				in:              "path",
+				allowEmptyValue: true,
+			},
+		},
+		{
+			yml: `name: foo
+in: path
 x-foo: bar`,
 			want: Parameter{
 				name: "foo",
@@ -2241,6 +2255,19 @@ func TestParameterUnmarshalYAMLError(t *testing.T) {
 		yml  string
 		want error
 	}{
+		{
+			yml:  `in: path`,
+			want: ErrRequired("name"),
+		},
+		{
+			yml:  `name: foo`,
+			want: ErrRequired("in"),
+		},
+		{
+			yml: `name: foo
+in: bar`,
+			want: errors.New(`"in" field must be one of ["query", "header", "path", "cookie"]`),
+		},
 		{
 			yml: `name: namename
 in: query
@@ -2430,7 +2457,24 @@ func TestRequestBodyUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want RequestBody
-	}{}
+	}{
+		{
+			yml: `$ref: "#/components/requestBodies/foo"`,
+			want: RequestBody{
+				reference: "#/components/requestBodies/foo",
+			},
+		},
+		{
+			yml: `content: {}
+x-foo: bar`,
+			want: RequestBody{
+				content: map[string]*MediaType{},
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got RequestBody
