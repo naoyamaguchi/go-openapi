@@ -508,6 +508,10 @@ func TestContactUnmarshalYAMLError(t *testing.T) {
 			want: errors.New(`"email" field must be an email address`),
 		},
 		{
+			yml:  `url: foobar`,
+			want: errors.New("parse foobar: invalid URI for request"),
+		},
+		{
 			yml:  `foo: bar`,
 			want: errors.New("unknown key: foo"),
 		},
