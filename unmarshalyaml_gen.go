@@ -1257,7 +1257,7 @@ func (v *Encoding) UnmarshalYAML(b []byte) error {
 	}
 
 	if explodeBytes, ok := proxy["explode"]; ok {
-		var explodeVal string
+		var explodeVal bool
 		if err := yaml.Unmarshal(explodeBytes, &explodeVal); err != nil {
 			return err
 		}

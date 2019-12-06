@@ -549,7 +549,7 @@ func (v *Encoding) Style() string {
 	return v.style
 }
 
-func (v *Encoding) Explode() string {
+func (v *Encoding) Explode() bool {
 	return v.explode
 }
 

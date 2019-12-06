@@ -220,7 +220,7 @@ type Encoding struct {
 	contentType   string             `yaml:",omitempty"`
 	headers       map[string]*Header `yaml:",omitempty"`
 	style         string             `yaml:",omitempty"`
-	explode       string             `yaml:",omitempty"`
+	explode       bool               `yaml:",omitempty"`
 	allowReserved bool               `yaml:",omitempty"`
 
 	extension map[string]interface{} `yaml:",omitempty,inline" format:"prefix,x-"`
