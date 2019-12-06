@@ -3560,7 +3560,22 @@ func TestExampleUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want Example
-	}{}
+	}{
+		{
+			yml: `description: foobar`,
+			want: Example{
+				description: "foobar",
+			},
+		},
+		{
+			yml: `x-foo: bar`,
+			want: Example{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got Example
@@ -4103,6 +4118,17 @@ x-foo: bar`,
 				name: "theName",
 				extension: map[string]interface{}{
 					"x-foo": "bar",
+				},
+			},
+		},
+		{
+			yml: `name: foo
+externalDocs:
+  url: https://example.com`,
+			want: Tag{
+				name: "foo",
+				externalDocs: &ExternalDocumentation{
+					url: "https://example.com",
 				},
 			},
 		},
