@@ -5432,8 +5432,28 @@ func TestoAuthFlowsUnmarshalYAMLError(t *testing.T) {
 		want error
 	}{
 		{
+			yml: `implicit: foobar`,
+			// implicit expects an object
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `password: foobar`,
+			// password expects an object
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `clientCredentials: foobar`,
+			// clientCredentials expects an object
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `authorizationCode: foobar`,
+			// authorizationCode expects an object
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -5569,6 +5589,26 @@ func TestOAuthFlowUnmarshalYAMLError(t *testing.T) {
 		yml  string
 		want error
 	}{
+		{
+			yml: `authorizationUrl: foobar`,
+			// authorizationUrl expects URI
+			want: errors.New("parse foobar: invalid URI for request"),
+		},
+		{
+			yml: `tokenUrl: foobar`,
+			// tokenUrl expects URI
+			want: errors.New("parse foobar: invalid URI for request"),
+		},
+		{
+			yml: `refreshUrl: foobar`,
+			// refreshUrl expects URI
+			want: errors.New("parse foobar: invalid URI for request"),
+		},
+		{
+			yml: `scopes: foobar`,
+			// scopes expects an object
+			want: errors.New("String node doesn't MapNode"),
+		},
 		{
 			yml:  `foo: bar`,
 			want: errors.New("unknown key: foo"),
