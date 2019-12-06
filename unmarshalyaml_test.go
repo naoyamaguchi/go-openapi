@@ -2660,7 +2660,16 @@ func TestMediaTypeUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want MediaType
-	}{}
+	}{
+		{
+			yml: `x-foo: bar`,
+			want: MediaType{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got MediaType
@@ -2833,7 +2842,34 @@ func TestEncodingUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want Encoding
-	}{}
+	}{
+		{
+			yml: `style: foobar`,
+			want: Encoding{
+				style: "foobar",
+			},
+		},
+		{
+			yml: `explode: true`,
+			want: Encoding{
+				explode: true,
+			},
+		},
+		{
+			yml: `allowReserved: true`,
+			want: Encoding{
+				allowReserved: true,
+			},
+		},
+		{
+			yml: `x-foo: bar`,
+			want: Encoding{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got Encoding
@@ -2937,7 +2973,16 @@ func TestResponsesUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want Responses
-	}{}
+	}{
+		{
+			yml: `x-foo: bar`,
+			want: Responses{
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got Responses
@@ -3133,7 +3178,24 @@ func TestResponseUnmarshalYAML(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want Response
-	}{}
+	}{
+		{
+			yml: `$ref: "#/components/responses/Foo"`,
+			want: Response{
+				reference: "#/components/responses/Foo",
+			},
+		},
+		{
+			yml: `description: foobar
+x-foo: bar`,
+			want: Response{
+				description: "foobar",
+				extension: map[string]interface{}{
+					"x-foo": "bar",
+				},
+			},
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var got Response
@@ -3153,6 +3215,10 @@ func TestResponseUnmarshalYAMLError(t *testing.T) {
 		yml  string
 		want error
 	}{
+		{
+			yml:  `headers: {}`,
+			want: ErrRequired("description"),
+		},
 		{
 			yml: `description: foo
 foo: bar`,
