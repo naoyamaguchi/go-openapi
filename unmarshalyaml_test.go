@@ -209,6 +209,54 @@ info:
 info:
   title: foobar
   version: 1.0.0
+servers: foo`,
+			// servers expects an array
+			want: errors.New("String node doesn't ArrayNode"),
+		},
+		{
+			yml: `openapi: 3.0.2
+info:
+  title: foobar
+  version: 1.0.0
+paths: foo`,
+			// paths expects an object
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `openapi: 3.0.2
+info:
+  title: foobar
+  version: 1.0.0
+paths: {}
+security: foobar`,
+			// security expects an array
+			want: errors.New("String node doesn't ArrayNode"),
+		},
+		{
+			yml: `openapi: 3.0.2
+info:
+  title: foobar
+  version: 1.0.0
+paths: {}
+tags: foobar`,
+			// tags expects an array
+			want: errors.New("String node doesn't ArrayNode"),
+		},
+		{
+			yml: `openapi: 3.0.2
+info:
+  title: foobar
+  version: 1.0.0
+paths: {}
+externalDocs: foobar`,
+			// externalDocs expects an object
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `openapi: 3.0.2
+info:
+  title: foobar
+  version: 1.0.0
 paths:
   /: {}
 foo: bar`,
@@ -225,6 +273,7 @@ foo: bar`,
 					return
 				}
 				if got.Error() != tt.want.Error() {
+					t.Log(reflect.TypeOf(got))
 					t.Errorf("unexpected error:\n  got:  %s\n  want: %s", got.Error(), tt.want.Error())
 					return
 				}
@@ -346,6 +395,27 @@ func TestInfoUnmarshalYAMLError(t *testing.T) {
 		{
 			yml:  `title: this is title`,
 			want: errors.New(`"version" field is required`),
+		},
+		{
+			yml: `ersion: 1.0.0
+title: foobar
+termsOfService: hoge`,
+			// termsOfService expects URI
+			want: errors.New("parse hoge: invalid URI for request"),
+		},
+		{
+			yml: `ersion: 1.0.0
+title: foobar
+contact: hoge`,
+			// contact expects an object
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `ersion: 1.0.0
+title: foobar
+license: hoge`,
+			// license expects an object
+			want: errors.New("String node doesn't MapNode"),
 		},
 		{
 			yml: `title: this is title
