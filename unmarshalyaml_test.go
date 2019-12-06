@@ -3351,17 +3351,6 @@ func TestCallbackUnmarshalYAMLError(t *testing.T) {
 }
 
 func TestExampleExampleUnmarshalYAML(t *testing.T) {
-	/* This is invalid example: https://github.com/OAI/OpenAPI-Specification/pull/2042
-	t.Run("in a model", func(t *testing.T) {
-		yml := `schemas:
-		  properties:
-		    name:
-		      type: string
-		      examples:
-		        name:
-		          $ref: http://example.org/petapi-examples/openapi.json#/components/examples/name-example`
-	})
-	*/
 	t.Run("in a request body", func(t *testing.T) {
 		yml := `requestBody:
   content:
