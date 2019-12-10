@@ -273,7 +273,6 @@ foo: bar`,
 					return
 				}
 				if got.Error() != tt.want.Error() {
-					t.Log(reflect.TypeOf(got))
 					t.Errorf("unexpected error:\n  got:  %s\n  want: %s", got.Error(), tt.want.Error())
 					return
 				}
