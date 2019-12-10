@@ -181,7 +181,7 @@ func TestOpenAPIUnmarshalYAMLError(t *testing.T) {
 			yml: `info:
   title: foobar
   version: 1.0.0`,
-			want: errors.New(`"openapi" field is required`),
+			want: ErrRequired("openapi"),
 		},
 		{
 			yml:  `openapi: version1`,
@@ -189,20 +189,20 @@ func TestOpenAPIUnmarshalYAMLError(t *testing.T) {
 		},
 		{
 			yml:  `openapi: 3.0.2`,
-			want: errors.New(`"info" field is required`),
+			want: ErrRequired("info"),
 		},
 		{
 			yml: `openapi: 3.0.2
 info:
   title: foobar
   version: 1.0.0`,
-			want: errors.New(`"paths" field is required`),
+			want: ErrRequired("paths"),
 		},
 		{
 			yml: `openapi: 3.0.2
 info:
   version: 1.0.0`,
-			want: errors.New(`"title" field is required`),
+			want: ErrRequired("title"),
 		},
 		{
 			yml: `openapi: 3.0.2
@@ -399,11 +399,11 @@ func TestInfoUnmarshalYAMLError(t *testing.T) {
 	}{
 		{
 			yml:  `version: 1.0.0`,
-			want: errors.New(`"title" field is required`),
+			want: ErrRequired("title"),
 		},
 		{
 			yml:  `title: this is title`,
-			want: errors.New(`"version" field is required`),
+			want: ErrRequired("version"),
 		},
 		{
 			yml: `ersion: 1.0.0
@@ -603,7 +603,7 @@ func TestLicenseUnmarshalYAMLError(t *testing.T) {
 	}{
 		{
 			yml:  `url: example.com`,
-			want: errors.New(`"name" field is required`),
+			want: ErrRequired("name"),
 		},
 		{
 			yml: `name: foobar
@@ -805,7 +805,7 @@ func TestServerUnmarshalYAMLError(t *testing.T) {
 	}{
 		{
 			yml:  `description: foobar`,
-			want: errors.New(`"url" field is required`),
+			want: ErrRequired("url"),
 		},
 		{
 			yml: `description: foobar
@@ -884,7 +884,7 @@ func TestServerVariableUnmarshalYAMLError(t *testing.T) {
 	}{
 		{
 			yml:  `description: foobar`,
-			want: errors.New(`"default" field is required`),
+			want: ErrRequired("default"),
 		},
 		{
 			yml: `default: foo
@@ -4447,7 +4447,7 @@ externalDocs: bar`,
 		},
 		{
 			yml:  `description: foobar`,
-			want: errors.New(`"name" field is required`),
+			want: ErrRequired("name"),
 		},
 		{
 			yml: `name: tagName
