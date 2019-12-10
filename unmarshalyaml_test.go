@@ -270,7 +270,7 @@ info:
 paths:
   /: {}
 foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -522,7 +522,7 @@ func TestContactUnmarshalYAMLError(t *testing.T) {
 		},
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -613,7 +613,7 @@ url: hoge`,
 		{
 			yml: `name: licensename
 foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -895,7 +895,7 @@ enum: bar`,
 		{
 			yml: `default: defaultValue
 foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -1312,7 +1312,7 @@ func TestComponentsUnmarshalYAMLError(t *testing.T) {
 	}{
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 		{
 			yml:  `schemas: foo`,
@@ -1347,7 +1347,7 @@ func TestComponentsUnmarshalYAMLError(t *testing.T) {
 			yml: `examples:
   fooExample:
     foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -1447,7 +1447,7 @@ func TestPathsUnmarshalYAMLError(t *testing.T) {
 	}{
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -1760,7 +1760,7 @@ func TestPathItemUnmarshalYAMLError(t *testing.T) {
 		},
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -2045,7 +2045,7 @@ responses: {}`,
   "200":
     description: foobar
 foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -2133,7 +2133,7 @@ func TestExternalDocumentationUnmarshalYAMLError(t *testing.T) {
 		{
 			yml: `url: https://example.com
 foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -2496,7 +2496,7 @@ content: hoge`,
 			yml: `name: namename
 in: query
 foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -2730,7 +2730,7 @@ func TestRequestBodyUnmarshalYAMLError(t *testing.T) {
 			yml: `content:
   application/json: {}
 foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -2927,7 +2927,7 @@ func TestMediaTypeUnmarshalYAMLError(t *testing.T) {
 		},
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -3131,7 +3131,7 @@ func TestEncodingUnmarshalYAMLError(t *testing.T) {
 		},
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -3264,7 +3264,7 @@ func TestResponsesUnmarshalYAMLError(t *testing.T) {
 		},
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -3497,7 +3497,7 @@ links: foo`,
 		{
 			yml: `description: foo
 foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -3865,7 +3865,7 @@ func TestExampleUnmarshalYAMLError(t *testing.T) {
 	}{
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -4205,7 +4205,7 @@ func TestLinkUnmarshalYAMLError(t *testing.T) {
 		},
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -4358,7 +4358,7 @@ func TestHeaderUnmarshalYAMLError(t *testing.T) {
 		},
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -4452,7 +4452,7 @@ externalDocs: bar`,
 		{
 			yml: `name: tagName
 foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -5106,7 +5106,7 @@ func TestSchemaUnmarshalYAMLError(t *testing.T) {
 		},
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -5252,7 +5252,7 @@ func TestDiscriminatorUnmarshalYAMLError(t *testing.T) {
 		},
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -5423,7 +5423,7 @@ func TestXMLUnmarshalYAMLError(t *testing.T) {
 	}{
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -5654,7 +5654,7 @@ func TestSecuritySchemeUnmarshalYAMLError(t *testing.T) {
 
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
@@ -5898,7 +5898,7 @@ func TestOAuthFlowUnmarshalYAMLError(t *testing.T) {
 		},
 		{
 			yml:  `foo: bar`,
-			want: errors.New("unknown key: foo"),
+			want: ErrUnknownKey("foo"),
 		},
 	}
 	for i, tt := range tests {
