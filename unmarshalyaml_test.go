@@ -1315,6 +1315,35 @@ func TestComponentsUnmarshalYAMLError(t *testing.T) {
 			want: errors.New("unknown key: foo"),
 		},
 		{
+			yml:  `schemas: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `responses: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `parameters: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `requestBodies: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `headers: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `links: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `callbacks: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+
+		{
 			yml: `examples:
   fooExample:
     foo: bar`,
@@ -1698,6 +1727,38 @@ func TestPathItemUnmarshalYAMLError(t *testing.T) {
 		want error
 	}{
 		{
+			yml:  `get: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `put: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `post: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `delete: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `options: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `head: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `trace: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `servers: foo`,
+			want: errors.New("String node doesn't ArrayNode"),
+		},
+		{
 			yml:  `foo: bar`,
 			want: errors.New("unknown key: foo"),
 		},
@@ -1945,6 +2006,41 @@ func TestOperationUnmarshalYAMLError(t *testing.T) {
 			want: ErrRequired("responses"),
 		},
 		{
+			yml: `externalDocs: foo
+responses: {}`,
+			// externalDocs expects an object
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `parameters: foo
+responses: {}`,
+			// parameters expects an array
+			want: errors.New("String node doesn't ArrayNode"),
+		},
+		{
+			yml: `requestBody: foo
+responses: {}`,
+			// requestBody expects an object
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `responses: foo`,
+			// responses expects an object
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `security: foo
+responses: {}`,
+			// security expects an array
+			want: errors.New("String node doesn't ArrayNode"),
+		},
+		{
+			yml: `servers: foo
+responses: {}`,
+			// servers expects an array
+			want: errors.New("String node doesn't ArrayNode"),
+		},
+		{
 			yml: `responses:
   "200":
     description: foobar
@@ -2029,6 +2125,10 @@ func TestExternalDocumentationUnmarshalYAMLError(t *testing.T) {
 		{
 			yml:  `description: foo`,
 			want: ErrRequired("url"),
+		},
+		{
+			yml:  `url: foobar`,
+			want: errors.New("parse foobar: invalid URI for request"),
 		},
 		{
 			yml: `url: https://example.com
@@ -2375,6 +2475,24 @@ in: bar`,
 			want: errors.New(`"in" field must be one of ["query", "header", "path", "cookie"]`),
 		},
 		{
+			yml: `in: path
+name: foo
+schema: hoge`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `in: path
+name: foo
+examples: hoge`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `in: path
+name: foo
+content: hoge`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
 			yml: `name: namename
 in: query
 foo: bar`,
@@ -2605,6 +2723,10 @@ func TestRequestBodyUnmarshalYAMLError(t *testing.T) {
 			want: ErrRequired("content"),
 		},
 		{
+			yml:  `content: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
 			yml: `content:
   application/json: {}
 foo: bar`,
@@ -2795,6 +2917,14 @@ func TestMediaTypeUnmarshalYAMLError(t *testing.T) {
 		yml  string
 		want error
 	}{
+		{
+			yml:  `examples: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `encoding: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
 		{
 			yml:  `foo: bar`,
 			want: errors.New("unknown key: foo"),
@@ -2996,6 +3126,10 @@ func TestEncodingUnmarshalYAMLError(t *testing.T) {
 		want error
 	}{
 		{
+			yml:  `headers: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
 			yml:  `foo: bar`,
 			want: errors.New("unknown key: foo"),
 		},
@@ -3081,6 +3215,17 @@ func TestResponsesUnmarshalYAML(t *testing.T) {
 		want Responses
 	}{
 		{
+			yml: `"200":
+  description: foobar`,
+			want: Responses{
+				responses: map[string]*Response{
+					"200": {
+						description: "foobar",
+					},
+				},
+			},
+		},
+		{
 			yml: `x-foo: bar`,
 			want: Responses{
 				extension: map[string]interface{}{
@@ -3108,6 +3253,15 @@ func TestResponsesUnmarshalYAMLError(t *testing.T) {
 		yml  string
 		want error
 	}{
+		{
+			yml:  `"200": foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `"600":
+  description: foobar`,
+			want: ErrUnknownKey("600"),
+		},
 		{
 			yml:  `foo: bar`,
 			want: errors.New("unknown key: foo"),
@@ -3327,6 +3481,21 @@ func TestResponseUnmarshalYAMLError(t *testing.T) {
 		},
 		{
 			yml: `description: foo
+headers: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `description: foo
+content: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `description: foo
+links: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `description: foo
 foo: bar`,
 			want: errors.New("unknown key: foo"),
 		},
@@ -3435,6 +3604,10 @@ func TestCallbackUnmarshalYAMLError(t *testing.T) {
 		yml  string
 		want error
 	}{
+		{
+			yml:  `$url: foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
 		{
 			yml:  `foo: bar`,
 			want: ErrUnknownKey("foo"),
@@ -4023,6 +4196,14 @@ func TestLinkUnmarshalYAMLError(t *testing.T) {
 		want error
 	}{
 		{
+			yml:  `parameters: foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `server: foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
 			yml:  `foo: bar`,
 			want: errors.New("unknown key: foo"),
 		},
@@ -4164,6 +4345,18 @@ func TestHeaderUnmarshalYAMLError(t *testing.T) {
 		want error
 	}{
 		{
+			yml:  `schema: foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `examples: foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `content: foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
 			yml:  `foo: bar`,
 			want: errors.New("unknown key: foo"),
 		},
@@ -4247,6 +4440,11 @@ func TestTagUnmarshalYAMLError(t *testing.T) {
 		yml  string
 		want error
 	}{
+		{
+			yml: `name: foo
+externalDocs: bar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
 		{
 			yml:  `description: foobar`,
 			want: errors.New(`"name" field is required`),
@@ -4867,6 +5065,46 @@ func TestSchemaUnmarshalYAMLError(t *testing.T) {
 		want error
 	}{
 		{
+			yml:  `enum: foobar`,
+			want: errors.New("String node doesn't ArrayNode"),
+		},
+		{
+			yml:  `allOf: foobar`,
+			want: errors.New("String node doesn't ArrayNode"),
+		},
+		{
+			yml:  `oneOf: foobar`,
+			want: errors.New("String node doesn't ArrayNode"),
+		},
+		{
+			yml:  `anyOf: foobar`,
+			want: errors.New("String node doesn't ArrayNode"),
+		},
+		{
+			yml:  `not: foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `properties: foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `additionalProperties: foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `discriminator: foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `xml: foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `externalDocs: foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
 			yml:  `foo: bar`,
 			want: errors.New("unknown key: foo"),
 		},
@@ -5008,6 +5246,10 @@ func TestDiscriminatorUnmarshalYAMLError(t *testing.T) {
 		yml  string
 		want error
 	}{
+		{
+			yml:  `mapping: foobar`,
+			want: errors.New("String node doesn't MapNode"),
+		},
 		{
 			yml:  `foo: bar`,
 			want: errors.New("unknown key: foo"),
@@ -5401,6 +5643,15 @@ func TestSecuritySchemeUnmarshalYAMLError(t *testing.T) {
 			yml:  `in: "foo"`,
 			want: errors.New(`"in" field must be one of ["query", "header", "cookie"]`),
 		},
+		{
+			yml:  `flows: foo`,
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml:  `openIdConnectUrl: foo`,
+			want: errors.New("parse foo: invalid URI for request"),
+		},
+
 		{
 			yml:  `foo: bar`,
 			want: errors.New("unknown key: foo"),
