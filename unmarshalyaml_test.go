@@ -5713,7 +5713,7 @@ func TestOAuthFlowsUnmarshalYAML(t *testing.T) {
 	}
 }
 
-func TestoAuthFlowsUnmarshalYAMLError(t *testing.T) {
+func TestOAuthFlowsUnmarshalYAMLError(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want error
