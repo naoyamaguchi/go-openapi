@@ -228,6 +228,16 @@ info:
   title: foobar
   version: 1.0.0
 paths: {}
+components: foo`,
+			// components expects an object
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
+			yml: `openapi: 3.0.2
+info:
+  title: foobar
+  version: 1.0.0
+paths: {}
 security: foobar`,
 			// security expects an array
 			want: errors.New("String node doesn't ArrayNode"),
@@ -596,6 +606,11 @@ func TestLicenseUnmarshalYAMLError(t *testing.T) {
 			want: errors.New(`"name" field is required`),
 		},
 		{
+			yml: `name: foobar
+url: hoge`,
+			want: errors.New("parse hoge: invalid URI for request"),
+		},
+		{
 			yml: `name: licensename
 foo: bar`,
 			want: errors.New("unknown key: foo"),
@@ -793,6 +808,18 @@ func TestServerUnmarshalYAMLError(t *testing.T) {
 			want: errors.New(`"url" field is required`),
 		},
 		{
+			yml: `description: foobar
+url: https%20://example.com`,
+			want: errors.New("parse https%20://example.com: first path segment in URL cannot contain colon"),
+		},
+		{
+			yml: `description: foobar
+url: example.com
+variables: hoge`,
+			// variables expexts an object
+			want: errors.New("String node doesn't MapNode"),
+		},
+		{
 			yml: `url: example.com
 foo: bar`,
 			want: errors.New(`unknown key: foo`),
@@ -858,6 +885,12 @@ func TestServerVariableUnmarshalYAMLError(t *testing.T) {
 		{
 			yml:  `description: foobar`,
 			want: errors.New(`"default" field is required`),
+		},
+		{
+			yml: `default: foo
+enum: bar`,
+			// enum expects an array
+			want: errors.New("String node doesn't ArrayNode"),
 		},
 		{
 			yml: `default: defaultValue
