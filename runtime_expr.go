@@ -62,7 +62,7 @@ func isJSONPointer(s string) bool {
 	return strings.HasPrefix(s, "/")
 }
 
-var rfc7230tchar = "-!#$%&'*+.^_`|~0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const rfc7230tchar = "-!#$%&'*+.^_`|~0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 func isRFC7230Token(s string) bool {
 	if len(s) == 0 {
