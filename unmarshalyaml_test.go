@@ -164,6 +164,7 @@ externalDocs:
 			if err := yaml.Unmarshal([]byte(tt.yml), &got); err != nil {
 				t.Fatal(err)
 			}
+			tt.want.setRoot(&tt.want)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("unexpected openapi:\n  got:  %#v\n  want: %#v", got, tt.want)
 				return

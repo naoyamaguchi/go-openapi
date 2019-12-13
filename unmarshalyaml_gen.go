@@ -118,6 +118,7 @@ func (v *OpenAPI) UnmarshalYAML(b []byte) error {
 			return ErrUnknownKey(k)
 		}
 	}
+	v.setRoot(v)
 	return nil
 }
 

@@ -1,5 +1,6 @@
 //go:generate go run mkunmarshalyaml.go astlib.go
 //go:generate go run mkgetter.go astlib.go
+//go:generate go run mksetroot.go
 
 package openapi
 

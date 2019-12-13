@@ -166,6 +166,7 @@ func main() {
 				if !required {
 					outf("\n}")
 				}
+
 				switch tag.get("format") {
 				case "semver":
 					outf("\n\nif !isValidSemVer(v.%s) {", fn)
@@ -235,6 +236,10 @@ func main() {
 				outf("\nreturn ErrUnknownKey(k)")
 				outf("\n}")
 				outf("\n}")
+			}
+
+			if typ.Name.Name == "OpenAPI" {
+				outf("\nv.setRoot(v)")
 			}
 
 			outf("\nreturn nil")
