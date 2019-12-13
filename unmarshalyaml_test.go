@@ -5976,7 +5976,12 @@ func TestSecurityRequirementUnmarshalYAMLError(t *testing.T) {
 	tests := []struct {
 		yml  string
 		want error
-	}{}
+	}{
+		{
+			yml:  `foo: bar`,
+			want: errors.New("String node doesn't ArrayNode"),
+		},
+	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			var securityRequirement SecurityRequirement
