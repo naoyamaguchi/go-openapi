@@ -5,8 +5,8 @@ import (
 	"bytes"
 	"fmt"
 	"go/format"
+	"io/ioutil"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -61,6 +61,8 @@ func (g *Generator) Import(name, path string) {
 	})
 }
 
+var WriteFile = ioutil.WriteFile
+
 func (g *Generator) Save(filepath string) error {
 	buf := pool.Get().(*bytes.Buffer)
 	defer pool.Put(buf)
@@ -74,19 +76,10 @@ func (g *Generator) Save(filepath string) error {
 	src, err := format.Source(buf.Bytes())
 	if err != nil {
 		log.Printf("error on formatting source code: %v", err)
-		//printSource(buf.Bytes())
 		return err
 	}
 	printSource(src)
-	f, err := os.OpenFile(filepath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	if _, err := f.Write(src); err != nil {
-		return err
-	}
-	return nil
+	return WriteFile(filepath, src, 0644)
 }
 
 func (imports imports) String() string {
@@ -130,7 +123,4 @@ func printSource(src []byte) {
 		log.Print(scanner.Text())
 	}
 	log.Print("=== SOURCE ===")
-	if err := scanner.Err(); err != nil {
-		panic(err)
-	}
 }
