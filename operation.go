@@ -9,18 +9,42 @@ import (
 // Operation Object
 type Operation struct {
 	Tags         []string
-	Summary      string
-	Description  string
+	Summary      string                 `yaml:"summary"`
+	Description  string                 `yaml:"description"`
 	ExternalDocs *ExternalDocumentation `yaml:"externalDocs"`
 	OperationID  string                 `yaml:"operationId"`
-	Parameters   []*Parameter
-	RequestBody  *RequestBody `yaml:"requestBody"`
-	Responses    Responses
+	Parameters   []*Parameter           `yaml:"parameters"`
+	RequestBody  *RequestBody           `yaml:"requestBody"`
+	Responses    Responses              `yaml:"responses"`
 	Callbacks    map[string]*Callback
 	Deprecated   bool
 	Security     []*SecurityRequirement
 	Servers      []*Server
-	Extension    map[string]interface{} `json:"-" yaml:"-"`
+	// Extension    interface{} `yaml:"x-apigw"`
+	Extension *XAPIGateway `yaml:"x-apigw"`
+}
+
+type XAPIGateway struct {
+	Hosts              []*Hosts        `yaml:"hosts"`
+	RequireAuth        bool            `yaml:"requireAuth"`
+	RatelimitPerMinute int             `yaml:"ratelimitPerMinute"`
+	SpecificRule       []*SpecificRule `yaml:"specificRule"`
+}
+
+type Hosts struct {
+	From string `yaml:"from"`
+	To   *To    `yaml:"to"`
+}
+
+type To struct {
+	Protocol string `yaml:"protocol"`
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+}
+
+type SpecificRule struct {
+	RemoteAddr         string `yaml:"remoteAddr"`
+	RatelimitPerMinute int    `yaml:"ratelimitPerMinute"`
 }
 
 // SuccessResponse returns a success response object.
