@@ -20,6 +20,7 @@ type Operation struct {
 	Deprecated   bool
 	Security     []*SecurityRequirement
 	Servers      []*Server
+	Extension    map[string]interface{} `json:"-" yaml:"-"`
 }
 
 // SuccessResponse returns a success response object.
